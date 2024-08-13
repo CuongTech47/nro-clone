@@ -2,7 +2,8 @@ package com.ngocrong.backend.repository;
 
 public class GameRepo {
     private static GameRepo instance;
-    public UserRepo user;
+    public UserRepo userRepo;
+    public PlayerRepo playerRepo;
 
 
 

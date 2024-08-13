@@ -3,7 +3,7 @@ package com.ngocrong.backend.network;
 
 import java.io.*;
 
-public class Message {
+public class Message implements AutoCloseable{
     private byte command;
     private ByteArrayOutputStream os;
     private DataOutputStream dos;
@@ -63,5 +63,10 @@ public class Message {
                 // log the error if necessary
             }
         }
+    }
+
+    @Override
+    public void close() throws Exception {
+        cleanup();
     }
 }
