@@ -48,6 +48,7 @@ public class Config {
             props.forEach((key, value) -> logger.debug(String.format("Config - %s: %s", key, value)));
 
             this.serverID = Integer.parseInt(props.getProperty("server.id"));
+            logger.info("Server ID: " + this.serverID);
             this.name = props.getProperty("server.name");
             this.port = Integer.parseInt(props.getProperty("server.port_game"));
             this.host = props.getProperty("server.host");

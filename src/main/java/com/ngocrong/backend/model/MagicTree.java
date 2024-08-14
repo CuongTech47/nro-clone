@@ -158,12 +158,12 @@ public class MagicTree {
         }
 
         // Xử lý thu hoạch vào túi đồ của nhân vật
-        int received = processHarvestForBag(_char);
-
-        // Nếu còn đậu chưa thu hoạch hết, xử lý thu hoạch vào rương đồ
-        if (received < this.currPeas) {
-            processHarvestForBox(_char);
-        }
+//        int received = processHarvestForBag(_char);
+//
+//        // Nếu còn đậu chưa thu hoạch hết, xử lý thu hoạch vào rương đồ
+//        if (received < this.currPeas) {
+//            processHarvestForBox(_char);
+//        }
 
         // Nếu vẫn còn đậu chưa thu hoạch và túi/rương đã đầy, thông báo cho người chơi
         if (this.currPeas > 0) {
@@ -173,7 +173,7 @@ public class MagicTree {
         }
 
         // Kiểm tra và tiến tới nhiệm vụ tiếp theo nếu điều kiện được thỏa mãn
-        checkAndAdvanceTask(_char);
+//        checkAndAdvanceTask(_char);
 
         // Cập nhật thời gian thu hoạch cuối cùng
         updateLastHarvestTime();
@@ -182,36 +182,36 @@ public class MagicTree {
         update();
 
         // Thông báo trạng thái cây phép thuật nếu số đậu hiện tại nhỏ hơn số đậu tối đa
-        notifyMagicTreeStatus(_char);
+//        notifyMagicTreeStatus(_char);
     }
 
     // Kiểm tra số lượng đậu trong túi và tiến hành thu hoạch
-    private int processHarvestForBag(Char _char) {
-        int numberInBag = getItemCountInBag(_char, Item.TYPE_DAUTHAN); // Đếm số lượng đậu trong túi
-        int maxInBag = Server.getMaxQuantityItem(); // Lấy số lượng đậu tối đa mà túi có thể chứa
-        int received = Math.min(maxInBag - numberInBag, this.currPeas); // Tính số lượng đậu có thể thu hoạch
-
-        if (received > 0) {
-            addItemToBag(_char, received); // Thêm đậu vào túi
-            this.currPeas -= received; // Giảm số lượng đậu hiện tại của cây sau khi thu hoạch
-        }
-
-        return received; // Trả về số lượng đậu đã thu hoạch
-    }
+//    private int processHarvestForBag(Char _char) {
+//        int numberInBag = getItemCountInBag(_char, Item.TYPE_DAUTHAN); // Đếm số lượng đậu trong túi
+//        int maxInBag = Server.getMaxQuantityItem(); // Lấy số lượng đậu tối đa mà túi có thể chứa
+//        int received = Math.min(maxInBag - numberInBag, this.currPeas); // Tính số lượng đậu có thể thu hoạch
+//
+//        if (received > 0) {
+//            addItemToBag(_char, received); // Thêm đậu vào túi
+//            this.currPeas -= received; // Giảm số lượng đậu hiện tại của cây sau khi thu hoạch
+//        }
+//
+//        return received; // Trả về số lượng đậu đã thu hoạch
+//    }
 
     // Kiểm tra số lượng đậu trong rương và tiến hành thu hoạch
-    private int processHarvestForBox(Char _char) {
-        int numberInBox = getItemCountInBox(_char, Item.TYPE_DAUTHAN); // Đếm số lượng đậu trong rương
-        int maxInBox = 20; // Số lượng đậu tối đa mà rương có thể chứa
-        int received = Math.min(maxInBox - numberInBox, this.currPeas); // Tính số lượng đậu có thể thu hoạch
-
-        if (received > 0) {
-            addItemToBox(_char, received); // Thêm đậu vào rương
-            this.currPeas -= received; // Giảm số lượng đậu hiện tại của cây sau khi thu hoạch
-        }
-
-        return received; // Trả về số lượng đậu đã thu hoạch
-    }
+//    private int processHarvestForBox(Char _char) {
+//        int numberInBox = getItemCountInBox(_char, Item.TYPE_DAUTHAN); // Đếm số lượng đậu trong rương
+//        int maxInBox = 20; // Số lượng đậu tối đa mà rương có thể chứa
+//        int received = Math.min(maxInBox - numberInBox, this.currPeas); // Tính số lượng đậu có thể thu hoạch
+//
+//        if (received > 0) {
+//            addItemToBox(_char, received); // Thêm đậu vào rương
+//            this.currPeas -= received; // Giảm số lượng đậu hiện tại của cây sau khi thu hoạch
+//        }
+//
+//        return received; // Trả về số lượng đậu đã thu hoạch
+//    }
 
     // Đếm số lượng đậu trong túi của nhân vật
     private int getItemCountInBag(Char _char, int itemType) {
@@ -225,42 +225,42 @@ public class MagicTree {
     }
 
     // Đếm số lượng đậu trong rương của nhân vật
-    private int getItemCountInBox(Char _char, int itemType) {
-        int count = 0;
-        for (Item item : _char.itemBox) {
-            if (item != null && item.template.type == itemType) {
-                count += item.quantity; // Cộng dồn số lượng đậu
-            }
-        }
-        return count;
-    }
+//    private int getItemCountInBox(Char _char, int itemType) {
+//        int count = 0;
+//        for (Item item : _char.itemBox) {
+//            if (item != null && item.template.type == itemType) {
+//                count += item.quantity; // Cộng dồn số lượng đậu
+//            }
+//        }
+//        return count;
+//    }
 
     // Thêm đậu vào túi của nhân vật
-    private void addItemToBag(Char _char, int quantity) {
-        Item item = new Item(PEAN_ID[this.level]);
-        item.setDefaultOptions(); // Đặt các thuộc tính mặc định cho item
-        item.quantity = quantity; // Thiết lập số lượng đậu
-        if (_char.addItem(item)) {
-            // Nếu thêm đậu thành công
-        }
-    }
-
-    // Thêm đậu vào rương của nhân vật
-    private void addItemToBox(Char _char, int quantity) {
-        Item item = new Item(PEAN_ID[this.level]);
-        item.setDefaultOptions(); // Đặt các thuộc tính mặc định cho item
-        item.quantity = quantity; // Thiết lập số lượng đậu
-        if (_char.addItemToBox(item)) {
-            // Nếu thêm đậu vào rương thành công
-        }
-    }
+//    private void addItemToBag(Char _char, int quantity) {
+//        Item item = new Item(PEAN_ID[this.level]);
+//        item.setDefaultOptions(); // Đặt các thuộc tính mặc định cho item
+//        item.quantity = quantity; // Thiết lập số lượng đậu
+//        if (_char.addItem(item)) {
+//            // Nếu thêm đậu thành công
+//        }
+//    }
+//
+//    // Thêm đậu vào rương của nhân vật
+//    private void addItemToBox(Char _char, int quantity) {
+//        Item item = new Item(PEAN_ID[this.level]);
+//        item.setDefaultOptions(); // Đặt các thuộc tính mặc định cho item
+//        item.quantity = quantity; // Thiết lập số lượng đậu
+//        if (_char.addItemToBox(item)) {
+//            // Nếu thêm đậu vào rương thành công
+//        }
+//    }
 
     // Kiểm tra và tiến tới nhiệm vụ tiếp theo nếu điều kiện được thỏa mãn
-    private void checkAndAdvanceTask(Char _char) {
-        if (_char.taskMain != null && _char.taskMain.id == 0 && _char.taskMain.index == 4) {
-            _char.taskNext(); // Chuyển tới nhiệm vụ tiếp theo
-        }
-    }
+//    private void checkAndAdvanceTask(Char _char) {
+//        if (_char.taskMain != null && _char.taskMain.id == 0 && _char.taskMain.index == 4) {
+//            _char.taskNext(); // Chuyển tới nhiệm vụ tiếp theo
+//        }
+//    }
 
     // Cập nhật thời gian thu hoạch cuối cùng
     private void updateLastHarvestTime() {
@@ -268,11 +268,11 @@ public class MagicTree {
     }
 
     // Thông báo trạng thái cây phép thuật nếu cần
-    private void notifyMagicTreeStatus(Char _char) {
-        if (this.currPeas < maxPeas) {
-            _char.service.magicTree((byte) 2, this); // Gửi trạng thái cây phép thuật
-        }
-    }
+//    private void notifyMagicTreeStatus(Char _char) {
+//        if (this.currPeas < maxPeas) {
+//            _char.service.magicTree((byte) 2, this); // Gửi trạng thái cây phép thuật
+//        }
+//    }
 
 
 }

@@ -4,6 +4,8 @@ public class GameRepo {
     private static GameRepo instance;
     public UserRepo userRepo;
     public PlayerRepo playerRepo;
+    public ClanMemberRepo clanMemberRepo;
+    public ClanRepo clanRepo;
 
 
 

@@ -169,4 +169,12 @@ public class Item {
             this.require = (long) itemOption.param * 1000000000L;
         }
     }
+
+    public ArrayList<ItemOption> getDisplayOptions() {
+        ArrayList<ItemOption> options = new ArrayList<>(this.options);
+        if (options.isEmpty()) {
+            options.add(new ItemOption(73, 0));
+        }
+        return options;
+    }
 }

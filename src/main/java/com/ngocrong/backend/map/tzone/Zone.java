@@ -11,6 +11,7 @@ import com.ngocrong.backend.task.Task;
 import com.ngocrong.backend.util.Utils;
 import org.apache.log4j.Logger;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -104,7 +105,7 @@ public class Zone extends Thread{
         List<Char> charactersInZone = getListChar(Zone.TYPE_ALL);
         for (Char otherCharacter : charactersInZone) {
             if (otherCharacter != character) {
-                character.loadEffectSkillPlayer(otherCharacter);
+//                character.loadEffectSkillPlayer(otherCharacter);
                 handlePetFollow(character, otherCharacter);
                 handleMobMeUpdate(character, otherCharacter);
             }
@@ -125,7 +126,7 @@ public class Zone extends Thread{
 
     private void reviveIfDead(Char character) {
         if (character.isDead()) {
-            character.revival(100);
+//            character.revival(100);
         }
     }
 

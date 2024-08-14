@@ -28,7 +28,7 @@ public class Escort extends Char {
         service = (CharService) new Service(this);
         effects = new ArrayList();
         itemTimes = new ArrayList();
-        idMount = -1;
+       setIdMount(-1);
         setDefaultPart();
     }
 
@@ -81,7 +81,7 @@ public class Escort extends Char {
         return true;
     }
 
-    @Override
+
     public void updateEveryFiveSeconds() {
         move();
     }

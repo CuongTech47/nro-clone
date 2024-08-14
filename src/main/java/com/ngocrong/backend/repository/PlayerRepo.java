@@ -14,7 +14,7 @@ import java.util.List;
 @Transactional
 @Repository
 public interface PlayerRepo extends JpaRepository<PlayerEntity,Integer> {
-    List<PlayerEntity> findByPlayerName(String username);
+    List<PlayerEntity> findByName(String username);
 
     List<PlayerEntity> findByUserIdAndServerId (Integer userId, Integer serverId);
 

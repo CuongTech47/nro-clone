@@ -1,42 +1,56 @@
 package com.ngocrong.backend.character;
 
 
+import com.google.gson.Gson;
 import com.ngocrong.backend.bot.Escort;
 import com.ngocrong.backend.clan.Clan;
 import com.ngocrong.backend.collection.Card;
+import com.ngocrong.backend.collection.CardTemplate;
 import com.ngocrong.backend.consts.*;
 import com.ngocrong.backend.crackball.CrackBall;
 import com.ngocrong.backend.disciple.Disciple;
 import com.ngocrong.backend.disciple.MiniDisciple;
 import com.ngocrong.backend.effect.AmbientEffect;
 import com.ngocrong.backend.effect.EffectChar;
-import com.ngocrong.backend.item.Item;
-import com.ngocrong.backend.item.ItemMap;
-import com.ngocrong.backend.item.ItemTemplate;
-import com.ngocrong.backend.item.ItemTime;
+import com.ngocrong.backend.item.*;
 import com.ngocrong.backend.lib.KeyValue;
 import com.ngocrong.backend.map.BaseBabidi;
 import com.ngocrong.backend.map.MapManager;
+import com.ngocrong.backend.map.tzone.Home;
+import com.ngocrong.backend.map.tzone.MapSingle;
 import com.ngocrong.backend.map.tzone.TMap;
 import com.ngocrong.backend.mob.Mob;
 import com.ngocrong.backend.model.*;
 import com.ngocrong.backend.network.Message;
+import com.ngocrong.backend.network.Service;
+import com.ngocrong.backend.network.Session;
+import com.ngocrong.backend.repository.GameRepo;
+import com.ngocrong.backend.server.DragonBall;
+import com.ngocrong.backend.server.Server;
 import com.ngocrong.backend.shop.Shop;
 import com.ngocrong.backend.skill.Skill;
 import com.ngocrong.backend.map.tzone.Zone;
+import com.ngocrong.backend.skill.SkillBook;
+import com.ngocrong.backend.skill.SpecialSkill;
 import com.ngocrong.backend.task.Task;
 import com.ngocrong.backend.util.Utils;
+import org.json.JSONArray;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.log4j.Logger;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.awt.*;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Getter
 @Setter
 public class Char {
-
 
 
     private static Logger logger = Logger.getLogger(Char.class);
@@ -51,19 +65,32 @@ public class Char {
     public static final int DISTANCE_EFFECT = 150;
 
 
-
     // int
-    private int dameDown;
-    public int idMount;
     private int id;
+    private int diamond;
+    private int diamondLock;
+    private int timeIsMoneky;
+    private int hpPercent;
+    private int betAmount;
     private int freezSeconds;
     private int seconds;
-    private int timeIsMoneky;
-    private int fusionType;
     private int clanID;
-    private int phuX;
+    private int mapEnter;
+    private int idMount;
+    private int dameDown;
+    private int goldTrading;
+    private int fusionType;
+    private int currZoneId;
+    private int capsule;
+    private int timePlayed;
+    private int numberCellBag, numberCellBox;
+    private int deltaTime = 1000;
     private int testCharId = -9999;
-    private int betAmount;
+    private int killCharId = -9999;
+    private int goldBarUnpaid;
+    private int tickMove;
+    private int percentDamageBonus;
+    private int phuX;
 
     //ARR ITEM
     public Item[] itemBody;
@@ -76,9 +103,15 @@ public class Char {
     private ArrayList<Card> cards;
     public ArrayList<EffectChar> effects;
     public ArrayList<ItemTime> itemTimes;
-    public ArrayList<Integer> listAccessMap;
+    private ArrayList<Integer> listAccessMap;
     public ArrayList<KeyValue> menus = new ArrayList<>();
-    public ArrayList<Amulet> amulets;
+    private ArrayList<Amulet> amulets;
+    public ArrayList<Achievement> achievements;
+    private ArrayList<MessageTime> messageTimes;
+    public ArrayList<Item> boxCrackBall;
+    public ArrayList<Friend> friends;
+    public Menu menu;
+    public ArrayList<Friend> enemies;
     // sort
     private short head, headDefault;
     private short body;
@@ -109,6 +142,8 @@ public class Char {
     private boolean isInvisible;
     private boolean isCuongNo, isBoHuyet, isGiapXen, isBoKhi, isAnDanh, isMayDo, isDuoiKhi, isPudding, isXucXich, isKemDau, isMiLy, isSushi;
     private boolean isTrading;
+    private boolean isNewMember;
+    private boolean isAutoPlay;
     //obj
     public Zone zone;
     private String name;
@@ -129,7 +164,11 @@ public class Char {
     private CrackBall crackBall;
     public Shop shop;
     private MagicTree magicTree;
-//    private PowerInfo accumulatedPoint;
+    private SkillBook studying;
+    private Timestamp resetTime;
+    private SpecialSkill specialSkill;
+    private Session session;
+    //    private PowerInfo accumulatedPoint;
     // byte
     private byte classId;
     private byte gender;
@@ -167,6 +206,16 @@ public class Char {
     private long lastTimeUseGiftCode;
 
 
+    // arr
+    private long[] lastUpdates = new long[100];
+    private byte[] shortcut;
+
+
+    // lock
+
+    private Lock lock = new ReentrantLock();
+    private Lock lockAction = new ReentrantLock();
+
     public boolean isDisciple() {
         return false;
     }
@@ -190,7 +239,6 @@ public class Char {
     public boolean isNhapThe() {
         return isNhapThe;
     }
-
 
 
     public Item getIemInBag(int id) {
@@ -229,10 +277,11 @@ public class Char {
         }
         return null;
     }
+
     public void stopRecoveryEnery() {
         this.isRecoveryEnergy = false;
         if (zone != null) {
-            zone.mapService.skillNotFocus(this,(byte) 3,null,null);
+            zone.mapService.skillNotFocus(this, (byte) 3, null, null);
         }
     }
 
@@ -283,7 +332,7 @@ public class Char {
         }
     }
 
-    private void updateSkin() {
+    protected void updateSkin() {
         this.bag = -1;
         if (taskMain != null && taskMain.id == 3 && taskMain.index == 2) {
             this.bag = ClanImageName.DUA_BE_51;
@@ -631,67 +680,67 @@ public class Char {
         this.crackBall = null;
         this.shop = null;
         this.zone = null;
-        this.combine = null;
-        this.lucky = null;
-        if (callDragon != null) {
-            callDragon.close();
-        }
-        clearAmbientEffect();
+//        this.combine = null;
+//        this.lucky = null;
+//        if (callDragon != null) {
+//            callDragon.close();
+//        }
+//        clearAmbientEffect();
     }
 
     private void clearTrade() {
-        if (!(this.status == Status.DONG_Y_GIAO_DICH)) {
-            this.service.giaoDich(null, (byte) 7, -1);
-        }
-        this.isTrading = false;
-        this.goldTrading = 0;
-        this.itemsTrading = null;
-        this.trader = null;
-        this.status = Status.NORMAL;
+//        if (!(this.status == Status.DONG_Y_GIAO_DICH)) {
+//            this.service.giaoDich(null, (byte) 7, -1);
+//        }
+//        this.isTrading = false;
+//        this.goldTrading = 0;
+//        this.itemsTrading = null;
+//        this.trader = null;
+//        this.status = Status.NORMAL;
     }
 
     private void resultPk(byte b) {
         switch (getCommandPK()) {
             case CMDPk.THACH_DAU: {
-                if (type == 0) {
-                    int gold = this.betAmount * 2;
-                    gold -= gold / 10;
-                    addGold(gold);
-                    service.serverMessage("Đối thủ đã kiệt sức, bạn thắng được " + gold + " vàng");
-                }
-                if (type == 1) {
-                    service.serverMessage("Bạn đã thua vì kiệt sức");
-                }
-                if (type == 2) {
-                    int gold = this.betAmount * 2;
-                    gold -= gold / 10;
-                    addGold(gold);
-                    service.serverMessage("Đối thủ đã bỏ chạy, bạn thắng được " + gold + " vàng");
-                }
-                if (type == 3) {
-                    service.serverMessage("Bạn đã thua vì bỏ chạy");
-                }
+//                if (type == 0) {
+//                    int gold = this.betAmount * 2;
+//                    gold -= gold / 10;
+//                    addGold(gold);
+//                    service.serverMessage("Đối thủ đã kiệt sức, bạn thắng được " + gold + " vàng");
+//                }
+//                if (type == 1) {
+//                    service.serverMessage("Bạn đã thua vì kiệt sức");
+//                }
+//                if (type == 2) {
+//                    int gold = this.betAmount * 2;
+//                    gold -= gold / 10;
+//                    addGold(gold);
+//                    service.serverMessage("Đối thủ đã bỏ chạy, bạn thắng được " + gold + " vàng");
+//                }
+//                if (type == 3) {
+//                    service.serverMessage("Bạn đã thua vì bỏ chạy");
+//                }
             }
             break;
 
             case CMDPk.TRA_THU: {
-                if (type == 3) {
-                    service.serverMessage("Bạn đã bị xử thua");
-                }
+//                if (type == 3) {
+//                    service.serverMessage("Bạn đã bị xử thua");
+//                }
             }
             break;
 
             case CMDPk.DAI_HOI_VO_THUAT:
-                Arena arena = (Arena) zone;
-                arena.checkResult();
-                break;
+//                Arena arena = (Arena) zone;
+//                arena.checkResult();
+//                break;
         }
         setCommandPK(CMDPk.NORMAL);
-        if (type == 0 || type == 2) {
-            if (achievements != null) {
-                achievements.get(3).addCount(1);// trăm trận trăm tháng
-            }
-        }
+//        if (type == 0 || type == 2) {
+//            if (achievements != null) {
+//                achievements.get(3).addCount(1);// trăm trận trăm tháng
+//            }
+//        }
     }
 
     private void clearPk() {
@@ -729,321 +778,845 @@ public class Char {
         this.head = this.headDefault;
     }
 
+    public short getPetAvatar() {
+        if (this.gender == 1) {
+            return 536;
+        }
+        if (this.gender == 2) {
+            return 537;
+        }
+        return 351;
+    }
 
-
-    public void updateEveryFiveSeconds() {
+    public void saveData() {
         try {
-            if (!isDead) {
-
-                try {
-                    if (zone == null || zone.mapService == null) {
-                        if (zone == null) {
-                            logger.debug("zone is null");
-                        }
-                        if (zone.mapService == null) {
-                            logger.debug("service is null");
-                        }
-                    }
-                    List<Char> list = zone.getListChar(Zone.TYPE_HUMAN, Zone.TYPE_PET);
-                    if (list.size() > 1) {
-                        String[] chats2 = {"Tránh ra đi Xinbatô ơi", "Phân tâm quá", "Nực quá", "Bực bội quá",
-                                "Im đi ông Xinbatô ơi"};
-                        if (characterInfo.getOptions()[8] > 0) {
-                            characterInfo.recovery(CharacterInfo.ALL, characterInfo.getOptions()[8], true);
-                        }
-                        for (Char _c : list) {
-                            if (_c.isDead) {
-                                continue;
-                            }
-
-                            int d = Utils.getDistance(this.x, this.y, _c.x, _c.y);
-                            if (d < DISTANCE_EFFECT) {
-                                boolean isUpdate = false;
-                                if (_c != this) {
-                                    if (characterInfo.getOptions()[8] > 0) {
-                                        _c.characterInfo.setHp(characterInfo.getHp() - Utils.percentOf(_c.characterInfo.getFullHP(), characterInfo.getOptions()[8]));
-                                        _c.characterInfo.setMp(characterInfo.getMp() - Utils.percentOf(_c.characterInfo.getFullMP(), characterInfo.getOptions()[8]));
-                                        if (_c.characterInfo.getHp() <= 0) {
-                                            _c.characterInfo.setHp(1);
-                                        }
-                                        if (_c.characterInfo.getMp() <= 0) {
-                                            _c.characterInfo.setMp(1);
-                                        }
-                                        _c.service.loadPoint();
-
-                                        zone.mapService.playerLoadBody(_c);
-                                    }
-                                    if (isHaveEquipXinbato) {
-                                        if (!_c.isAnDanh) {
-                                            AmbientEffect am = new AmbientEffect(111, info.options[111], 5000);
-                                            if (_c.addAmbientEffect(am)) {
-                                                isUpdate = true;
-                                            }
-                                            zone.service.chat(_c, chats2[Utils.nextInt(chats2.length)]);
-                                        }
-                                    } else if (isHaveEquipBuiBui) {
-                                        AmbientEffect am = new AmbientEffect(24, -95, 5000);
-                                        if (_c.addAmbientEffect(am)) {
-                                            isUpdate = true;
-                                        }
-                                        zone.service.chat(_c, "Nặng quá");
-                                    } else if (info.options[162] > 0) {
-                                        zone.service.chat(_c, "Cute");
-                                    }
-                                }
-                                if (isHaveEquipBulma || isHaveEquipMiNuong) {
-                                    AmbientEffect am = new AmbientEffect(117, info.options[117], 5000);
-                                    if (_c.addAmbientEffect(am)) {
-                                        isUpdate = true;
-                                    }
-                                    String chat;
-                                    if (isHaveEquipMiNuong) {
-                                        chat = "Bắn tim...biu biu";
-                                    } else {
-                                        chat = "Wow, Sexy quá";
-                                    }
-                                    if (_c != this) {
-                                        zone.service.chat(_c, chat);
-                                    }
-                                }
-                                if (isUpdate) {
-                                    _c.info.setInfo();
-                                    _c.service.loadPoint();
-                                }
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    logger.error("update every five seconds - block 1");
-                }
-                try {
-                    if (isHaveEquipInvisible) {
-                        isInvisible = true;
-                        zone.mapService.playerLoadAll(this);
-                        long delay = 1000;
-//                        if (this instanceof Yacon) {
-//                            delay = 2000;
-//                        }
-                        Utils.setTimeout(() -> {
-                            if (zone != null) {
-                                isInvisible = false;
-                                zone.mapService.playerLoadAll(this);
-                            }
-                        }, delay);
-                    }
-                } catch (Exception e) {
-                    logger.error("update every five seconds - block 2");
+            if (isLoggedOut) {
+                return;
+            }
+            if (myDisciple != null) {
+                myDisciple.saveData();
+            }
+            Gson g = new Gson();
+            ArrayList<Item> bags = new ArrayList<>();
+            for (Item item : this.itemBag) {
+                if (item != null) {
+                    bags.add(item);
                 }
             }
+
+            ArrayList<Item> bodys = new ArrayList<>();
+            for (Item item : this.itemBody) {
+                if (item != null) {
+                    bodys.add(item);
+                }
+            }
+
+            ArrayList<Item> boxs = new ArrayList<>();
+            for (Item item : this.itemBox) {
+                if (item != null) {
+                    boxs.add(item);
+                }
+            }
+
+            ArrayList<Integer> maps = new ArrayList<>();
+            int mapId = 0;
+            if (zone == null) {
+//                mapId = transportToMap;
+            } else {
+                mapId = zone.map.mapID;
+            }
+
+            int x = this.x;
+            int y = this.y;
+            if (zone != null) {
+                TMap map = zone.map;
+                if (this.isDead || (map.isCantOffline())) {
+                    if (map.isTreasure() || map.isClanTerritory()) {
+                        mapId = MapName.DAO_KAME;
+                        x = 1000;
+                        y = 408;
+                    } else if (map.isDauTruong()) {
+                        mapId = MapName.DAI_HOI_VO_THUAT;
+                    } else {
+                        switch (this.gender) {
+                            case 0:
+                                mapId = MapName.NHA_GOHAN;
+                                x = 456;
+                                y = 336;
+                                break;
+
+                            case 1:
+                                mapId = MapName.NHA_MOORI;
+                                x = 168;
+                                y = 336;
+                                break;
+
+                            case 2:
+                                mapId = MapName.NHA_BROLY;
+                                x = 432;
+                                y = 336;
+                                break;
+                        }
+                    }
+                    if (isDead) {
+                        this.characterInfo.setHp(1);
+                        this.characterInfo.setMp(1);
+                    }
+                }
+            }
+            maps.add(mapId);
+            maps.add(x);
+            maps.add(y);
+            ArrayList<ItemTime> items = new ArrayList<>();
+            for (ItemTime item : itemTimes) {
+                if (!item.isSave) {
+                    continue;
+                }
+                items.add(item);
+            }
+            JSONArray skills = new JSONArray();
+            for (Skill skill : this.skills) {
+                try {
+                    JSONObject obj = new JSONObject();
+                    obj.put("id", skill.template.id);
+                    obj.put("level", skill.point);
+                    obj.put("last_time_use", skill.lastTimeUseThisSkill);
+                    skills.put(obj);
+                } catch (JSONException ex) {
+                    logger.error("failed!", ex);
+                }
+            }
+            String study = null;
+            if (this.studying != null) {
+                JSONObject obj = new JSONObject();
+                obj.put("id", studying.id);
+                obj.put("level", studying.level);
+                obj.put("studying_time", studying.studyTime);
+                study = obj.toString();
+            }
+            GameRepo.getInstance().playerRepo.saveData(this.id, g.toJson(this.taskMain), this.gold, this.diamond, this.diamondLock, g.toJson(bags), g.toJson(bodys), g.toJson(boxs),
+                    g.toJson(maps), skills.toString(), g.toJson(this.characterInfo), this.clanID, g.toJson(this.shortcut), this.numberCellBag, this.numberCellBox, g.toJson(this.friends), g.toJson(this.enemies),
+                    this.headDefault, this.ship, g.toJson(this.magicTree), g.toJson(items), this.fusionType, g.toJson(this.amulets), this.typeTraining, g.toJson(this.achievements), this.timePlayed, study,
+                    g.toJson(this.boxCrackBall), this.timeAtSplitFusion, (int) this.head, (int) this.body, (int) this.leg, typePorata, g.toJson(this.cards), g.toJson(this.specialSkill),
+                    this.countNumberOfSpecialSkillChanges, resetTime);
         } catch (Exception e) {
-            logger.error("updateEveryFiveSeconds error", e.getCause());
+            logger.debug("saveData", e);
         }
     }
 
-
-    public void revival(int percent) {
-        if (this.isDead) {
-            this.statusMe = 1;
-            this.isDead = false;
-            service.sendMessage(new Message(Cmd.ME_LIVE));
-            zone.mapService.playerLoadLive(this);
+    public void logout() {
+        if (isLoggedOut) {
+            return;
         }
-        this.characterInfo.recovery(CharacterInfo.ALL, percent, true);
-    }
-
-    public void loadEffectSkillPlayer(Char character) {
-        applyStatusEffects(character);
-        handleRecoveryEnergy(character);
-        handleHoldEffect(character);
-        handleChargeSkill(character);
-    }
-
-    private void handleChargeSkill(Char character) {
-        if (character.isCharge()) {
-            short skillId = (short) character.select.id;
-            byte chargeType = getChargeType(skillId);
-            if (chargeType != -1) {
-                service.skillNotFocus(character.id, skillId, chargeType, null, null);
+        try {
+            closeTrade();
+            saveData();
+            if (zone != null) {
+                zone.leave(this);
             }
-        }
-    }
-
-    private byte getChargeType(short skillId) {
-        switch (skillId) {
-            case SkillName.QUA_CAU_KENH_KHI:
-            case SkillName.MAKANKOSAPPO:
-                return (byte) 4;
-
-            case SkillName.BIEN_HINH:
-                return (byte) 6;
-
-            case SkillName.TU_PHAT_NO:
-                return (byte) 7;
-
-            default:
-                return -1;
-        }
-    }
-
-    private void handleHoldEffect(Char character) {
-        if (character.isHeld && character.hold.getHolder() == character) {
-            applyHoldEffect(character.hold, character.hold.getDetainee());
-        }
-    }
-
-    private void applyHoldEffect(Hold hold, Object detainee) {
-        if (detainee instanceof Mob) {
-            Mob mob = (Mob) detainee;
-            service.setEffect(hold, mob.mobId, Skill.ADD_EFFECT, Skill.MONSTER, (byte) 32);
-        } else if (detainee instanceof Char) {
-            Char detaineeChar = (Char) detainee;
-            service.setEffect(hold, detaineeChar.id, Skill.ADD_EFFECT, Skill.CHARACTER, (byte) 32);
-        }
-    }
-
-    private void handleRecoveryEnergy(Char character) {
-        if (character.isRecoveryEnergy) {
-            service.skillNotFocus(character.id, (short) character.select.id, (byte) 1, null, null);
-        }
-    }
-
-    private void applyStatusEffects(Char character) {
-        if (character.isSleep) {
-            applyEffect(character, (byte) 41);
-        }
-        if (character.isProtected) {
-            applyEffect(character, (byte) 33);
-        }
-        if (character.isBlind) {
-            applyEffect(character, (byte) 40);
-        }
-    }
-
-    private void applyEffect(Char character, byte effectId) {
-        service.setEffect(null, character.getId(), Skill.ADD_EFFECT, Skill.CHARACTER, effectId);
-    }
-
-    public boolean isHaveFood() {
-        return isPudding() || isXucXich() || isKemDau() || isMiLy() || isSushi();
-    }
-
-    public boolean addItem(Item item) {
-        if (handleSpecialItems(item)) {
-            return true;
-        }
-        if (item.template.isUpToUp()) {
-            if (mergeWithExistingItem(item)) {
-                return true;
+            History history = new History(id, History.LOGOUT);
+            history.setBefores(gold, diamond, diamondLock);
+            history.setAfters(gold, diamond, diamondLock);
+            for (Item item : itemBag) {
+                if (item != null) {
+                    history.addItem(item);
+                }
             }
-        }
-
-        return addItemToEmptySlot(item);
-    }
-
-    // Xử lý các loại item đặc biệt như Vàng, Kim cương, Khóa kim cương, Bùa
-    private boolean handleSpecialItems(Item item) {
-        switch (item.template.getType()) {
-            case Item.TYPE_GOLD:
-                addGold(item.quantity);
-                return true;
-            case Item.TYPE_DIAMOND:
-                addDiamond(item.quantity);
-                return true;
-            case Item.TYPE_DIAMOND_LOCK:
-                addDiamondLock(item.quantity);
-                return true;
-            case Item.TYPE_AMULET:
-                return handleAmuletItem(item);
-            default:
-                return false;
-        }
-    }
-
-    private void addGold(long gold) {
-        this.gold += gold;
-        service.addGold(gold);
-    }
-
-    // Xử lý thêm bùa vào danh sách hoặc gia hạn thời gian sử dụng bùa
-    private boolean handleAmuletItem(Item item) {
-        Amulet amulet = getAmulet(item.id);
-        if (amulet != null) {
-            amulet.expiredTime += item.quantity;
-        } else {
-            amulet = new Amulet();
-            amulet.id = item.id;
-            amulet.expiredTime = System.currentTimeMillis() + item.quantity;
-            addAmulet(amulet);
-        }
-        return true;
-    }
-
-    // Gộp item mới với item đã tồn tại trong túi (nếu có thể)
-    private boolean mergeWithExistingItem(Item item) {
-        int maxQuantity = Server.getMaxQuantityItem();
-        int index = getIndexBagById(item.id);
-
-        if (index != -1) {
-            Item existingItem = this.itemBag[index];
-
-            if (mergeItemOptions(existingItem, item)) {
-                return true;
+            for (Item item : itemBody) {
+                if (item != null) {
+                    history.addItem(item);
+                }
+            }
+            for (Item item : itemBox) {
+                if (item != null) {
+                    history.addItem(item);
+                }
             }
 
-            if (existingItem.quantity + item.quantity > maxQuantity) {
-                return false; // Không thể thêm nếu vượt quá số lượng tối đa
-            }
-
-            existingItem.quantity += item.quantity;
-            updateBagUI(index, existingItem);
-            return true;
+            history.setExtras(session.getIp());
+            history.save();
+            GameRepo.getInstance().playerRepo.setOffline(this.id, (byte) 0, new Timestamp(System.currentTimeMillis()));
+        } finally {
+            isLoggedOut = true;
         }
-        return false;
     }
 
-    // Gộp các tùy chọn của item mới vào item đã tồn tại nếu có tùy chọn tương tự
-    private boolean mergeItemOptions(Item existingItem, Item newItem) {
-        boolean merged = false;
-        for (ItemOption existingOption : existingItem.options) {
-            if (isMergableOption(existingOption)) {
-                for (ItemOption newOption : newItem.options) {
-                    if (existingOption.optionTemplate.id == newOption.optionTemplate.id) {
-                        existingOption.param += newOption.param;
-                        service.setItemBag(); // Cập nhật lại túi đồ sau khi gộp
-                        merged = true;
+    private void closeTrade() {
+        if (isTrading) {
+            trader.service.serverMessage(Language.TRADE_FAIL);
+            service.serverMessage(Language.TRADE_FAIL);
+            trader.clearTrade();
+            clearTrade();
+        }
+    }
+
+    public void setNewMember(boolean b) {
+    }
+
+    public void initializedCollectionBook() {
+        if (cards == null) {
+            cards = new ArrayList<>();
+        }
+        if (cards.size() < Card.templates.size()) {
+            for (CardTemplate cardT : Card.templates) {
+                boolean isExist = false;
+                for (Card card : cards) {
+                    if (card.id == cardT.id) {
+                        isExist = true;
+                        break;
                     }
+                }
+                if (!isExist) {
+                    Card cardNew = new Card();
+                    cardNew.id = cardT.id;
+                    cardNew.level = 0;
+                    cardNew.amount = 0;
+                    cardNew.isUse = false;
+                    cards.add(cardNew);
                 }
             }
         }
-        return merged;
+        for (Card card : cards) {
+            card.setTemplate();
+        }
+        setAuraEffect();
     }
 
-    // Kiểm tra nếu tùy chọn của item có thể gộp với item khác
-    private boolean isMergableOption(ItemOption option) {
-        return option.optionTemplate.id == 1 || option.optionTemplate.id == 31 ||
-                option.optionTemplate.id == 11 || option.optionTemplate.id == 12 ||
-                option.optionTemplate.id == 13;
-    }
-
-    // Thêm item vào slot trống trong túi
-    private boolean addItemToEmptySlot(Item item) {
-        for (int i = 0; i < itemBag.length; i++) {
-            if (itemBag[i] == null) {
-                itemBag[i] = item;
-                item.indexUI = i;
-                service.setItemBag(); // Cập nhật túi đồ sau khi thêm item
-                return true;
+    private void setAuraEffect() {
+        short id = -1;
+        for (Card card : cards) {
+            if (card.isUse) {
+                if (card.id == 956) {
+                    id = card.template.aura;
+                    break;
+                }
             }
         }
-        return false; // Không có slot trống trong túi
+        idAuraEff = id;
     }
 
-    // Cập nhật giao diện túi sau khi thay đổi số lượng item
-    private void updateBagUI(int index, Item item) {
-        if (item.template.type == Item.TYPE_DAUTHAN) {
-            service.setItemBag(); // Cập nhật toàn bộ túi
-        } else {
-            service.updateBag(index, item.quantity); // Cập nhật chỉ mục cụ thể trong túi
+    public void setStatusItemTime() {
+        synchronized (itemTimes) {
+            for (ItemTime item : itemTimes) {
+                switch (item.id) {
+                    case ItemTimeName.CUONG_NO:
+                        setCuongNo(true);
+                        break;
+
+                    case ItemTimeName.BO_HUYET:
+                        setBoHuyet(true);
+                        break;
+
+                    case ItemTimeName.BO_KHI:
+                        setBoKhi(true);
+                        break;
+
+                    case ItemTimeName.GIAP_XEN_BO_HUNG:
+                        setGiapXen(true);
+                        break;
+
+                    case ItemTimeName.AN_DANH:
+                        setAnDanh(true);
+                        break;
+
+                    case ItemTimeName.MAY_DO_CAPSULE_KI_BI:
+                        setMayDo(true);
+                        break;
+
+                    case ItemTimeName.DUOI_KHI:
+                        setDuoiKhi(true);
+                        break;
+
+                    case ItemTimeName.BANH_PUDDING:
+                        setPudding(true);
+                        break;
+
+                    case ItemTimeName.XUC_XICH:
+                        setXucXich(true);
+                        break;
+
+                    case ItemTimeName.KEM_DAU:
+                        setKemDau(true);
+                        break;
+
+                    case ItemTimeName.MI_LY:
+                        setMiLy(true);
+                        break;
+
+                    case ItemTimeName.SUSHI:
+                        setSushi(true);
+                        break;
+                }
+            }
         }
     }
+
+    public void enter() {
+        Server server = DragonBall.getInstance().getServer();
+        GameRepo.getInstance().playerRepo.setOnline(this.id, (byte) server.getConfig().getServerID(), new Timestamp(System.currentTimeMillis()));
+        updateSkin();
+        setMount();
+        characterInfo.setCharacterInfo();
+        service.sendDataBG();
+        service.setTileSet();
+        service.setTask();
+        service.loadAll();
+        service.updateActivePoint();
+        service.setMaxStamina();
+        service.setStamina();
+        service.loadPoint();
+        service.specialSkill((byte) 0);
+        if (shortcut != null) {
+            service.changeOnSkill(shortcut);
+        }
+        service.updateCoolDown(skills);
+        if (amulets == null) {
+            amulets = new ArrayList<>();
+        }
+        if (itemTimes == null) {
+            itemTimes = new ArrayList<>();
+        }
+        if (this.myDisciple == null) {
+            service.petInfo((byte) 0);
+        } else {
+            Disciple deTu = this.myDisciple;
+            deTu.setMaster(this);
+            deTu.service = new CharService(deTu);
+            deTu.followMaster();
+            deTu.updateSkin();
+            service.petInfo((byte) 1);
+        }
+        for (int m : Barrack.MAPS) {
+            if (m == mapEnter) {
+                switch (gender) {
+                    case 0:
+                        mapEnter = 21;
+                        x = 456;
+                        y = 336;
+                        break;
+
+                    case 1:
+                        mapEnter = 22;
+                        x = 168;
+                        y = 336;
+                        break;
+
+                    case 2:
+                        mapEnter = 23;
+                        x = 432;
+                        y = 336;
+                        break;
+                }
+                break;
+            }
+        }
+        boolean isFusion = false;
+        for (ItemTime item : itemTimes) {
+            if (item.id == 2) {
+                isFusion = true;
+            }
+            service.setItemTime(item);
+            if (item.id == 12) {
+                isAutoPlay = true;
+            }
+        }
+        if (fusionType == 4 && !isFusion) {
+            isNhapThe = true;
+            ItemTime itemTime = new ItemTime(ItemTimeName.HOP_THE, gender == 1 ? 3901 : 3790, 10, true);
+            addItemTime(itemTime);
+        }
+        TMap map = MapManager.getInstance().getMap(mapEnter);
+        if (!map.isMapSingle()) {
+            int zoneId = map.getZoneID();
+            map.enterZone(this, zoneId);
+        } else {
+            enterMapSingle(map);
+        }
+        if (this.isMask) {
+            zone.mapService.updateBody((byte) 0, this);
+        }
+        service.gameInfo();
+        String subName = taskMain.subNames[taskMain.index];
+        service.serverMessage(subName);
+
+        if (achievements == null) {
+            initAchievement();
+        } else {
+            for (Achievement achive : achievements) {
+                achive.initTemplate();
+            }
+        }
+        if (clan != null) {
+            ClanMember clanMember = clan.getMember(id);
+            if (clanMember == null) {
+                clan = null;
+                clanID = -1;
+            } else {
+                clanMember.receiveItem(this);
+                service.clanInfo();
+            }
+        }
+        int mapID = zone.map.mapID;
+        if (!(mapID == 39 || mapID == 40 || mapID == 41)) {
+            Notification notification = Notification.getInstance();
+            if (notification != null && !notification.equals("")) {
+                service.openUISay(5, notification.getText(), notification.getAvatar());
+            }
+        }
+        setListAccessMap();
+    }
+
+    private void addItemTime(ItemTime item) {
+        synchronized (this.itemTimes) {
+            for (ItemTime itm : this.itemTimes) {
+                if (itm.id == item.id) {
+                    if (item.id == 11) {
+                        itm.seconds += item.seconds;
+                        if (itm.seconds > 1800) {
+                            itm.seconds = 1800;
+                        }
+                    } else {
+                        itm.seconds = item.seconds;
+                    }
+                    service.setItemTime(itm);
+                    return;
+                }
+            }
+            this.itemTimes.add(item);
+            service.setItemTime(item);
+        }
+    }
+
+    private void enterMapSingle(TMap map) {
+        int zoneID = map.autoIncrease++;
+        Zone z = null;
+        if (map.mapID == MapName.NHA_GOHAN || map.mapID == MapName.NHA_MOORI || map.mapID == MapName.NHA_BROLY) {
+            z = new Home(map, zoneID);
+        } else if (map.mapID == MapName.RUNG_KARIN) {
+            z = new KarinForest(map, zoneID, this);
+        } else if (map.mapID == MapName.DONG_NAM_KARIN) {
+            z = new SoutheastKarin(map, zoneID);
+        } else if (map.mapID == MapName.THAP_KARIN) {
+            z = new KarinTower(map, zoneID, typeTraining);
+        } else {
+            z = new MapSingle(map, zoneID);
+        }
+        map.addZone(z);
+        z.enter(this);
+    }
+
+    private void setMount() {
+        this.isHaveMount = false;
+        this.idMount = -1;
+        for (Item item : this.itemBody) {
+            if (item != null) {
+                if (item.template.getType() == 23 || item.template.getType() == 24) {
+                    this.isHaveMount = true;
+                    this.idMount = item.template.mountID;
+                    return;
+                }
+            }
+        }
+    }
+
+    public void goHome() {
+        lock.lock();
+        try {
+            int mapID = 0;
+            switch (this.gender) {
+                case 0:
+                    mapID = 21;
+                    break;
+
+                case 1:
+                    mapID = 22;
+                    break;
+
+                case 2:
+                    mapID = 23;
+                    break;
+            }
+            teleport(mapID);
+        } finally {
+            lock.unlock();
+
+        }
+    }
+
+    private void teleport(int mapID) {
+        TMap map = MapManager.getInstance().getMap(mapID);
+        if (map.isBarrack()) {
+            if (clan == null || clan.barrack == null) {
+                return;
+            }
+            if (!clan.barrack.isRunning()) {
+                service.serverMessage2("Trại độc nhãn đã kết thúc");
+                return;
+            }
+        }
+        byte ship = getShip();
+        if (ship == 1) {
+            setTeleport((byte) 3);
+        } else {
+            setTeleport((byte) 1);
+        }
+        if (ship == 1) {
+            characterInfo.recovery(CharacterInfo.ALL, 100, true);
+        }
+        zone.mapService.addTeleport(this.id, this.teleport);
+        switch (mapID) {
+            case 68:
+                this.x = (short) 100;
+                break;
+            case 19:
+                this.x = (short) (map.width - 100);
+                break;
+            default:
+                this.x = calculateX(map);
+                break;
+        }
+        this.y = 0;
+        zone.leave(this);
+        if (map.isMapSingle()) {
+            enterMapSingle(map);
+        } else if (map.isBarrack()) {
+            clan.barrack.enterMap(mapId, this);
+        } else {
+            int zoneId = 0;
+            if (isGoBack()) {
+                zoneId = currZoneId;
+                isGoBack = false;
+            } else {
+                zoneId = map.getZoneID();
+            }
+            map.enterZone(this, zoneId);
+
+        }
+        this.y = zone.map.collisionLand(this.x, this.y);
+        setTeleport((byte) 0);
+    }
+
+    private short calculateX(TMap map) {
+        double g = (double) this.x / (double) zone.map.width;
+        short x = (short) (g * map.width);
+        return x;
+    }
+
+
+//    public void updateEveryFiveSeconds() {
+//        try {
+//            if (!isDead) {
+//
+//                try {
+//                    if (zone == null || zone.mapService == null) {
+//                        if (zone == null) {
+//                            logger.debug("zone is null");
+//                        }
+//                        if (zone.mapService == null) {
+//                            logger.debug("service is null");
+//                        }
+//                    }
+//                    List<Char> list = zone.getListChar(Zone.TYPE_HUMAN, Zone.TYPE_PET);
+//                    if (list.size() > 1) {
+//                        String[] chats2 = {"Tránh ra đi Xinbatô ơi", "Phân tâm quá", "Nực quá", "Bực bội quá",
+//                                "Im đi ông Xinbatô ơi"};
+//                        if (characterInfo.getOptions()[8] > 0) {
+//                            characterInfo.recovery(CharacterInfo.ALL, characterInfo.getOptions()[8], true);
+//                        }
+//                        for (Char _c : list) {
+//                            if (_c.isDead) {
+//                                continue;
+//                            }
+//
+//                            int d = Utils.getDistance(this.x, this.y, _c.x, _c.y);
+//                            if (d < DISTANCE_EFFECT) {
+//                                boolean isUpdate = false;
+//                                if (_c != this) {
+//                                    if (characterInfo.getOptions()[8] > 0) {
+//                                        _c.characterInfo.setHp(characterInfo.getHp() - Utils.percentOf(_c.characterInfo.getFullHP(), characterInfo.getOptions()[8]));
+//                                        _c.characterInfo.setMp(characterInfo.getMp() - Utils.percentOf(_c.characterInfo.getFullMP(), characterInfo.getOptions()[8]));
+//                                        if (_c.characterInfo.getHp() <= 0) {
+//                                            _c.characterInfo.setHp(1);
+//                                        }
+//                                        if (_c.characterInfo.getMp() <= 0) {
+//                                            _c.characterInfo.setMp(1);
+//                                        }
+//                                        _c.service.loadPoint();
+//
+//                                        zone.mapService.playerLoadBody(_c);
+//                                    }
+//                                    if (isHaveEquipXinbato) {
+//                                        if (!_c.isAnDanh) {
+////                                            AmbientEffect am = new AmbientEffect(111, info.options[111], 5000);
+////                                            if (_c.addAmbientEffect(am)) {
+////                                                isUpdate = true;
+////                                            }
+////                                            zone.service.chat(_c, chats2[Utils.nextInt(chats2.length)]);
+//                                        }
+//                                    } else if (isHaveEquipBuiBui) {
+//                                        AmbientEffect am = new AmbientEffect(24, -95, 5000);
+////                                        if (_c.addAmbientEffect(am)) {
+////                                            isUpdate = true;
+////                                        }
+////                                        zone.service.chat(_c, "Nặng quá");
+////                                    } else if (info.options[162] > 0) {
+////                                        zone.service.chat(_c, "Cute");
+////                                    }
+//                                }
+//                                if (isHaveEquipBulma || isHaveEquipMiNuong) {
+////                                    AmbientEffect am = new AmbientEffect(117, info.options[117], 5000);
+////                                    if (_c.addAmbientEffect(am)) {
+////                                        isUpdate = true;
+////                                    }
+//                                    String chat;
+//                                    if (isHaveEquipMiNuong) {
+//                                        chat = "Bắn tim...biu biu";
+//                                    } else {
+//                                        chat = "Wow, Sexy quá";
+//                                    }
+//                                    if (_c != this) {
+////                                        zone.service.chat(_c, chat);
+//                                    }
+//                                }
+//                                if (isUpdate) {
+//                                    _c.info.setInfo();
+//                                    _c.service.loadPoint();
+//                                }
+//                            }
+//                        }
+//                    }
+//                } catch (Exception e) {
+//                    logger.error("update every five seconds - block 1");
+//                }
+//                try {
+//                    if (isHaveEquipInvisible) {
+//                        isInvisible = true;
+//                        zone.mapService.playerLoadAll(this);
+//                        long delay = 1000;
+////                        if (this instanceof Yacon) {
+////                            delay = 2000;
+////                        }
+//                        Utils.setTimeout(() -> {
+//                            if (zone != null) {
+//                                isInvisible = false;
+//                                zone.mapService.playerLoadAll(this);
+//                            }
+//                        }, delay);
+//                    }
+//                } catch (Exception e) {
+//                    logger.error("update every five seconds - block 2");
+//                }
+//            }
+//        } catch (Exception e) {
+//            logger.error("updateEveryFiveSeconds error", e.getCause());
+//        }
+//    }
+//
+//
+//    public void revival(int percent) {
+//        if (this.isDead) {
+//            this.statusMe = 1;
+//            this.isDead = false;
+//            service.sendMessage(new Message(Cmd.ME_LIVE));
+//            zone.mapService.playerLoadLive(this);
+//        }
+//        this.characterInfo.recovery(CharacterInfo.ALL, percent, true);
+//    }
+//
+//    public void loadEffectSkillPlayer(Char character) {
+//        applyStatusEffects(character);
+//        handleRecoveryEnergy(character);
+//        handleHoldEffect(character);
+//        handleChargeSkill(character);
+//    }
+//
+//    private void handleChargeSkill(Char character) {
+//        if (character.isCharge()) {
+//            short skillId = (short) character.select.id;
+//            byte chargeType = getChargeType(skillId);
+//            if (chargeType != -1) {
+//                service.skillNotFocus(character.id, skillId, chargeType, null, null);
+//            }
+//        }
+//    }
+//
+//    private byte getChargeType(short skillId) {
+//        switch (skillId) {
+//            case SkillName.QUA_CAU_KENH_KHI:
+//            case SkillName.MAKANKOSAPPO:
+//                return (byte) 4;
+//
+//            case SkillName.BIEN_HINH:
+//                return (byte) 6;
+//
+//            case SkillName.TU_PHAT_NO:
+//                return (byte) 7;
+//
+//            default:
+//                return -1;
+//        }
+//    }
+//
+//    private void handleHoldEffect(Char character) {
+//        if (character.isHeld && character.hold.getHolder() == character) {
+//            applyHoldEffect(character.hold, character.hold.getDetainee());
+//        }
+//    }
+//
+//    private void applyHoldEffect(Hold hold, Object detainee) {
+//        if (detainee instanceof Mob) {
+//            Mob mob = (Mob) detainee;
+//            service.setEffect(hold, mob.mobId, Skill.ADD_EFFECT, Skill.MONSTER, (byte) 32);
+//        } else if (detainee instanceof Char) {
+//            Char detaineeChar = (Char) detainee;
+//            service.setEffect(hold, detaineeChar.id, Skill.ADD_EFFECT, Skill.CHARACTER, (byte) 32);
+//        }
+//    }
+//
+//    private void handleRecoveryEnergy(Char character) {
+//        if (character.isRecoveryEnergy) {
+//            service.skillNotFocus(character.id, (short) character.select.id, (byte) 1, null, null);
+//        }
+//    }
+//
+//    private void applyStatusEffects(Char character) {
+//        if (character.isSleep) {
+//            applyEffect(character, (byte) 41);
+//        }
+//        if (character.isProtected) {
+//            applyEffect(character, (byte) 33);
+//        }
+//        if (character.isBlind) {
+//            applyEffect(character, (byte) 40);
+//        }
+//    }
+//
+//    private void applyEffect(Char character, byte effectId) {
+//        service.setEffect(null, character.getId(), Skill.ADD_EFFECT, Skill.CHARACTER, effectId);
+//    }
+//
+//    public boolean isHaveFood() {
+//        return isPudding() || isXucXich() || isKemDau() || isMiLy() || isSushi();
+//    }
+//
+//    public boolean addItem(Item item) {
+//        if (handleSpecialItems(item)) {
+//            return true;
+//        }
+//        if (item.template.isUpToUp()) {
+//            if (mergeWithExistingItem(item)) {
+//                return true;
+//            }
+//        }
+//
+//        return addItemToEmptySlot(item);
+//    }
+//
+//    // Xử lý các loại item đặc biệt như Vàng, Kim cương, Khóa kim cương, Bùa
+//    private boolean handleSpecialItems(Item item) {
+//        switch (item.template.getType()) {
+//            case Item.TYPE_GOLD:
+//                addGold(item.quantity);
+//                return true;
+//            case Item.TYPE_DIAMOND:
+//                addDiamond(item.quantity);
+//                return true;
+//            case Item.TYPE_DIAMOND_LOCK:
+//                addDiamondLock(item.quantity);
+//                return true;
+//            case Item.TYPE_AMULET:
+//                return handleAmuletItem(item);
+//            default:
+//                return false;
+//        }
+//    }
+//
+//    private void addGold(long gold) {
+//        this.gold += gold;
+//        service.addGold(gold);
+//    }
+//
+//    // Xử lý thêm bùa vào danh sách hoặc gia hạn thời gian sử dụng bùa
+//    private boolean handleAmuletItem(Item item) {
+//        Amulet amulet = getAmulet(item.id);
+//        if (amulet != null) {
+//            amulet.expiredTime += item.quantity;
+//        } else {
+//            amulet = new Amulet();
+//            amulet.id = item.id;
+//            amulet.expiredTime = System.currentTimeMillis() + item.quantity;
+//            addAmulet(amulet);
+//        }
+//        return true;
+//    }
+//
+//    // Gộp item mới với item đã tồn tại trong túi (nếu có thể)
+//    private boolean mergeWithExistingItem(Item item) {
+//        int maxQuantity = Server.getMaxQuantityItem();
+//        int index = getIndexBagById(item.id);
+//
+//        if (index != -1) {
+//            Item existingItem = this.itemBag[index];
+//
+//            if (mergeItemOptions(existingItem, item)) {
+//                return true;
+//            }
+//
+//            if (existingItem.quantity + item.quantity > maxQuantity) {
+//                return false; // Không thể thêm nếu vượt quá số lượng tối đa
+//            }
+//
+//            existingItem.quantity += item.quantity;
+//            updateBagUI(index, existingItem);
+//            return true;
+//        }
+//        return false;
+//    }
+//
+//    // Gộp các tùy chọn của item mới vào item đã tồn tại nếu có tùy chọn tương tự
+//    private boolean mergeItemOptions(Item existingItem, Item newItem) {
+//        boolean merged = false;
+//        for (ItemOption existingOption : existingItem.options) {
+//            if (isMergableOption(existingOption)) {
+//                for (ItemOption newOption : newItem.options) {
+//                    if (existingOption.optionTemplate.id == newOption.optionTemplate.id) {
+//                        existingOption.param += newOption.param;
+//                        service.setItemBag(); // Cập nhật lại túi đồ sau khi gộp
+//                        merged = true;
+//                    }
+//                }
+//            }
+//        }
+//        return merged;
+//    }
+//
+//    // Kiểm tra nếu tùy chọn của item có thể gộp với item khác
+//    private boolean isMergableOption(ItemOption option) {
+//        return option.optionTemplate.id == 1 || option.optionTemplate.id == 31 ||
+//                option.optionTemplate.id == 11 || option.optionTemplate.id == 12 ||
+//                option.optionTemplate.id == 13;
+//    }
+//
+//    // Thêm item vào slot trống trong túi
+//    private boolean addItemToEmptySlot(Item item) {
+//        for (int i = 0; i < itemBag.length; i++) {
+//            if (itemBag[i] == null) {
+//                itemBag[i] = item;
+//                item.indexUI = i;
+//                service.setItemBag(); // Cập nhật túi đồ sau khi thêm item
+//                return true;
+//            }
+//        }
+//        return false; // Không có slot trống trong túi
+//    }
+//
+//    // Cập nhật giao diện túi sau khi thay đổi số lượng item
+//    private void updateBagUI(int index, Item item) {
+//        if (item.template.type == Item.TYPE_DAUTHAN) {
+//            service.setItemBag(); // Cập nhật toàn bộ túi
+//        } else {
+//            service.updateBag(index, item.quantity); // Cập nhật chỉ mục cụ thể trong túi
+//        }
+//    }
+//}
 }

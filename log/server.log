@@ -1,0 +1,1198 @@
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - server.name: Ngoc Rong
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - app.encoding: UTF-8
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - database.host: 14.225.208.47
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - spring.jpa.hibernate.ddl-auto: none
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - spring.datasource.driver-class-name: com.mysql.cj.jdbc.Driver
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - game.data.version: 1
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - server.port_game: 1445
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - server.port: 1707
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - game.exp: 1
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - server.id: 1
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - database.user: cuong
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - server.host: 127.0.0.1
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - game.item.version: 1
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - server.redirect: false
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.MySQLDialect
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - game.map.version: 1
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - database.name: nro-team
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - database.port: 3306
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - server.autosave.delay: 300000
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - spring.datasource.password: cuonglov3
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - spring.jpa.show-sql: false
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - spring.datasource.username: cuong
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - game.servers: Local:127.0.0.1:1445:0,0,0
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - spring.datasource.url: jdbc:mysql://14.225.208.47:3306/nro-team
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - database.password: cuong123@@
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - app.java.version: 22.0.1
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - game.skill.version: 1
+[2024-08-14 14:24:10 DEBUG (Config:48)] Config - game.item.quantity.max: 1000000
+[2024-08-14 14:24:10 INFO  (Config:51)] Server ID: 1
+[2024-08-14 14:24:10 DEBUG (DragonBall:18)] Start server!
+[2024-08-14 14:24:10 DEBUG (Server:68)] Start socket post=1445
+[2024-08-14 14:24:10 DEBUG (Server:83)] Start server Success!
+[2024-08-14 14:29:10 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 14:30:40 DEBUG (DragonBall:30)] Shutdown Server!
+[2024-08-14 14:30:40 DEBUG (Server:118)] End socket
+[2024-08-14 14:30:40 ERROR (Server:96)] failed!
+java.net.SocketException: Socket closed
+	at java.base/sun.nio.ch.NioSocketImpl.endAccept(NioSocketImpl.java:682)
+	at java.base/sun.nio.ch.NioSocketImpl.accept(NioSocketImpl.java:755)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:695)
+	at java.base/java.net.ServerSocket.platformImplAccept(ServerSocket.java:660)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:636)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:582)
+	at java.base/java.net.ServerSocket.accept(ServerSocket.java:541)
+	at com.ngocrong.backend.server.Server.start(Server.java:86)
+	at com.ngocrong.backend.server.DragonBall.start(DragonBall.java:21)
+	at com.ngocrong.backend.BackendApplication.run(BackendApplication.java:24)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:557)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:546)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:611)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.ngocrong.backend.BackendApplication.main(BackendApplication.java:19)
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - server.name: Ngoc Rong
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - app.encoding: UTF-8
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - database.host: 14.225.208.47
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - spring.jpa.hibernate.ddl-auto: none
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - spring.datasource.driver-class-name: com.mysql.cj.jdbc.Driver
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - game.data.version: 1
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - server.port_game: 1445
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - server.port: 1707
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - game.exp: 1
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - server.id: 1
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - database.user: cuong
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - server.host: 127.0.0.1
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - game.item.version: 1
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - server.redirect: false
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.MySQLDialect
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - game.map.version: 1
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - database.name: nro-team
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - database.port: 3306
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - server.autosave.delay: 300000
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - spring.datasource.password: cuonglov3
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - spring.jpa.show-sql: false
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - spring.datasource.username: cuong
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - game.servers: Local:127.0.0.1:1445:0,0,0
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - spring.datasource.url: jdbc:mysql://14.225.208.47:3306/nro-team
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - database.password: cuong123@@
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - app.java.version: 22.0.1
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - game.skill.version: 1
+[2024-08-14 14:30:47 DEBUG (Config:48)] Config - game.item.quantity.max: 1000000
+[2024-08-14 14:30:47 INFO  (Config:51)] Server ID: 1
+[2024-08-14 14:30:47 DEBUG (DragonBall:18)] Start server!
+[2024-08-14 14:30:47 DEBUG (Server:68)] Start socket post=1445
+[2024-08-14 14:30:47 DEBUG (Server:83)] Start server Success!
+[2024-08-14 14:31:01 DEBUG (Server:91)] com.ngocrong.backend.network.Session@323b5264
+[2024-08-14 14:31:28 DEBUG (DragonBall:30)] Shutdown Server!
+[2024-08-14 14:31:28 DEBUG (Server:119)] End socket
+[2024-08-14 14:31:28 ERROR (Server:97)] failed!
+java.net.SocketException: Socket closed
+	at java.base/sun.nio.ch.NioSocketImpl.endAccept(NioSocketImpl.java:682)
+	at java.base/sun.nio.ch.NioSocketImpl.accept(NioSocketImpl.java:755)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:695)
+	at java.base/java.net.ServerSocket.platformImplAccept(ServerSocket.java:660)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:636)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:582)
+	at java.base/java.net.ServerSocket.accept(ServerSocket.java:541)
+	at com.ngocrong.backend.server.Server.start(Server.java:86)
+	at com.ngocrong.backend.server.DragonBall.start(DragonBall.java:21)
+	at com.ngocrong.backend.BackendApplication.run(BackendApplication.java:24)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:557)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:546)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:611)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.ngocrong.backend.BackendApplication.main(BackendApplication.java:19)
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - server.name: Ngoc Rong
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - app.encoding: UTF-8
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - database.host: 14.225.208.47
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - spring.jpa.hibernate.ddl-auto: none
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - spring.datasource.driver-class-name: com.mysql.cj.jdbc.Driver
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - game.data.version: 1
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - server.port_game: 1445
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - server.port: 1707
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - game.exp: 1
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - server.id: 1
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - database.user: cuong
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - server.host: 127.0.0.1
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - game.item.version: 1
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - server.redirect: false
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.MySQLDialect
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - game.map.version: 1
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - database.name: nro-team
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - database.port: 3306
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - server.autosave.delay: 300000
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - spring.datasource.password: cuonglov3
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - spring.jpa.show-sql: false
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - spring.datasource.username: cuong
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - game.servers: Local:127.0.0.1:1445:0,0,0
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - spring.datasource.url: jdbc:mysql://14.225.208.47:3306/nro-team
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - database.password: cuong123@@
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - app.java.version: 22.0.1
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - game.skill.version: 1
+[2024-08-14 14:31:34 DEBUG (Config:48)] Config - game.item.quantity.max: 1000000
+[2024-08-14 14:31:34 INFO  (Config:51)] Server ID: 1
+[2024-08-14 14:31:34 DEBUG (DragonBall:18)] Start server!
+[2024-08-14 14:31:34 DEBUG (Server:68)] Start socket post=1445
+[2024-08-14 14:31:34 DEBUG (Server:83)] Start server Success!
+[2024-08-14 14:31:36 DEBUG (Server:91)] com.ngocrong.backend.network.Session@502f6f6a
+[2024-08-14 14:35:36 DEBUG (DragonBall:30)] Shutdown Server!
+[2024-08-14 14:35:36 DEBUG (Server:119)] End socket
+[2024-08-14 14:35:36 ERROR (Server:97)] failed!
+java.net.SocketException: Socket closed
+	at java.base/sun.nio.ch.NioSocketImpl.endAccept(NioSocketImpl.java:682)
+	at java.base/sun.nio.ch.NioSocketImpl.accept(NioSocketImpl.java:755)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:695)
+	at java.base/java.net.ServerSocket.platformImplAccept(ServerSocket.java:660)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:636)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:582)
+	at java.base/java.net.ServerSocket.accept(ServerSocket.java:541)
+	at com.ngocrong.backend.server.Server.start(Server.java:86)
+	at com.ngocrong.backend.server.DragonBall.start(DragonBall.java:21)
+	at com.ngocrong.backend.BackendApplication.run(BackendApplication.java:24)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:557)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:546)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:611)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.ngocrong.backend.BackendApplication.main(BackendApplication.java:19)
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - server.name: Ngoc Rong
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - app.encoding: UTF-8
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - database.host: 14.225.208.47
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - spring.jpa.hibernate.ddl-auto: none
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - spring.datasource.driver-class-name: com.mysql.cj.jdbc.Driver
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - game.data.version: 1
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - server.port_game: 1445
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - server.port: 1707
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - game.exp: 1
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - server.id: 1
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - database.user: cuong
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - server.host: 127.0.0.1
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - game.item.version: 1
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - server.redirect: false
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.MySQLDialect
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - game.map.version: 1
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - database.name: nro-team
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - database.port: 3306
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - server.autosave.delay: 300000
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - spring.datasource.password: cuonglov3
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - spring.jpa.show-sql: false
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - spring.datasource.username: cuong
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - game.servers: Local:127.0.0.1:1445:0,0,0
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - spring.datasource.url: jdbc:mysql://14.225.208.47:3306/nro-team
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - database.password: cuong123@@
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - app.java.version: 22.0.1
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - game.skill.version: 1
+[2024-08-14 14:35:43 DEBUG (Config:48)] Config - game.item.quantity.max: 1000000
+[2024-08-14 14:35:43 INFO  (Config:51)] Server ID: 1
+[2024-08-14 14:35:43 DEBUG (DragonBall:18)] Start server!
+[2024-08-14 14:35:43 DEBUG (Server:68)] Start socket post=1445
+[2024-08-14 14:35:43 DEBUG (Server:83)] Start server Success!
+[2024-08-14 14:35:51 INFO  (Server:91)] Client connected from IP: 127.0.0.1
+[2024-08-14 14:35:51 DEBUG (Server:94)] New session created: com.ngocrong.backend.network.Session@64bb6ba7
+[2024-08-14 14:38:13 DEBUG (DragonBall:30)] Shutdown Server!
+[2024-08-14 14:38:13 DEBUG (Server:122)] End socket
+[2024-08-14 14:38:13 ERROR (Server:100)] failed!
+java.net.SocketException: Socket closed
+	at java.base/sun.nio.ch.NioSocketImpl.endAccept(NioSocketImpl.java:682)
+	at java.base/sun.nio.ch.NioSocketImpl.accept(NioSocketImpl.java:755)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:695)
+	at java.base/java.net.ServerSocket.platformImplAccept(ServerSocket.java:660)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:636)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:582)
+	at java.base/java.net.ServerSocket.accept(ServerSocket.java:541)
+	at com.ngocrong.backend.server.Server.start(Server.java:86)
+	at com.ngocrong.backend.server.DragonBall.start(DragonBall.java:21)
+	at com.ngocrong.backend.BackendApplication.run(BackendApplication.java:24)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:557)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:546)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:611)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.ngocrong.backend.BackendApplication.main(BackendApplication.java:19)
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - server.name: Ngoc Rong
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - app.encoding: UTF-8
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - database.host: 14.225.208.47
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - spring.jpa.hibernate.ddl-auto: none
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - spring.datasource.driver-class-name: com.mysql.cj.jdbc.Driver
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - game.data.version: 1
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - server.port_game: 1445
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - server.port: 1707
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - game.exp: 1
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - server.id: 1
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - database.user: cuong
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - server.host: 127.0.0.1
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - game.item.version: 1
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - server.redirect: false
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.MySQLDialect
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - game.map.version: 1
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - database.name: nro-team
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - database.port: 3306
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - server.autosave.delay: 300000
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - spring.datasource.password: cuonglov3
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - spring.jpa.show-sql: false
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - spring.datasource.username: cuong
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - game.servers: Local:127.0.0.1:1445:0,0,0
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - spring.datasource.url: jdbc:mysql://14.225.208.47:3306/nro-team
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - database.password: cuong123@@
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - app.java.version: 22.0.1
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - game.skill.version: 1
+[2024-08-14 14:38:20 DEBUG (Config:48)] Config - game.item.quantity.max: 1000000
+[2024-08-14 14:38:20 INFO  (Config:51)] Server ID: 1
+[2024-08-14 14:38:20 DEBUG (DragonBall:18)] Start server!
+[2024-08-14 14:38:20 DEBUG (Server:68)] Start socket post=1445
+[2024-08-14 14:38:20 DEBUG (Server:83)] Start server Success!
+[2024-08-14 14:38:29 INFO  (Server:91)] Client connected from IP: 127.0.0.1
+[2024-08-14 14:38:29 ERROR (Server:104)] failed!
+java.lang.NullPointerException: Cannot invoke "com.ngocrong.backend.user.User.getSession()" because "session.user" is null
+	at com.ngocrong.backend.server.Server.start(Server.java:94)
+	at com.ngocrong.backend.server.DragonBall.start(DragonBall.java:21)
+	at com.ngocrong.backend.BackendApplication.run(BackendApplication.java:24)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:557)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:546)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:611)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.ngocrong.backend.BackendApplication.main(BackendApplication.java:19)
+[2024-08-14 14:38:39 DEBUG (DragonBall:30)] Shutdown Server!
+[2024-08-14 14:38:39 DEBUG (Server:122)] End socket
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - server.name: Ngoc Rong
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - app.encoding: UTF-8
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - database.host: 14.225.208.47
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - spring.jpa.hibernate.ddl-auto: none
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - spring.datasource.driver-class-name: com.mysql.cj.jdbc.Driver
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - game.data.version: 1
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - server.port_game: 1445
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - server.port: 1707
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - game.exp: 1
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - server.id: 1
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - database.user: cuong
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - server.host: 127.0.0.1
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - game.item.version: 1
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - server.redirect: false
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.MySQLDialect
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - game.map.version: 1
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - database.name: nro-team
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - database.port: 3306
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - server.autosave.delay: 300000
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - spring.datasource.password: cuonglov3
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - spring.jpa.show-sql: false
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - spring.datasource.username: cuong
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - game.servers: Local:127.0.0.1:1445:0,0,0
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - spring.datasource.url: jdbc:mysql://14.225.208.47:3306/nro-team
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - database.password: cuong123@@
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - app.java.version: 22.0.1
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - game.skill.version: 1
+[2024-08-14 14:38:45 DEBUG (Config:48)] Config - game.item.quantity.max: 1000000
+[2024-08-14 14:38:45 INFO  (Config:51)] Server ID: 1
+[2024-08-14 14:38:45 DEBUG (DragonBall:18)] Start server!
+[2024-08-14 14:38:45 DEBUG (Server:68)] Start socket post=1445
+[2024-08-14 14:38:45 DEBUG (Server:83)] Start server Success!
+[2024-08-14 14:38:51 INFO  (Server:91)] Client connected from IP: 127.0.0.1
+[2024-08-14 14:38:51 DEBUG (Server:94)] New session created: null
+[2024-08-14 14:39:22 INFO  (Server:91)] Client connected from IP: 127.0.0.1
+[2024-08-14 14:39:22 DEBUG (Server:94)] New session created: null
+[2024-08-14 14:40:56 DEBUG (DragonBall:30)] Shutdown Server!
+[2024-08-14 14:40:56 DEBUG (Server:122)] End socket
+[2024-08-14 14:40:56 ERROR (Server:100)] failed!
+java.net.SocketException: Socket closed
+	at java.base/sun.nio.ch.NioSocketImpl.endAccept(NioSocketImpl.java:682)
+	at java.base/sun.nio.ch.NioSocketImpl.accept(NioSocketImpl.java:755)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:695)
+	at java.base/java.net.ServerSocket.platformImplAccept(ServerSocket.java:660)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:636)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:582)
+	at java.base/java.net.ServerSocket.accept(ServerSocket.java:541)
+	at com.ngocrong.backend.server.Server.start(Server.java:86)
+	at com.ngocrong.backend.server.DragonBall.start(DragonBall.java:21)
+	at com.ngocrong.backend.BackendApplication.run(BackendApplication.java:24)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:557)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:546)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:611)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.ngocrong.backend.BackendApplication.main(BackendApplication.java:19)
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - server.name: Ngoc Rong
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - app.encoding: UTF-8
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - database.host: 14.225.208.47
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - spring.jpa.hibernate.ddl-auto: none
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - spring.datasource.driver-class-name: com.mysql.cj.jdbc.Driver
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - game.data.version: 1
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - server.port_game: 1445
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - server.port: 1707
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - game.exp: 1
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - server.id: 1
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - database.user: cuong
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - server.host: 127.0.0.1
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - game.item.version: 1
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - server.redirect: false
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.MySQLDialect
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - game.map.version: 1
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - database.name: nro-team
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - database.port: 3306
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - server.autosave.delay: 300000
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - spring.datasource.password: cuonglov3
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - spring.jpa.show-sql: false
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - spring.datasource.username: cuong
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - game.servers: Local:127.0.0.1:1445:0,0,0
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - spring.datasource.url: jdbc:mysql://14.225.208.47:3306/nro-team
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - database.password: cuong123@@
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - app.java.version: 22.0.1
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - game.skill.version: 1
+[2024-08-14 14:41:02 DEBUG (Config:48)] Config - game.item.quantity.max: 1000000
+[2024-08-14 14:41:02 INFO  (Config:51)] Server ID: 1
+[2024-08-14 14:41:02 DEBUG (DragonBall:18)] Start server!
+[2024-08-14 14:41:02 DEBUG (Server:68)] Start socket post=1445
+[2024-08-14 14:41:02 DEBUG (Server:83)] Start server Success!
+[2024-08-14 14:41:05 INFO  (Server:91)] Client connected from IP: 127.0.0.1
+[2024-08-14 14:41:05 DEBUG (Server:94)] New session created: null
+[2024-08-14 14:41:37 DEBUG (DragonBall:30)] Shutdown Server!
+[2024-08-14 14:41:37 DEBUG (Server:122)] End socket
+[2024-08-14 14:41:37 ERROR (Server:100)] failed!
+java.net.SocketException: Socket closed
+	at java.base/sun.nio.ch.NioSocketImpl.endAccept(NioSocketImpl.java:682)
+	at java.base/sun.nio.ch.NioSocketImpl.accept(NioSocketImpl.java:755)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:695)
+	at java.base/java.net.ServerSocket.platformImplAccept(ServerSocket.java:660)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:636)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:582)
+	at java.base/java.net.ServerSocket.accept(ServerSocket.java:541)
+	at com.ngocrong.backend.server.Server.start(Server.java:86)
+	at com.ngocrong.backend.server.DragonBall.start(DragonBall.java:21)
+	at com.ngocrong.backend.BackendApplication.run(BackendApplication.java:30)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:557)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:546)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:611)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.ngocrong.backend.BackendApplication.main(BackendApplication.java:25)
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - server.name: Ngoc Rong
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - app.encoding: UTF-8
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - database.host: 14.225.208.47
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - spring.jpa.hibernate.ddl-auto: none
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - spring.datasource.driver-class-name: com.mysql.cj.jdbc.Driver
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - game.data.version: 1
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - server.port_game: 1445
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - server.port: 1707
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - game.exp: 1
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - server.id: 1
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - spring.jpa.database-platform: org.hibernate.dialect.MySQL8Dialect
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - database.user: cuong
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - server.host: 127.0.0.1
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - game.item.version: 1
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - server.redirect: false
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - game.map.version: 1
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - database.name: nro-team
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - database.port: 3306
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - server.autosave.delay: 300000
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - spring.datasource.password: cuonglov3
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - spring.jpa.show-sql: false
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - spring.datasource.username: cuong
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - game.servers: Local:127.0.0.1:1445:0,0,0
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - spring.datasource.url: jdbc:mysql://14.225.208.47:3306/nro-team
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - database.password: cuong123@@
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - app.java.version: 22.0.2
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - game.skill.version: 1
+[2024-08-14 14:41:43 DEBUG (Config:48)] Config - game.item.quantity.max: 1000000
+[2024-08-14 14:41:43 INFO  (Config:51)] Server ID: 1
+[2024-08-14 14:41:43 DEBUG (DragonBall:18)] Start server!
+[2024-08-14 14:41:43 DEBUG (Server:68)] Start socket post=1445
+[2024-08-14 14:41:43 DEBUG (Server:83)] Start server Success!
+[2024-08-14 14:42:25 DEBUG (DragonBall:30)] Shutdown Server!
+[2024-08-14 14:42:25 DEBUG (Server:122)] End socket
+[2024-08-14 14:42:25 ERROR (Server:100)] failed!
+java.net.SocketException: Socket closed
+	at java.base/sun.nio.ch.NioSocketImpl.endAccept(NioSocketImpl.java:682)
+	at java.base/sun.nio.ch.NioSocketImpl.accept(NioSocketImpl.java:755)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:695)
+	at java.base/java.net.ServerSocket.platformImplAccept(ServerSocket.java:660)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:636)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:582)
+	at java.base/java.net.ServerSocket.accept(ServerSocket.java:541)
+	at com.ngocrong.backend.server.Server.start(Server.java:86)
+	at com.ngocrong.backend.server.DragonBall.start(DragonBall.java:21)
+	at com.ngocrong.backend.BackendApplication.run(BackendApplication.java:30)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:557)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:546)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:611)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.ngocrong.backend.BackendApplication.main(BackendApplication.java:25)
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - server.name: Ngoc Rong
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - app.encoding: UTF-8
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - database.host: 14.225.208.47
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - spring.jpa.hibernate.ddl-auto: none
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - spring.datasource.driver-class-name: com.mysql.cj.jdbc.Driver
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - game.data.version: 1
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - server.port_game: 1445
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - server.port: 1707
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - game.exp: 1
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - server.id: 1
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - spring.jpa.database-platform: org.hibernate.dialect.MySQL8Dialect
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - database.user: cuong
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - server.host: 127.0.0.1
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - game.item.version: 1
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - server.redirect: false
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - game.map.version: 1
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - database.name: nro-team
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - database.port: 3306
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - server.autosave.delay: 300000
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - spring.datasource.password: cuong123@@
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - spring.jpa.show-sql: false
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - spring.datasource.username: cuong
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - game.servers: Local:127.0.0.1:1445:0,0,0
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - spring.datasource.url: jdbc:mysql://14.225.208.47:3306/nro-team
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - database.password: cuong123@@
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - app.java.version: 22.0.2
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - game.skill.version: 1
+[2024-08-14 14:42:29 DEBUG (Config:48)] Config - game.item.quantity.max: 1000000
+[2024-08-14 14:42:29 INFO  (Config:51)] Server ID: 1
+[2024-08-14 14:42:29 DEBUG (DragonBall:18)] Start server!
+[2024-08-14 14:42:29 DEBUG (Server:68)] Start socket post=1445
+[2024-08-14 14:42:29 DEBUG (Server:83)] Start server Success!
+[2024-08-14 14:42:48 INFO  (Server:91)] Client connected from IP: 127.0.0.1
+[2024-08-14 14:42:48 DEBUG (Server:94)] New session created: null
+[2024-08-14 14:43:33 DEBUG (DragonBall:30)] Shutdown Server!
+[2024-08-14 14:43:33 DEBUG (Server:122)] End socket
+[2024-08-14 14:43:33 ERROR (Server:100)] failed!
+java.net.SocketException: Socket closed
+	at java.base/sun.nio.ch.NioSocketImpl.endAccept(NioSocketImpl.java:682)
+	at java.base/sun.nio.ch.NioSocketImpl.accept(NioSocketImpl.java:755)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:695)
+	at java.base/java.net.ServerSocket.platformImplAccept(ServerSocket.java:660)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:636)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:582)
+	at java.base/java.net.ServerSocket.accept(ServerSocket.java:541)
+	at com.ngocrong.backend.server.Server.start(Server.java:86)
+	at com.ngocrong.backend.server.DragonBall.start(DragonBall.java:21)
+	at com.ngocrong.backend.BackendApplication.run(BackendApplication.java:30)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:557)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:546)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:611)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.ngocrong.backend.BackendApplication.main(BackendApplication.java:25)
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - server.name: Ngoc Rong
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - app.encoding: UTF-8
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - database.host: 14.225.208.47
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - spring.jpa.hibernate.ddl-auto: none
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - spring.datasource.driver-class-name: com.mysql.cj.jdbc.Driver
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - game.data.version: 1
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - server.port_game: 1445
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - server.port: 1707
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - game.exp: 1
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - server.id: 1
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - spring.jpa.database-platform: org.hibernate.dialect.MySQL8Dialect
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - database.user: cuong
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - server.host: 127.0.0.1
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - game.item.version: 1
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - server.redirect: false
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - game.map.version: 1
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - database.name: nro-team
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - database.port: 3306
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - server.autosave.delay: 300000
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - spring.datasource.password: cuong123@@
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - spring.jpa.show-sql: false
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - spring.datasource.username: cuong
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - game.servers: Local:127.0.0.1:1445:0,0,0
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - spring.datasource.url: jdbc:mysql://14.225.208.47:3306/nro-team
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - database.password: cuong123@@
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - app.java.version: 22.0.2
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - game.skill.version: 1
+[2024-08-14 14:43:38 DEBUG (Config:48)] Config - game.item.quantity.max: 1000000
+[2024-08-14 14:43:38 INFO  (Config:51)] Server ID: 1
+[2024-08-14 14:43:38 DEBUG (DragonBall:18)] Start server!
+[2024-08-14 14:43:38 DEBUG (Server:68)] Start socket post=1445
+[2024-08-14 14:43:38 DEBUG (Server:83)] Start server Success!
+[2024-08-14 14:43:52 DEBUG (DragonBall:30)] Shutdown Server!
+[2024-08-14 14:43:52 DEBUG (Server:122)] End socket
+[2024-08-14 14:43:52 ERROR (Server:100)] failed!
+java.net.SocketException: Socket closed
+	at java.base/sun.nio.ch.NioSocketImpl.endAccept(NioSocketImpl.java:682)
+	at java.base/sun.nio.ch.NioSocketImpl.accept(NioSocketImpl.java:755)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:695)
+	at java.base/java.net.ServerSocket.platformImplAccept(ServerSocket.java:660)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:636)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:582)
+	at java.base/java.net.ServerSocket.accept(ServerSocket.java:541)
+	at com.ngocrong.backend.server.Server.start(Server.java:86)
+	at com.ngocrong.backend.server.DragonBall.start(DragonBall.java:21)
+	at com.ngocrong.backend.BackendApplication.run(BackendApplication.java:25)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:557)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:546)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:611)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.ngocrong.backend.BackendApplication.main(BackendApplication.java:18)
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - server.name: Ngoc Rong
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - app.encoding: UTF-8
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - database.host: 14.225.208.47
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - spring.jpa.hibernate.ddl-auto: none
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - spring.datasource.driver-class-name: com.mysql.cj.jdbc.Driver
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - game.data.version: 1
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - server.port_game: 1445
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - server.port: 1707
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - game.exp: 1
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - server.id: 1
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - spring.jpa.database-platform: org.hibernate.dialect.MySQL8Dialect
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - database.user: cuong
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - server.host: 127.0.0.1
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - game.item.version: 1
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - server.redirect: false
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - game.map.version: 1
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - database.name: nro-team
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - database.port: 3306
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - server.autosave.delay: 300000
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - spring.datasource.password: cuong123@@
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - spring.jpa.show-sql: false
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - spring.datasource.username: cuong
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - game.servers: Local:127.0.0.1:1445:0,0,0
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - spring.datasource.url: jdbc:mysql://14.225.208.47:3306/nro-team
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - database.password: cuong123@@
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - app.java.version: 22.0.2
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - game.skill.version: 1
+[2024-08-14 14:43:58 DEBUG (Config:48)] Config - game.item.quantity.max: 1000000
+[2024-08-14 14:43:58 INFO  (Config:51)] Server ID: 1
+[2024-08-14 14:43:58 DEBUG (DragonBall:18)] Start server!
+[2024-08-14 14:43:58 DEBUG (Server:68)] Start socket post=1445
+[2024-08-14 14:43:58 DEBUG (Server:83)] Start server Success!
+[2024-08-14 14:44:07 INFO  (Server:91)] Client connected from IP: 127.0.0.1
+[2024-08-14 14:44:07 DEBUG (Server:94)] New session created: null
+[2024-08-14 14:44:17 INFO  (Server:91)] Client connected from IP: 127.0.0.1
+[2024-08-14 14:44:17 DEBUG (Server:94)] New session created: null
+[2024-08-14 14:48:58 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 14:50:06 DEBUG (DragonBall:30)] Shutdown Server!
+[2024-08-14 14:50:06 DEBUG (Server:122)] End socket
+[2024-08-14 14:50:06 ERROR (Server:100)] failed!
+java.net.SocketException: Socket closed
+	at java.base/sun.nio.ch.NioSocketImpl.endAccept(NioSocketImpl.java:682)
+	at java.base/sun.nio.ch.NioSocketImpl.accept(NioSocketImpl.java:755)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:695)
+	at java.base/java.net.ServerSocket.platformImplAccept(ServerSocket.java:660)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:636)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:582)
+	at java.base/java.net.ServerSocket.accept(ServerSocket.java:541)
+	at com.ngocrong.backend.server.Server.start(Server.java:86)
+	at com.ngocrong.backend.server.DragonBall.start(DragonBall.java:21)
+	at com.ngocrong.backend.BackendApplication.run(BackendApplication.java:25)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:557)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:546)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:611)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.ngocrong.backend.BackendApplication.main(BackendApplication.java:18)
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - server.name: Ngoc Rong
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - app.encoding: UTF-8
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - database.host: 14.225.208.47
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - spring.jpa.hibernate.ddl-auto: none
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - spring.datasource.driver-class-name: com.mysql.cj.jdbc.Driver
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - game.data.version: 1
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - server.port_game: 1445
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - server.port: 1707
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - game.exp: 1
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - server.id: 1
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - spring.jpa.database-platform: org.hibernate.dialect.MySQL8Dialect
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - database.user: cuong
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - server.host: 127.0.0.1
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - game.item.version: 1
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - server.redirect: false
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - game.map.version: 1
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - database.name: nro-team
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - database.port: 3306
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - server.autosave.delay: 300000
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - spring.datasource.password: cuong123@@
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - spring.jpa.show-sql: false
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - spring.datasource.username: cuong
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - game.servers: Local:127.0.0.1:1445:0,0,0
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - spring.datasource.url: jdbc:mysql://14.225.208.47:3306/nro-team
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - database.password: cuong123@@
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - app.java.version: 22.0.2
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - game.skill.version: 1
+[2024-08-14 14:51:39 DEBUG (Config:48)] Config - game.item.quantity.max: 1000000
+[2024-08-14 14:51:39 INFO  (Config:51)] Server ID: 1
+[2024-08-14 14:51:39 DEBUG (DragonBall:18)] Start server!
+[2024-08-14 14:51:39 DEBUG (Server:68)] Start socket post=1445
+[2024-08-14 14:51:39 DEBUG (Server:83)] Start server Success!
+[2024-08-14 14:51:46 INFO  (Server:91)] Client connected from IP: 127.0.0.1
+[2024-08-14 14:51:46 DEBUG (MessageHandler:424)] Client 1: Kết nối thành công!
+[2024-08-14 14:51:46 DEBUG (Server:94)] New session created: null
+[2024-08-14 14:52:02 INFO  (Server:91)] Client connected from IP: 127.0.0.1
+[2024-08-14 14:52:02 DEBUG (MessageHandler:424)] Client 2: Kết nối thành công!
+[2024-08-14 14:52:02 DEBUG (Server:94)] New session created: null
+[2024-08-14 14:52:15 INFO  (Server:91)] Client connected from IP: 127.0.0.1
+[2024-08-14 14:52:15 DEBUG (MessageHandler:424)] Client 3: Kết nối thành công!
+[2024-08-14 14:52:15 DEBUG (Server:94)] New session created: null
+[2024-08-14 14:56:39 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 15:01:39 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 15:06:39 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 15:11:39 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 15:16:39 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 15:21:39 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 15:23:15 DEBUG (DragonBall:30)] Shutdown Server!
+[2024-08-14 15:23:15 DEBUG (Server:122)] End socket
+[2024-08-14 15:23:15 ERROR (Server:100)] failed!
+java.net.SocketException: Socket closed
+	at java.base/sun.nio.ch.NioSocketImpl.endAccept(NioSocketImpl.java:682)
+	at java.base/sun.nio.ch.NioSocketImpl.accept(NioSocketImpl.java:755)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:695)
+	at java.base/java.net.ServerSocket.platformImplAccept(ServerSocket.java:660)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:636)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:582)
+	at java.base/java.net.ServerSocket.accept(ServerSocket.java:541)
+	at com.ngocrong.backend.server.Server.start(Server.java:86)
+	at com.ngocrong.backend.server.DragonBall.start(DragonBall.java:21)
+	at com.ngocrong.backend.BackendApplication.run(BackendApplication.java:25)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:557)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:546)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:611)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.ngocrong.backend.BackendApplication.main(BackendApplication.java:18)
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - server.name: Ngoc Rong
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - app.encoding: UTF-8
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - database.host: 14.225.208.47
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - spring.jpa.hibernate.ddl-auto: none
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - spring.datasource.driver-class-name: com.mysql.cj.jdbc.Driver
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - game.data.version: 1
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - server.port_game: 1445
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - server.port: 1707
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - game.exp: 1
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - server.id: 1
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - spring.jpa.database-platform: org.hibernate.dialect.MySQL8Dialect
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - database.user: cuong
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - server.host: 127.0.0.1
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - game.item.version: 1
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - server.redirect: false
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - game.map.version: 1
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - database.name: nro-team
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - database.port: 3306
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - server.autosave.delay: 300000
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - spring.datasource.password: cuong123@@
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - spring.jpa.show-sql: false
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - spring.datasource.username: cuong
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - game.servers: Local:127.0.0.1:1445:0,0,0
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - spring.datasource.url: jdbc:mysql://14.225.208.47:3306/nro-team
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - database.password: cuong123@@
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - app.java.version: 22.0.2
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - game.skill.version: 1
+[2024-08-14 15:25:18 DEBUG (Config:48)] Config - game.item.quantity.max: 1000000
+[2024-08-14 15:25:18 INFO  (Config:51)] Server ID: 1
+[2024-08-14 15:25:18 DEBUG (DragonBall:18)] Start server!
+[2024-08-14 15:25:18 DEBUG (Server:68)] Start socket post=1445
+[2024-08-14 15:25:18 DEBUG (Server:83)] Start server Success!
+[2024-08-14 15:25:27 INFO  (Server:91)] Client connected from IP: 127.0.0.1
+[2024-08-14 15:25:27 DEBUG (MessageHandler:424)] Client 1: Kết nối thành công!
+[2024-08-14 15:25:27 DEBUG (Server:94)] New session created: null
+[2024-08-14 15:30:18 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 15:32:30 DEBUG (DragonBall:30)] Shutdown Server!
+[2024-08-14 15:32:30 DEBUG (Server:122)] End socket
+[2024-08-14 15:32:30 ERROR (Server:100)] failed!
+java.net.SocketException: Socket closed
+	at java.base/sun.nio.ch.NioSocketImpl.endAccept(NioSocketImpl.java:682)
+	at java.base/sun.nio.ch.NioSocketImpl.accept(NioSocketImpl.java:755)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:695)
+	at java.base/java.net.ServerSocket.platformImplAccept(ServerSocket.java:660)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:636)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:582)
+	at java.base/java.net.ServerSocket.accept(ServerSocket.java:541)
+	at com.ngocrong.backend.server.Server.start(Server.java:86)
+	at com.ngocrong.backend.server.DragonBall.start(DragonBall.java:21)
+	at com.ngocrong.backend.BackendApplication.run(BackendApplication.java:25)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:557)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:546)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:611)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.ngocrong.backend.BackendApplication.main(BackendApplication.java:18)
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - server.name: Ngoc Rong
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - app.encoding: UTF-8
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - database.host: 14.225.208.47
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - spring.jpa.hibernate.ddl-auto: none
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - spring.datasource.driver-class-name: com.mysql.cj.jdbc.Driver
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - game.data.version: 1
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - server.port_game: 1445
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - server.port: 1707
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - game.exp: 1
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - server.id: 1
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - spring.jpa.database-platform: org.hibernate.dialect.MySQL8Dialect
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - database.user: cuong
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - server.host: 127.0.0.1
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - game.item.version: 1
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - server.redirect: false
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - game.map.version: 1
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - database.name: nro-team
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - database.port: 3306
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - server.autosave.delay: 300000
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - spring.datasource.password: cuong123@@
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - spring.jpa.show-sql: false
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - spring.datasource.username: cuong
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - game.servers: Local:127.0.0.1:1445:0,0,0
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - spring.datasource.url: jdbc:mysql://14.225.208.47:3306/nro-team
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - database.password: cuong123@@
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - app.java.version: 22.0.2
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - game.skill.version: 1
+[2024-08-14 15:32:36 DEBUG (Config:48)] Config - game.item.quantity.max: 1000000
+[2024-08-14 15:32:36 INFO  (Config:51)] Server ID: 1
+[2024-08-14 15:32:36 DEBUG (DragonBall:18)] Start server!
+[2024-08-14 15:32:36 DEBUG (Server:68)] Start socket post=1445
+[2024-08-14 15:32:36 DEBUG (Server:83)] Start server Success!
+[2024-08-14 15:32:43 INFO  (Server:91)] Client connected from IP: 127.0.0.1
+[2024-08-14 15:32:43 DEBUG (MessageHandler:429)] Client 1: Kết nối thành công!
+[2024-08-14 15:32:43 DEBUG (Server:94)] New session created: null
+[2024-08-14 15:34:22 DEBUG (DragonBall:30)] Shutdown Server!
+[2024-08-14 15:34:22 DEBUG (Server:122)] End socket
+[2024-08-14 15:34:22 ERROR (Server:100)] failed!
+java.net.SocketException: Socket closed
+	at java.base/sun.nio.ch.NioSocketImpl.endAccept(NioSocketImpl.java:682)
+	at java.base/sun.nio.ch.NioSocketImpl.accept(NioSocketImpl.java:755)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:695)
+	at java.base/java.net.ServerSocket.platformImplAccept(ServerSocket.java:660)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:636)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:582)
+	at java.base/java.net.ServerSocket.accept(ServerSocket.java:541)
+	at com.ngocrong.backend.server.Server.start(Server.java:86)
+	at com.ngocrong.backend.server.DragonBall.start(DragonBall.java:21)
+	at com.ngocrong.backend.BackendApplication.run(BackendApplication.java:25)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:557)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:546)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:611)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.ngocrong.backend.BackendApplication.main(BackendApplication.java:18)
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - server.name: Ngoc Rong
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - app.encoding: UTF-8
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - database.host: 14.225.208.47
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - spring.jpa.hibernate.ddl-auto: none
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - spring.datasource.driver-class-name: com.mysql.cj.jdbc.Driver
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - game.data.version: 1
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - server.port_game: 1445
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - server.port: 1707
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - game.exp: 1
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - server.id: 1
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - spring.jpa.database-platform: org.hibernate.dialect.MySQL8Dialect
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - database.user: cuong
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - server.host: 127.0.0.1
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - game.item.version: 1
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - server.redirect: false
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - game.map.version: 1
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - database.name: nro-team
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - database.port: 3306
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - server.autosave.delay: 300000
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - spring.datasource.password: cuong123@@
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - spring.jpa.show-sql: false
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - spring.datasource.username: cuong
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - game.servers: Local:127.0.0.1:1445:0,0,0
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - spring.datasource.url: jdbc:mysql://14.225.208.47:3306/nro-team
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - database.password: cuong123@@
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - app.java.version: 22.0.2
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - game.skill.version: 1
+[2024-08-14 15:34:28 DEBUG (Config:48)] Config - game.item.quantity.max: 1000000
+[2024-08-14 15:34:28 INFO  (Config:51)] Server ID: 1
+[2024-08-14 15:34:28 DEBUG (DragonBall:18)] Start server!
+[2024-08-14 15:34:28 DEBUG (Server:68)] Start socket post=1445
+[2024-08-14 15:34:28 DEBUG (Server:83)] Start server Success!
+[2024-08-14 15:34:34 INFO  (Server:91)] Client connected from IP: 127.0.0.1
+[2024-08-14 15:34:34 DEBUG (MessageHandler:429)] Client 1: Kết nối thành công!
+[2024-08-14 15:34:34 DEBUG (Server:94)] New session created: null
+[2024-08-14 15:34:44 INFO  (Server:91)] Client connected from IP: 127.0.0.1
+[2024-08-14 15:34:44 DEBUG (MessageHandler:429)] Client 2: Kết nối thành công!
+[2024-08-14 15:34:44 DEBUG (Server:94)] New session created: null
+[2024-08-14 15:36:20 DEBUG (DragonBall:30)] Shutdown Server!
+[2024-08-14 15:36:20 DEBUG (Server:122)] End socket
+[2024-08-14 15:36:20 ERROR (Server:100)] failed!
+java.net.SocketException: Socket closed
+	at java.base/sun.nio.ch.NioSocketImpl.endAccept(NioSocketImpl.java:682)
+	at java.base/sun.nio.ch.NioSocketImpl.accept(NioSocketImpl.java:755)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:695)
+	at java.base/java.net.ServerSocket.platformImplAccept(ServerSocket.java:660)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:636)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:582)
+	at java.base/java.net.ServerSocket.accept(ServerSocket.java:541)
+	at com.ngocrong.backend.server.Server.start(Server.java:86)
+	at com.ngocrong.backend.server.DragonBall.start(DragonBall.java:21)
+	at com.ngocrong.backend.BackendApplication.run(BackendApplication.java:25)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:557)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:546)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:611)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.ngocrong.backend.BackendApplication.main(BackendApplication.java:18)
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - server.name: Ngoc Rong
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - app.encoding: UTF-8
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - database.host: 14.225.208.47
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - spring.jpa.hibernate.ddl-auto: none
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - spring.datasource.driver-class-name: com.mysql.cj.jdbc.Driver
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - game.data.version: 1
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - server.port_game: 1445
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - server.port: 1707
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - game.exp: 1
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - server.id: 1
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - spring.jpa.database-platform: org.hibernate.dialect.MySQL8Dialect
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - database.user: cuong
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - server.host: 127.0.0.1
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - game.item.version: 1
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - server.redirect: false
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - game.map.version: 1
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - database.name: nro-team
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - database.port: 3306
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - server.autosave.delay: 300000
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - spring.datasource.password: cuong123@@
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - spring.jpa.show-sql: false
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - spring.datasource.username: cuong
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - game.servers: Local:127.0.0.1:1445:0,0,0
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - spring.datasource.url: jdbc:mysql://14.225.208.47:3306/nro-team
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - database.password: cuong123@@
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - app.java.version: 22.0.2
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - game.skill.version: 1
+[2024-08-14 15:43:47 DEBUG (Config:48)] Config - game.item.quantity.max: 1000000
+[2024-08-14 15:43:47 INFO  (Config:51)] Server ID: 1
+[2024-08-14 15:43:47 DEBUG (DragonBall:18)] Start server!
+[2024-08-14 15:43:47 DEBUG (Server:68)] Start socket post=1445
+[2024-08-14 15:43:47 DEBUG (Server:83)] Start server Success!
+[2024-08-14 15:43:55 INFO  (Server:91)] Client connected from IP: 127.0.0.1
+[2024-08-14 15:43:55 DEBUG (MessageHandler:429)] Client 1: Kết nối thành công!
+[2024-08-14 15:43:55 DEBUG (Server:94)] New session created: null
+[2024-08-14 15:46:10 DEBUG (DragonBall:30)] Shutdown Server!
+[2024-08-14 15:46:10 DEBUG (Server:122)] End socket
+[2024-08-14 15:46:10 ERROR (Server:100)] failed!
+java.net.SocketException: Socket closed
+	at java.base/sun.nio.ch.NioSocketImpl.endAccept(NioSocketImpl.java:682)
+	at java.base/sun.nio.ch.NioSocketImpl.accept(NioSocketImpl.java:755)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:695)
+	at java.base/java.net.ServerSocket.platformImplAccept(ServerSocket.java:660)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:636)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:582)
+	at java.base/java.net.ServerSocket.accept(ServerSocket.java:541)
+	at com.ngocrong.backend.server.Server.start(Server.java:86)
+	at com.ngocrong.backend.server.DragonBall.start(DragonBall.java:21)
+	at com.ngocrong.backend.BackendApplication.run(BackendApplication.java:25)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:557)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:546)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:611)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.ngocrong.backend.BackendApplication.main(BackendApplication.java:18)
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - server.name: Ngoc Rong
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - app.encoding: UTF-8
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - database.host: 14.225.208.47
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - spring.jpa.hibernate.ddl-auto: none
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - spring.datasource.driver-class-name: com.mysql.cj.jdbc.Driver
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - game.data.version: 1
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - server.port_game: 1445
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - server.port: 1707
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - game.exp: 1
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - server.id: 1
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - spring.jpa.database-platform: org.hibernate.dialect.MySQL8Dialect
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - database.user: cuong
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - server.host: 127.0.0.1
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - game.item.version: 1
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - server.redirect: false
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - game.map.version: 1
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - database.name: nro-team
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - database.port: 3306
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - server.autosave.delay: 300000
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - spring.datasource.password: cuong123@@
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - spring.jpa.show-sql: false
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - spring.datasource.username: cuong
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - game.servers: Local:127.0.0.1:1445:0,0,0
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - spring.datasource.url: jdbc:mysql://14.225.208.47:3306/nro-team
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - database.password: cuong123@@
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - app.java.version: 22.0.2
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - game.skill.version: 1
+[2024-08-14 15:46:16 DEBUG (Config:48)] Config - game.item.quantity.max: 1000000
+[2024-08-14 15:46:16 INFO  (Config:51)] Server ID: 1
+[2024-08-14 15:46:16 DEBUG (DragonBall:18)] Start server!
+[2024-08-14 15:46:16 DEBUG (Server:68)] Start socket post=1445
+[2024-08-14 15:46:16 DEBUG (Server:83)] Start server Success!
+[2024-08-14 15:46:24 INFO  (Server:91)] Client connected from IP: 127.0.0.1
+[2024-08-14 15:46:24 DEBUG (MessageHandler:429)] Client 1: Kết nối thành công!
+[2024-08-14 15:46:24 DEBUG (Server:94)] New session created: null
+[2024-08-14 15:51:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 15:56:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 16:01:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 16:06:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 16:11:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 16:16:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 16:21:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 16:26:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 16:31:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 16:36:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 16:41:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 16:46:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 16:51:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 16:56:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 17:01:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 17:06:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 17:11:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 17:16:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 17:21:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 17:26:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 17:31:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 17:36:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 17:41:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 17:46:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 17:51:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 17:56:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 18:01:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 18:06:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 18:11:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 18:16:16 DEBUG (AutoSaveData:31)] Data saved successfully.
+[2024-08-14 18:17:45 DEBUG (DragonBall:30)] Shutdown Server!
+[2024-08-14 18:17:46 DEBUG (Server:122)] End socket
+[2024-08-14 18:17:46 ERROR (Server:100)] failed!
+java.net.SocketException: Socket closed
+	at java.base/sun.nio.ch.NioSocketImpl.endAccept(NioSocketImpl.java:682)
+	at java.base/sun.nio.ch.NioSocketImpl.accept(NioSocketImpl.java:755)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:695)
+	at java.base/java.net.ServerSocket.platformImplAccept(ServerSocket.java:660)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:636)
+	at java.base/java.net.ServerSocket.implAccept(ServerSocket.java:582)
+	at java.base/java.net.ServerSocket.accept(ServerSocket.java:541)
+	at com.ngocrong.backend.server.Server.start(Server.java:86)
+	at com.ngocrong.backend.server.DragonBall.start(DragonBall.java:21)
+	at com.ngocrong.backend.BackendApplication.run(BackendApplication.java:25)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:557)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:546)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:611)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.ngocrong.backend.BackendApplication.main(BackendApplication.java:18)

@@ -13,9 +13,10 @@ public abstract class IMap<E>{
     private boolean running;
 
 //    @Getter
+
     private final int id;
     private int countDown;
-    private final int countdownTimes;
+    private  int countdownTimes;
     protected final List<E> zones;
 
     public IMap(int countdown) {

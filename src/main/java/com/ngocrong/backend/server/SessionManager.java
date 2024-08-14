@@ -1,5 +1,6 @@
 package com.ngocrong.backend.server;
 
+import com.ngocrong.backend.character.Char;
 import com.ngocrong.backend.network.Message;
 import com.ngocrong.backend.network.Session;
 import com.ngocrong.backend.user.User;
@@ -14,81 +15,190 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class SessionManager {
     private static final Logger logger = Logger.getLogger(SessionManager.class);
-    private static final Map<Integer, Session> sessions = new ConcurrentHashMap<>(); // Dùng ConcurrentHashMap để thay thế ArrayList
+    public static ArrayList<Session> sessions = new ArrayList<>();
     private static final ReadWriteLock lock = new ReentrantReadWriteLock();
 
     public static void addSession(Session session) {
-        sessions.put(session.id ,session);
+        lock.writeLock().lock();
+        try {
+            sessions.add(session);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     public static void removeSession(Session session) {
-        sessions.remove(session.id);
+        lock.writeLock().lock();
+        try {
+            sessions.remove(session);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     public static List<User> findUser(String name) {
         List<User> userList = new ArrayList<>();
-        sessions.values().forEach(session -> {
-            if (isValidSession(session) && session.user.getUsername().equalsIgnoreCase(name)) {
-                userList.add(session.user);
+        lock.readLock().lock();
+        try {
+            for (Session ss : sessions) {
+                if (ss.isEnter && ss.getSocket() != null && !ss.getSocket().isClosed() && ss.user != null && ss.user.getUsername().toLowerCase().equals(name.toLowerCase())) {
+                    userList.add(ss.user);
+                }
             }
-        });
+        } finally {
+            lock.readLock().unlock();
+        }
         return userList;
     }
 
     public static boolean deviceInvalid(String device) {
-        long count = sessions.values().stream()
-                .filter(session -> isValidSession(session) && device.equals(session.deviceInfo))
-                .count();
-        return count > Server.COUNT_SESSION_ON_IP;
+        lock.readLock().lock();
+        try {
+            int num = 0;
+            for (Session ss : sessions) {
+                if (ss.isEnter && ss.getSocket() != null && !ss.getSocket().isClosed() && ss.deviceInfo != null && ss.deviceInfo.equals(device)) {
+                    num++;
+                }
+            }
+            return num > Server.COUNT_SESSION_ON_IP;
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     // Tìm user theo ID
     public static List<User> findUserById(int id) {
         List<User> userList = new ArrayList<>();
-        sessions.values().forEach(session -> {
-            if (isValidSession(session) && session.user.getId() == id) {
-                userList.add(session.user);
+        lock.readLock().lock();
+        try {
+            for (Session ss : sessions) {
+                if (ss.isEnter && ss.getSocket() != null && !ss.getSocket().isClosed() && ss.user != null && ss.user.getId() == id) {
+                    userList.add(ss.user);
+                }
             }
-        });
+        } finally {
+            lock.readLock().unlock();
+        }
         return userList;
     }
 
-//    public static void sendMessage(Message message) {
-//        lock.readLock().lock();
-//        try {
-//            for (Session session : sessions) {
-//                if (isValidSession(session) && session.getCharacter() != null) {
-//                    session.sendMessage(message);
-//                }
-//            }
-//        } catch (Exception ex) {
-//            logger.error("Failed to send message", ex);
-//        } finally {
-//            lock.readLock().unlock();
-//        }
-//    }
+    public static void sendMessage(Message message) {
+        lock.readLock().lock();
+        try {
+            for (Session ss : sessions) {
+                try {
+                    if (ss.isEnter && ss.getSocket() != null && !ss.getSocket().isClosed() && ss._char != null) {
+                        ss.sendMessage(message);
+                    }
+                } catch (Exception ex) {
+                    logger.error("failed!", ex);
+                }
+            }
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
 
     public static void chatVip(String text) {
         // Implement chatVip or remove method
+        text = "    " + text;
+        lock.readLock().lock();
+        try {
+            for (Session ss : sessions) {
+                try {
+                    if (ss.isEnter && ss.getSocket() != null && !ss.getSocket().isClosed() && ss._char != null) {
+                        ss._char.service.chatVip(text);
+                    }
+                } catch (Exception ex) {
+                    logger.error("failed!", ex);
+                }
+            }
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public static void serverMessage(String text) {
-        // Implement serverMessage or remove method
+        lock.readLock().lock();
+        try {
+            for (Session ss : sessions) {
+                try {
+                    if (ss.isEnter && ss.getSocket() != null && !ss.getSocket().isClosed() && ss._char != null) {
+                        ss._char.service.serverMessage(text);
+                    }
+                } catch (Exception ex) {
+                    logger.error("failed!", ex);
+                }
+            }
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public static void addBigMessage(String text) {
-        // Implement addBigMessage or remove method
+        lock.readLock().lock();
+        try {
+            for (Session ss : sessions) {
+                try {
+                    if (ss.isEnter && ss.getSocket() != null && !ss.getSocket().isClosed() && ss._char != null) {
+                        ss._char.service.addBigMessage(ss._char.getPetAvatar(), text, (byte) 0, null, null);
+                    }
+                } catch (Exception ex) {
+                    logger.error("failed!", ex);
+                }
+
+            }
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public static void saveData() {
-        // Implement saveData or remove method
+        lock.readLock().lock();
+        try {
+            for (Session ss : sessions) {
+                try {
+                    if (ss.isEnter && ss.getSocket() != null && !ss.getSocket().isClosed() && ss._char != null) {
+                        ss._char.saveData();
+                    }
+                } catch (Exception ex) {
+                    logger.error("failed!", ex);
+                }
+            }
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public static void close() {
-        // Implement close or remove method
+        lock.readLock().lock();
+        try {
+            for (Session ss : sessions) {
+                try {
+                    if (ss.isEnter && ss.getSocket() != null && !ss.getSocket().isClosed() && ss._char != null) {
+                        ss.close();
+                    }
+                } catch (Exception ex) {
+                    logger.error("failed!", ex);
+                }
+            }
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
-    private static boolean isValidSession(Session session) {
-        return session.isEnter && session.isConnected();
+
+    public static Char findChar(int playerID) {
+        lock.readLock().lock();
+        try {
+            for (Session ss : sessions) {
+                if (ss.isEnter && ss.getSocket() != null && !ss.getSocket().isClosed() && ss._char != null && ss._char.getId() == playerID) {
+                    return ss._char;
+                }
+            }
+        } finally {
+            lock.readLock().unlock();
+        }
+        return null;
     }
 }

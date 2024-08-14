@@ -348,4 +348,18 @@ public class MapService {
             zone.lockChar.readLock().unlock();
         }
     }
+
+    public void addTeleport(int id, byte teleport) {
+        try {
+            Message mss = new Message(Cmd.TELEPORT);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeInt(id);
+            ds.writeByte(teleport);
+            ds.flush();
+            sendMessage(mss, null);
+            mss.cleanup();
+        } catch (Exception ex) {
+            logger.error("failed!", ex);
+        }
+    }
 }

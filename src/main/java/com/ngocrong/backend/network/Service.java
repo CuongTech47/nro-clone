@@ -61,6 +61,9 @@ public class Service implements IService{
     }
 
 
+
+
+
     public void loadHP() {
         try {
             Message message = messageSubCommand(Cmd.ME_LOAD_HP);
@@ -293,5 +296,99 @@ public class Service implements IService{
 
     public void clearMap() {
         sendMessage(new Message(Cmd.MAP_CLEAR));
+    }
+
+    public void dialogMessage(String s) {
+        try {
+            Message ms = new Message(Cmd.DIALOG_MESSAGE);
+            DataOutputStream ds = ms.getWriter();
+            ds.writeUTF(s);
+            ds.flush();
+            sendMessage(ms);
+            ms.cleanup();
+        } catch (Exception ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void updateMap() {
+        try {
+            Server server = DragonBall.getInstance().getServer();
+            Message ms = messageNotMap(Cmd.UPDATE_MAP);
+            DataOutputStream ds = ms.getWriter();
+            ds.write(server.CACHE_MAP);
+            ds.flush();
+            sendMessage(ms);
+            ms.cleanup();
+        } catch (Exception ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    private Message messageNotMap(int command) {
+        try {
+            Message ms = new Message(Cmd.NOT_MAP);
+            ms.getWriter().writeByte(command);
+            return ms;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    public void updateSkill() {
+        try {
+            Server server = DragonBall.getInstance().getServer();
+            Message ms = messageNotMap(Cmd.UPDATE_SKILL);
+            DataOutputStream ds = ms.getWriter();
+            ds.write(server.CACHE_SKILL_TEMPLATE);
+            ds.flush();
+            sendMessage(ms);
+            ms.cleanup();
+        } catch (Exception ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void updateItem(byte b) {
+        try {
+            Server server = DragonBall.getInstance().getServer();
+            Message ms = messageNotMap(Cmd.UPDATE_ITEM);
+            DataOutputStream ds = ms.getWriter();
+            ds.write(server.CACHE_ITEM[b]);
+            ds.flush();
+            sendMessage(ms);
+            ms.cleanup();
+        } catch (Exception ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void requestMapTemplate(Message mss) {
+        try {
+            int map = mss.getReader().readUnsignedByte();
+            byte[] ab = player.zone.map.mapData;
+            Message mssage = messageNotMap(Cmd.REQUEST_MAPTEMPLATE);
+            DataOutputStream ds = mssage.getWriter();
+            ds.write(ab);
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void serverMessage2(String s) {
+        try {
+            Message ms = messageNotMap(35);
+            DataOutputStream ds = ms.getWriter();
+            ds.writeUTF(s);
+            ds.flush();
+            sendMessage(ms);
+            ms.cleanup();
+        } catch (Exception ex) {
+            logger.error("failed!", ex);
+        }
     }
 }

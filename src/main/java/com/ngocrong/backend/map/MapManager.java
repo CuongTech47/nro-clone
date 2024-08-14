@@ -19,8 +19,8 @@ public class MapManager implements Runnable{
     public HashMap<Integer, TMap> maps;
     public HashMap<Integer, IMap> list;
     public BaseBabidi baseBabidi;
-    public MBlackDragonBall blackDragonBall;
-    public MartialArtsFestival martialArtsFestival;
+//    public MBlackDragonBall blackDragonBall;
+//    public MartialArtsFestival martialArtsFestival;
     public boolean running;
 
     public MapManager() {

@@ -24,7 +24,7 @@ public class Sender implements Runnable{
     @Override
     public void run() {
         try{
-            while (session.isConnected) {
+            while (session.isConnected()) {
                 processMessages();
                 try {
                     Thread.sleep(10);
@@ -38,7 +38,7 @@ public class Sender implements Runnable{
         }
     }
 
-    private void processMessages() {
+    private void processMessages() throws IOException {
         Message message = sendingMessages.poll();
         if (message != null) {
             session.doSendMessage(message);

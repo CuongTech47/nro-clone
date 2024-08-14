@@ -2,7 +2,10 @@ package com.ngocrong.backend.entity;
 
 
 import com.ngocrong.backend.character.Char;
+
+
 import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

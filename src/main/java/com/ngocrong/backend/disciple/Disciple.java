@@ -21,7 +21,7 @@ public class Disciple extends Char {
     public Disciple() {
         this.effects = new ArrayList<>();
         this.itemTimes = new ArrayList<>();
-        this.idMount = -1;
+        this.setIdMount(-1);
         setHaveMount(false);
         this.listTarget = new ArrayList<>();
     }
@@ -60,7 +60,7 @@ public class Disciple extends Char {
     }
 
 
-
-
-
+    public void setMaster(Char master) {
+        this.master = master;
+    }
 }

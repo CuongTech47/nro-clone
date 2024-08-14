@@ -8,6 +8,7 @@ import java.util.ArrayList;
 @Getter
 public class ItemTemplate {
 
+    public int mountID;
     private short id;
 
 

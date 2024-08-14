@@ -23,6 +23,7 @@ public class MySQLConnect {
     }
 
     private static String buildUrl(String host, int port, String database) {
+        System.out.println("host: " + host);
         String url = "jdbc:mysql://" + host + ":" + port + "/" + database;
         logger.debug("MySQL connect: " + url);
         return url;

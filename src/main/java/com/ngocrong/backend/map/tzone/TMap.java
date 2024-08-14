@@ -90,23 +90,23 @@ public class TMap {
         return isBarrack() || isBaseBabidi() || isTreasure() || isClanTerritory() || isBlackDragonBall() || isNguHanhSon() || isDauTruong();
     }
 
-    private boolean isNguHanhSon() {
+    public boolean isNguHanhSon() {
         return mapID == MapName.NGU_HANH_SON || mapID == MapName.NGU_HANH_SON_2 || mapID == MapName.NGU_HANH_SON_3;
     }
 
-    private boolean isBlackDragonBall() {
+    public boolean isBlackDragonBall() {
         return mapID == MapName.HANH_TINH_M_2 || mapID == MapName.HANH_TINH_POLARIS || mapID == MapName.HANH_TINH_CRETACEOUS || mapID == MapName.HANH_TINH_MONMAASU || mapID == MapName.HANH_TINH_RUDEEZE || mapID == MapName.HANH_TINH_GELBO || mapID == MapName.HANH_TINH_TIGERE;
     }
 
-    private boolean isClanTerritory() {
+    public boolean isClanTerritory() {
         return mapID == MapName.LANH_DIA_BANG_HOI;
     }
 
-    private boolean isTreasure() {
+    public boolean isTreasure() {
         return mapID == MapName.DONG_HAI_TAC || mapID == MapName.CANG_HAI_TAC || mapID == MapName.HANG_BACH_TUOC || mapID == MapName.DONG_KHO_BAU;
     }
 
-    private boolean isBarrack() {
+    public boolean isBarrack() {
         return mapID == 53 || mapID == 54 || mapID == 55 || mapID == 56 || mapID == 57 || mapID == 58 || mapID == 59 || mapID == 60 || mapID == 61 || mapID == 62;
     }
 
@@ -193,5 +193,19 @@ public class TMap {
 
     public boolean isDoubleMap() {
         return false;
+    }
+
+    public boolean isCantOffline() {
+        return isBarrack() || isBaseBabidi() || isTreasure() || isClanTerritory() || isBlackDragonBall() || isNguHanhSon() || isDauTruong();
+    }
+
+    public void removeZone(Zone z) {
+        z.running = false;
+        lock.writeLock().lock();
+        try {
+            zones.remove(z);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 }

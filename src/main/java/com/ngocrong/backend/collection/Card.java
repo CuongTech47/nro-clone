@@ -20,5 +20,12 @@ public class Card {
     public transient CardTemplate template;
 
 
-
+    public void setTemplate() {
+        for (CardTemplate t : templates) {
+            if (t.id == this.id) {
+                this.template = t;
+                break;
+            }
+        }
+    }
 }

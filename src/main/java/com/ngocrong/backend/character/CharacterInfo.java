@@ -11,6 +11,7 @@ import com.ngocrong.backend.effect.AmbientEffect;
 import com.ngocrong.backend.item.Item;
 import com.ngocrong.backend.item.ItemOption;
 import com.ngocrong.backend.map.tzone.GravityRoom;
+import com.ngocrong.backend.model.Caption;
 import com.ngocrong.backend.model.PowerLimitMark;
 import com.ngocrong.backend.server.DragonBall;
 import com.ngocrong.backend.server.Server;
@@ -369,9 +370,9 @@ public class CharacterInfo {
 
     private void applyFoodAndColdEffects() {
         boolean isUnaffectedCold = false;
-        if (_character.isHaveFood()) {
-            this.fullDamage += this.fullDamage / 10;
-        }
+//        if (_character.isHaveFood()) {
+//            this.fullDamage += this.fullDamage / 10;
+//        }
         if (_character.zone != null && _character.zone.map.isCold()) {
             if (!isUnaffectedCold) {
                 this.hpFullTemp /= 2;
@@ -659,5 +660,35 @@ public class CharacterInfo {
         for (int param : options) {
             stat += Utils.percentOf(stat, param);
         }
+    }
+
+    public void applyCharLevelPercent() {
+        try {
+            long num = 1L;
+            long num2 = 0L;
+            int num3 = 0;
+            Server server = DragonBall.getInstance().getServer();
+            int size = server.powers.size();
+            for (int i = size - 1; i >= 0; i--) {
+                if (this.power >= server.powers.get(i)) {
+                    if (i == size - 1) {
+                        num = 1L;
+                    } else {
+                        num = server.powers.get(i + 1) - server.powers.get(i);
+                    }
+                    num2 = this.power - server.powers.get(i);
+                    num3 = i;
+                    break;
+                }
+            }
+            this.level = num3;
+            this.levelPercent = num2 * 10000L / num;
+        } catch (Exception ignored) {
+        }
+    }
+
+
+    public String getStrLevel() {
+        return Caption.getCaption(_character.getClassId()).get(this.level) + "+" + (this.levelPercent / 100L) + "." + (this.levelPercent % 100L) + "%";
     }
 }

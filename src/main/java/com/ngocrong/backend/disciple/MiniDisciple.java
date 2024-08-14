@@ -11,9 +11,9 @@ public class MiniDisciple extends Char {
 
     public MiniDisciple(Item item, Char _owner, Char owner) {
         super();
-        this.id = -(((Utils.nextInt(100) * 1000) + Utils.nextInt(100) * 100)) + Utils.nextInt(100);
+        this.setId(-(((Utils.nextInt(100) * 1000) + Utils.nextInt(100) * 100)) + Utils.nextInt(100));
         this.owner = owner;
-        this.name = "";
+        this.setName("");
         setPart();
     }
 

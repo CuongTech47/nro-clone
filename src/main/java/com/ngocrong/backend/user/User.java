@@ -140,7 +140,7 @@ public class User {
     }
 
     private boolean isNameExists(String name) {
-        return !GameRepo.getInstance().playerRepo.findByPlayerName(name).isEmpty();
+        return !GameRepo.getInstance().playerRepo.findByName(name).isEmpty();
     }
 
     private byte validateGender(byte gender) {
