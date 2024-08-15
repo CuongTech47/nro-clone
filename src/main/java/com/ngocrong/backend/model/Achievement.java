@@ -76,4 +76,9 @@ public class Achievement {
     public String getDescription() {
         return String.format("%s (%s/%s)", template.getContent(), Utils.formatNumber(count), Utils.formatNumber(template.getMaxCount()));
     }
+
+    public void initTemplate() {
+        Server server = DragonBall.getInstance().getServer();
+        this.template = server.getAchievements().get(this.id);
+    }
 }

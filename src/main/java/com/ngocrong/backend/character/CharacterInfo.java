@@ -94,13 +94,15 @@ public class CharacterInfo {
     private transient int fullDefense;
     private transient int fullCritical;
     private transient byte speed;
+
+    private transient long hpFullTemp;
+    private transient long mpFullTemp;
+
     private transient int accuracy;
     private transient int accuracyPercent;
     private transient int evasion;
     private transient int evasionPercent;
 
-    private transient long hpFullTemp;
-    private transient long mpFullTemp;
 
     private transient int level;
     private transient long levelPercent;
@@ -183,7 +185,7 @@ public class CharacterInfo {
 
     // Thiết lập giới hạn sức mạnh
     public void setPowerLimited() {
-        this.powerLimitMark = PowerLimitMark.limitMarks.get(this.openPowerCount);
+        this.powerLimitMark = PowerLimitMark.limitMark.get(this.openPowerCount);
     }
 
     // Thiết lập thể lực

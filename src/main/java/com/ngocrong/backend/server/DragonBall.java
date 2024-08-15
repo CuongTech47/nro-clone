@@ -16,23 +16,18 @@ public class DragonBall {
         server = new Server();
         try {
             logger.debug("Start server!");
-            addShutdownHook();
-            initializeServer();
+            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    logger.debug("Shutdown Server!");
+                    server.stop();
+                }
+            }));
+            server.init();
+            System.gc();
             server.start();
         } catch (Exception ex) {
-            logger.error("Failed to start the server", ex);
+            logger.error("START ERR", ex);
         }
-    }
-
-
-    private void addShutdownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            logger.debug("Shutdown Server!");
-            server.stop();
-        }));
-    }
-
-    private void initializeServer() throws Exception {
-        server.init();
     }
 }

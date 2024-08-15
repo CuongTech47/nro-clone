@@ -10,6 +10,8 @@ import com.ngocrong.backend.model.Waypoint;
 import com.ngocrong.backend.util.Utils;
 import org.apache.log4j.Logger;
 
+import java.io.*;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -72,6 +74,22 @@ public class TMap {
     public byte[] mapData;
     public ArrayList<Floor> floors = new ArrayList<>();
     public ReadWriteLock lock = new ReentrantReadWriteLock();
+
+    public static void createData() {
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            DataOutputStream dos = new DataOutputStream(bos);
+            dos.writeShort(mapNames.size());
+            for (String name : mapNames) {
+                dos.writeUTF(name);
+            }
+            data = bos.toByteArray();
+            dos.close();
+            bos.close();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
 
 
     public boolean isMapSingle() {
@@ -168,7 +186,7 @@ public class TMap {
         return y;
     }
 
-    private boolean checkBlock(short px, short py) {
+    public boolean checkBlock(short px, short py) {
         return blocks[py / 24 * tmw + px / 24];
     }
 
@@ -206,6 +224,124 @@ public class TMap {
             zones.remove(z);
         } finally {
             lock.writeLock().unlock();
+        }
+    }
+
+    public void init() {
+        if (tileID != 0) {
+            loadMapFromResource();
+            this.zones = new ArrayList<>();
+            for (autoIncrease = 0; autoIncrease < this.zoneNumber; autoIncrease++) {
+                Zone z = null;
+//                if (mapID == MapName.VACH_NUI_ARU_2 || mapID == MapName.VACH_NUI_MOORI_2 || mapID == MapName.VACH_NUI_KAKAROT) {
+//                    z = new Cliff(this, autoIncrease);
+//                } else if (mapID == MapName.NGU_HANH_SON || mapID == MapName.NGU_HANH_SON_2 || mapID == MapName.NGU_HANH_SON_3) {
+//                    z = new NguHanhSon(this, autoIncrease);
+//                } else if (mapID == MapName.DAI_HOI_VO_THUAT) {
+//                    z = new WaitingArea(this, autoIncrease);
+//                } else if (mapID == MapName.DAI_HOI_VO_THUAT_3) {
+//                    z = new Arena23(this, autoIncrease);
+//                } else if (isMapSingle()) {
+//                    z = new MapSingle(this, autoIncrease);
+//                } else {
+//                    z = new Zone(this, autoIncrease);
+//                }
+                addZone(z);
+            }
+        }
+    }
+
+    public void loadMapFromResource() {
+        logger.debug("loadMapFromResource map: " + this.name);
+        this.mapData = Utils.getFile("resources/map/" + this.mapID);
+
+        if (this.mapData == null) {
+            logger.error("Map data is null for mapID: " + this.mapID);
+            return; // Thoát khỏi phương thức nếu không có dữ liệu
+        }
+
+        try (ByteArrayInputStream bis = new ByteArrayInputStream(this.mapData);
+             DataInputStream dis = new DataInputStream(bis)) {
+
+            // Đọc kích thước bản đồ
+            this.tmw = dis.read();
+            this.tmh = dis.read();
+
+            // Đọc dữ liệu bản đồ
+            int lent = dis.available();
+            this.maps = new int[lent];
+            for (int i = 0; i < lent; i++) {
+                this.maps[i] = dis.read();
+            }
+
+            // Khởi tạo các mảng `types` và `blocks`
+            this.types = new int[this.maps.length];
+            this.blocks = new boolean[this.maps.length];
+
+            // Tải các khối trên bản đồ
+            loadBlock();
+
+        } catch (IOException ex) {
+            logger.error("I/O error occurred while loading map!", ex);
+        } catch (Exception ex) {
+            logger.error("Unexpected error occurred while loading map!", ex);
+        }
+    }
+
+
+
+    private void loadBlock() {
+        File file = new File("resources/map/block/" + this.mapID);
+        if (file.exists()) {
+            try {
+                byte[] ab = Files.readAllBytes(file.toPath());
+
+                for (int i = 0; i < ab.length; i++) {
+                    blocks[i] = ab[i] == 1;
+                }
+            } catch (IOException ex) {
+                logger.error("load block err");
+            }
+        }
+    }
+
+    public void loadMap() {
+        this.height = this.tmh * 24;
+        this.width = this.tmw * 24;
+        int index = this.tileID - 1;
+        try {
+            int lent = this.tmw * this.tmh;
+            for (int i = 0; i < lent; i++) {
+                for (int j = 0; j < TMap.tileType[index].length; j++) {
+                    setTile(i, TMap.tileIndex[index][j], TMap.tileType[index][j]);
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        setListFloor();
+    }
+
+    private void setListFloor() {
+        for (int i = 0; i < tmw; i++) {
+            for (int j = 0; j < tmh; j++) {
+                int t = this.types[j * this.tmw + i];
+                if ((t & T_TOP) == T_TOP || (t & T_BRIDGE) == T_BRIDGE) {
+                    Floor floor = new Floor();
+                    floor.x = i;
+                    floor.y = j;
+                    floors.add(floor);
+                }
+            }
+        }
+    }
+
+    private void setTile(int index, int[] mapsArr, int type) {
+        for (int i = 0; i < mapsArr.length; i++) {
+            if (this.maps[index] == mapsArr[i]) {
+                this.types[index] |= type;
+                break;
+            }
         }
     }
 }

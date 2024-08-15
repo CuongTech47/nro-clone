@@ -8,6 +8,7 @@ import com.ngocrong.backend.item.ItemMap;
 import com.ngocrong.backend.mob.Mob;
 import com.ngocrong.backend.model.Hold;
 import com.ngocrong.backend.network.Message;
+import com.ngocrong.backend.network.Service;
 import com.ngocrong.backend.skill.Skill;
 import com.ngocrong.backend.map.tzone.Zone;
 import org.apache.log4j.Logger;
@@ -197,7 +198,7 @@ public class MapService {
 
 
 
-    private void sendMessage(Message message , Char _char) {
+    public void sendMessage(Message message , Char _char) {
         zone.lockChar.readLock();
         try {
             for (Char _c : zone.chars) {
@@ -355,6 +356,36 @@ public class MapService {
             DataOutputStream ds = mss.getWriter();
             ds.writeInt(id);
             ds.writeByte(teleport);
+            ds.flush();
+            sendMessage(mss, null);
+            mss.cleanup();
+        } catch (Exception ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void playerSetTypePk(Char _char) {
+        try {
+            Message mss = Service.messageSubCommand(Cmd.UPDATE_TYPE_PK);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeInt(_char.getId());
+            ds.writeByte(_char.getTypePk());
+            ds.flush();
+            sendMessage(mss, null);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void setPosition(Char _char, byte type) {
+        try {
+            Message mss = new Message(Cmd.SET_POS);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeInt(_char.getId());
+            ds.writeShort(_char.getX());
+            ds.writeShort(_char.getY());
+            ds.writeByte(type);
             ds.flush();
             sendMessage(mss, null);
             mss.cleanup();

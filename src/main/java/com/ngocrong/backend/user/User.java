@@ -1,6 +1,15 @@
 package com.ngocrong.backend.user;
 
 
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.log4j.Logger;
+
 import com.google.common.base.CharMatcher;
 import com.google.gson.Gson;
 import com.ngocrong.backend.character.CharacterInfo;
@@ -14,15 +23,8 @@ import com.ngocrong.backend.server.Config;
 import com.ngocrong.backend.server.DragonBall;
 import com.ngocrong.backend.server.Server;
 import com.ngocrong.backend.server.SessionManager;
-import lombok.Data;
-import org.apache.log4j.Logger;
 
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import lombok.Data;
 
 @Data
 public class User {
@@ -49,7 +51,7 @@ public class User {
 
     public int login() throws SQLException {
         Server server = DragonBall.getInstance().getServer();
-        if (server.isMaintained()) {
+        if (server.isMaintained) {
             return 5;
         }
         if (!isValidUsername(username)) {

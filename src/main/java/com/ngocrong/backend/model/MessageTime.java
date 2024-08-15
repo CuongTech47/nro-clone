@@ -1,5 +1,9 @@
 package com.ngocrong.backend.model;
 
+
+import lombok.Data;
+
+@Data
 public class MessageTime {
     public static final byte DOANH_TRAI = 0;
     public static final byte HANG_KHO_BAU = 1;
@@ -17,4 +21,6 @@ public class MessageTime {
     public void update() {
         this.time--;
     }
+
+
 }

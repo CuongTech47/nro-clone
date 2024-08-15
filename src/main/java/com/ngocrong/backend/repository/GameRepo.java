@@ -6,6 +6,7 @@ public class GameRepo {
     public PlayerRepo playerRepo;
     public ClanMemberRepo clanMemberRepo;
     public ClanRepo clanRepo;
+    public DiscipleRepo discipleRepo;
 
 
 

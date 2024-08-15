@@ -1,5 +1,21 @@
 package com.ngocrong.backend.network;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.apache.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.ngocrong.backend.character.Char;
@@ -10,6 +26,7 @@ import com.ngocrong.backend.clan.ClanManager;
 import com.ngocrong.backend.collection.Card;
 import com.ngocrong.backend.consts.Cmd;
 import com.ngocrong.backend.disciple.Disciple;
+import com.ngocrong.backend.entity.DiscipleEntity;
 import com.ngocrong.backend.entity.PlayerEntity;
 import com.ngocrong.backend.item.Amulet;
 import com.ngocrong.backend.item.Item;
@@ -29,22 +46,10 @@ import com.ngocrong.backend.skill.Skills;
 import com.ngocrong.backend.skill.SpecialSkill;
 import com.ngocrong.backend.task.Task;
 import com.ngocrong.backend.user.User;
+import com.ngocrong.backend.util.Utils;
+
 import lombok.Data;
 import lombok.Getter;
-import lombok.Setter;
-import lombok.Synchronized;
-import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 @Data
 public class Session implements ISession {
@@ -162,11 +167,11 @@ public class Session implements ISession {
                 dis = null;
             }
             if (sendThread != null && sendThread.isAlive()) {
-                sendThread.stop();
+                sendThread.interrupt();
                 sendThread = null;
             }
             if (collectorThread != null && collectorThread.isAlive()) {
-                collectorThread.stop();
+                collectorThread.interrupt();
                 collectorThread = null;
             }
             System.gc();
@@ -531,26 +536,28 @@ public class Session implements ISession {
             _char.characterInfo.setPowerLimited();
             _char.characterInfo.setCharacter(this._char);
             _char.setStatusItemTime();
-            _char.myDisciple = loadDisciple(-_char.id);
+            _char.myDisciple = loadDisciple(-_char.getId());
         } catch (Exception ex) {
             logger.error("loadChar", ex);
         }
         return true;
     }
 
-    private Disciple loadDisciple(int i) {
+    private Disciple loadDisciple(int id) {
         try {
             Gson gson = new Gson();
-            Optional<DiscipleData> discipleOptional = GameRepository.getInstance().disciple.findById(id);
+            Optional<DiscipleEntity> discipleOptional = GameRepo.getInstance().discipleRepo.findById(id);
             if (discipleOptional.isPresent()) {
-                DiscipleData discipleData = discipleOptional.get();
+                DiscipleEntity discipleData = discipleOptional.get();
                 Disciple deTu = new Disciple();
                 deTu.typeDisciple = discipleData.type;
-                deTu.id = id;
-                deTu.name = discipleData.name;
-                deTu.gender = deTu.classId = discipleData.planet;
+                deTu.setId(id);
+                deTu.setName(discipleData.name);
+//                deTu.gender = deTu.classId = discipleData.planet;
+                deTu.setClassId(discipleData.getPlanet());
+               deTu.setGender(deTu.getClassId());
                 deTu.discipleStatus = discipleData.status;
-                deTu.skills = new ArrayList<>();
+                deTu.setSkills(new ArrayList<>());
                 JSONArray skills = new JSONArray(discipleData.skill);
                 int lent2 = skills.length();
                 for (int i = 0; i < lent2; i++) {
@@ -565,29 +572,103 @@ public class Session implements ISession {
                         deTu.addSkill(skill2);
                     }
                 }
-                deTu.skillOpened = (byte) deTu.skills.size();
+                deTu.skillOpened = (byte) deTu.getSkills().size();
                 deTu.itemBody = new Item[10];
                 JSONArray itemBody = new JSONArray(discipleData.itemBody);
                 int lent = itemBody.length();
                 for (int i = 0; i < lent; i++) {
                     Item item = new Item();
                     item.load(itemBody.getJSONObject(i));
-                    int index = item.template.type;
+                    int index = item.template.getType();
                     if (index == 32) {
                         index = 6;
                     }
                     deTu.itemBody[index] = item;
                 }
-                deTu.info = gson.fromJson(discipleData.info, Info.class);
-                deTu.info.applyCharLevelPercent();
-                deTu.info.setPowerLimited();
-                deTu.info.setChar(deTu);
-                deTu.info.setInfo();
+                deTu.characterInfo = gson.fromJson(discipleData.info, CharacterInfo.class);
+                deTu.characterInfo.applyCharLevelPercent();
+                deTu.characterInfo.setPowerLimited();
+                deTu.characterInfo.setCharacter(deTu);
+                deTu.characterInfo.setCharacterInfo();
                 return deTu;
             }
         } catch (Exception ex) {
             logger.error("failed!", ex);
         }
         return null;
+    }
+
+    public void login(Message ms) throws IOException {
+        try {
+            if (!this.isSetClientInfo || this.isLogin) {
+                disconnect();
+                return;
+            }
+            String username = ms.getReader().readUTF();
+            String password = ms.getReader().readUTF();
+            String version = ms.getReader().readUTF();
+            byte type = ms.getReader().readByte();
+            User us = new User(username, password, this);
+            int status = us.login();
+            Service sv = (Service) service;
+            if (status == 0) {
+                sv.dialogMessage("Tài khoản hoặc mật khẩu không chính xác!");
+            } else if (status == 2) {
+                sv.dialogMessage("Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên để biết thêm chi tiết.");
+            } else if (status == 3) {
+                disconnect();
+            } else if (status == 5) {
+                sv.dialogMessage("Máy chủ đang tiến hành bảo trì, vui lòng quay lại sau.");
+            } else if (status == 6) {
+                sv.dialogMessage("Tài khoản không được chứa ký tự đặc biệt");
+            } else {
+                if (status == 4) {
+                    Timestamp banUntil = us.getLockTime();
+                    long now = System.currentTimeMillis();
+                    long timeRemaining = banUntil.getTime() - now;
+                    if (timeRemaining > 0) {
+                        sv.dialogMessage(String.format("Tài khoản của bạn đã bị khóa trong %s. Vui lòng liên hệ Admin để biết thêm chi tiết.", Utils.timeAgo((int) (timeRemaining / 1000))));
+                        return;
+                    }
+                }
+                this.user = us;
+                sv.sendSmallVersion();
+                sv.sendBGSmallVersion();
+                sv.sendVersion();
+            }
+        } catch (SQLException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void generateKey(int size) {
+        this.key = new byte[size];
+        for (int i = 0; i < size; i++) {
+            this.key[i] = (byte) Utils.nextInt(-128, 127);
+        }
+    }
+
+    public void sendKey() throws IOException {
+        if (isConnected) {
+            return;
+        }
+        Server server = DragonBall.getInstance().getServer();
+        Config config = server.getConfig();
+        Message ms = new Message(Cmd.GET_SESSION_ID);
+        DataOutputStream ds = ms.getWriter();
+        ds.writeByte(key.length);
+        ds.writeByte(key[0]);
+        for (int i = 1; i < key.length; i++) {
+            ds.writeByte(key[i] ^ key[i - 1]);
+        }
+        ds.writeUTF(config.getHost());
+        ds.writeInt(config.getPort());
+        ds.writeBoolean(config.isRedirect());
+        ds.flush();
+        doSendMessage(ms);
+        ms.cleanup();
+        isConnected = true;
+        sendThread.start();
+        messageHandler.setService(service);
     }
 }

@@ -1,10 +1,12 @@
 package com.ngocrong.backend.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PowerLimitMark {
     // Static list to hold all PowerLimitMark instances
-    public static List<PowerLimitMark> limitMarks;
+    public static ArrayList<PowerLimitMark> limitMark;
+
 
     // Fields representing power limits and attributes
     private long power;

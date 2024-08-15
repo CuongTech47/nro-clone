@@ -22,6 +22,7 @@ public class BackendApplication implements CommandLineRunner {
         GameRepo.getInstance().playerRepo = playerRepository;
         GameRepo.getInstance().clanRepo = clanRepository;
         GameRepo.getInstance().clanMemberRepo = clanMemberRepository;
+        GameRepo.getInstance().discipleRepo = discipleRepository;
         DragonBall.getInstance().start();
     }
 
@@ -38,6 +39,9 @@ public class BackendApplication implements CommandLineRunner {
 
     @Autowired
     ClanMemberRepo clanMemberRepository;
+
+    @Autowired
+    DiscipleRepo discipleRepository;
 
 
 }

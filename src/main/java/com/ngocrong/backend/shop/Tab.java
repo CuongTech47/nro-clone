@@ -4,9 +4,11 @@ import com.ngocrong.backend.character.Char;
 import com.ngocrong.backend.item.ItemTemplate;
 import com.ngocrong.backend.server.DragonBall;
 import com.ngocrong.backend.server.Server;
+import lombok.Data;
 
 import java.util.ArrayList;
 
+@Data
 public class Tab {
     private String tabName;
     private ArrayList<ItemTemplate> TRAI_DAT = new ArrayList<>();
@@ -59,28 +61,28 @@ public class Tab {
         }
         Server server = DragonBall.getInstance().getServer();
         for (ItemTemplate item : ALL) {
-//            if (item.id == 293) {
-//                if (_c.magicTree == null || _c.magicTree.level <= 1) {
-//                    continue;
-//                }
-//                int mLevel = _c.magicTree.level;
-//                if (mLevel > 2) {
-//                    int[] IDS = {294, 295, 296, 297, 298, 299, 596, 597};
-//                    int id = IDS[mLevel - 3];
-//                    boolean isNew = item.isNew;
-//                    int buyGem = item.buyGem;
-//                    long buyGold = item.buyGold;
-//                    item = server.iTemplates.get(id);
-//                    item.isNew = isNew;
-//                    item.buyGem = buyGem;
-//                    item.buyGold = buyGold;
-//                    if (mLevel > 6) {
-//                        item.buyGem *= 3;
-//                        item.buyGold *= 3;
-//                    }
-//                }
-//            }
-//            list.add(item);
+            if (item.id == 293) {
+                if (_c.magicTree == null || _c.magicTree.level <= 1) {
+                    continue;
+                }
+                int mLevel = _c.magicTree.level;
+                if (mLevel > 2) {
+                    int[] IDS = {294, 295, 296, 297, 298, 299, 596, 597};
+                    int id = IDS[mLevel - 3];
+                    boolean isNew = item.isNew;
+                    int buyGem = item.buyGem;
+                    long buyGold = item.buyGold;
+                    item = server.iTemplates.get(id);
+                    item.isNew = isNew;
+                    item.buyGem = buyGem;
+                    item.buyGold = buyGold;
+                    if (mLevel > 6) {
+                        item.buyGem *= 3;
+                        item.buyGold *= 3;
+                    }
+                }
+            }
+            list.add(item);
         }
         return list;
     }

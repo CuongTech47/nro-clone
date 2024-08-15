@@ -150,4 +150,14 @@ public class Clan {
             lockMember.writeLock().unlock();
         }
     }
+
+    public int getNumberMember() {
+        lockMember.readLock().lock();
+        try {
+            return members.size();
+        } finally {
+            lockMember.readLock().unlock();
+        }
+    }
+
 }

@@ -10,10 +10,12 @@ import com.ngocrong.backend.server.SessionManager;
 public class ZBarrack extends Zone {
     private static Logger logger = Logger.getLogger(ZBarrack.class);
     private Barrack barrack;
-    public ZBarrack(TMap map, int zoneId) {
+    public ZBarrack(Barrack barrack, TMap map, int zoneId) {
         super(map, zoneId);
         this.barrack = barrack;
     }
+
+
 
     public void setBarrack(Clan clan) {
         long hp = 8000;
@@ -42,4 +44,7 @@ public class ZBarrack extends Zone {
         }
 
     }
+
+
+
 }

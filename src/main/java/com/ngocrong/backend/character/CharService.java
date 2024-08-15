@@ -1,11 +1,15 @@
 package com.ngocrong.backend.character;
 
 
+import com.ngocrong.backend.clan.Clan;
+import com.ngocrong.backend.clan.ClanMember;
+import com.ngocrong.backend.clan.ClanMessage;
 import com.ngocrong.backend.consts.Cmd;
 import com.ngocrong.backend.consts.Language;
 import com.ngocrong.backend.effect.EffectChar;
 import com.ngocrong.backend.item.Item;
 import com.ngocrong.backend.item.ItemOption;
+import com.ngocrong.backend.lib.KeyValue;
 import com.ngocrong.backend.map.tzone.TMap;
 import com.ngocrong.backend.map.tzone.Zone;
 import com.ngocrong.backend.mob.Mob;
@@ -18,6 +22,7 @@ import com.ngocrong.backend.server.Server;
 import com.ngocrong.backend.skill.Skill;
 import com.ngocrong.backend.skill.SpecialSkill;
 import com.ngocrong.backend.skill.SpecialSkillTemplate;
+import com.ngocrong.backend.util.Utils;
 import org.apache.log4j.Logger;
 
 import java.io.DataOutputStream;
@@ -178,6 +183,21 @@ public class CharService  extends Service {
             DataOutputStream ds = mss.getWriter();
             ds.writeInt(aChar.getId());
             ds.writeByte(aChar.getBag());
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void updateBag(int index, int quantity) {
+        try {
+            Message mss = new Message(Cmd.BAG);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeByte(2);
+            ds.writeByte(index);
+            ds.writeInt(quantity);
             ds.flush();
             sendMessage(mss);
             mss.cleanup();
@@ -730,18 +750,18 @@ public class CharService  extends Service {
 
                 ds.writeUTF("$" + name);
                 ds.writeUTF(player.myDisciple.characterInfo.getStrLevel());
-                ds.writeLong(player.myDisciple.info.power);
-                ds.writeLong(player.myDisciple.info.potential);
+                ds.writeLong(player.myDisciple.characterInfo.getPower());
+                ds.writeLong(player.myDisciple.characterInfo.getPotential());
                 ds.writeByte(player.myDisciple.discipleStatus);
-                ds.writeShort(player.myDisciple.info.stamina);
-                ds.writeShort(player.myDisciple.info.maxStamina);
-                ds.writeByte(player.myDisciple.info.criticalFull);
-                ds.writeShort(player.myDisciple.info.defenseFull);
+                ds.writeShort(player.myDisciple.characterInfo.getStamina());
+                ds.writeShort(player.myDisciple.characterInfo.getMaxStamina());
+                ds.writeByte(player.myDisciple.characterInfo.getFullCritical());
+                ds.writeShort(player.myDisciple.characterInfo.getFullDefense());
                 ArrayList<KeyValue> skillInfos = player.myDisciple.getInfoSkill();
                 ds.writeByte(skillInfos.size());
                 for (KeyValue<Short, String> keyValue : skillInfos) {
-                    short skillId = keyValue.key;
-                    String moreInfo = keyValue.value;
+                    short skillId = keyValue.getKey();
+                    String moreInfo = keyValue.getValue();
                     ds.writeShort(skillId);
                     if (skillId == -1) {
                         ds.writeUTF(moreInfo);
@@ -753,6 +773,174 @@ public class CharService  extends Service {
             mss.cleanup();
         } catch (IOException ex) {
             logger.error("failed!", ex);
+        }
+    }
+
+    public void taskNext() {
+        sendMessage(new Message(Cmd.TASK_UPDATE));
+    }
+
+    public void loadInfo() {
+        try {
+            Message mss = messageSubCommand(Cmd.ME_LOAD_INFO);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeLong(player.getGold());
+            ds.writeInt(player.getDiamond());
+            ds.writeLong(player.characterInfo.getHp());
+            ds.writeLong(player.characterInfo.getMp());
+            ds.writeInt(player.getDiamondLock());
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void setItemBag() {
+        try {
+            Message mss = new Message(Cmd.BAG);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeByte(0);
+            ds.writeByte(player.getItemBag().length);
+            for (Item item : player.itemBag) {
+                if (item != null) {
+                    ds.writeShort(item.id);
+                    ds.writeInt(item.quantity);
+                    ds.writeUTF(item.info);
+                    ds.writeUTF(item.content);
+                    ArrayList<ItemOption> options = item.getDisplayOptions();
+                    ds.writeByte(options.size());
+                    for (ItemOption option : options) {
+                        int[] format = option.format();
+                        ds.writeShort(format[0]);
+                        ds.writeInt(format[1]);
+                    }
+                } else {
+                    ds.writeShort(-1);
+                }
+            }
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void setItemBody() {
+        try {
+            Message mss = new Message(Cmd.BODY);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeByte(0);
+            ds.writeShort(player.getHead());
+            ds.writeByte(player.itemBody.length);
+            for (Item item : player.itemBody) {
+                if (item != null) {
+                    ds.writeShort(item.id);
+                    ds.writeInt(item.quantity);
+                    ds.writeUTF(item.info);
+                    ds.writeUTF(item.content);
+                    ArrayList<ItemOption> options = item.getDisplayOptions();
+                    ds.writeByte(options.size());
+                    for (ItemOption option : options) {
+                        int[] format = option.format();
+                        ds.writeShort(format[0]);
+                        ds.writeInt(format[1]);
+                    }
+                } else {
+                    ds.writeShort(-1);
+                }
+            }
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void gameInfo() {
+        try {
+            Server server = DragonBall.getInstance().getServer();
+            Message mss = new Message(Cmd.GAME_INFO);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeByte(server.gameInfos.size());
+            for (GameInfo gameInfo : server.gameInfos) {
+                ds.writeShort(gameInfo.getId());
+                ds.writeUTF(gameInfo.getTitle());
+                ds.writeUTF(gameInfo.getContent());
+            }
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void clanInfo() {
+        try {
+            Message ms = new Message(Cmd.CLAN_INFO);
+            DataOutputStream ds = ms.getWriter();
+            ds.writeInt(player.getClanID());
+            if (player.getClanID() != -1) {
+                Clan clan = player.clan;
+                if (clan == null) {
+                    return;
+                }
+                List<ClanMember> clanMembers = clan.getMembers();
+                ds.writeUTF(clan.name);
+                ds.writeUTF(clan.slogan);
+                ds.writeByte(clan.imgID);
+                ds.writeUTF(Utils.formatNumber(clan.powerPoint));
+                ds.writeUTF(clan.leaderName);
+                ds.writeByte(clan.getNumberMember());
+                ds.writeByte(clan.maxMember);
+                ds.writeByte(clan.getMember(player.getId()).role);
+                ds.writeInt(clan.clanPoint);
+                ds.writeByte(clan.level);
+                for (ClanMember mem : clanMembers) {
+                    ds.writeInt(mem.playerID);
+                    ds.writeShort(mem.head);
+                    ds.writeShort(mem.leg);
+                    ds.writeShort(mem.body);
+                    ds.writeUTF(mem.name);
+                    ds.writeByte(mem.role);
+                    ds.writeUTF(Utils.formatNumber(mem.powerPoint));
+                    ds.writeInt(mem.donate);
+                    ds.writeInt(mem.receiveDonate);
+                    ds.writeInt(mem.clanPoint);
+                    ds.writeInt(mem.currClanPoint);
+                    ds.writeUTF(mem.getStrJoinTime());
+                }
+                ds.writeByte(clan.messages.size());
+                for (ClanMessage message : clan.messages) {
+                    writeClanMessage(ds, message);
+                }
+            }
+            ds.flush();
+            sendMessage(ms);
+            ms.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    private void writeClanMessage(DataOutputStream ds, ClanMessage message) throws IOException{
+        ds.writeByte(message.type);
+        ds.writeInt(message.id);
+        ds.writeInt(message.playerId);
+        ds.writeUTF(message.playerName);
+        ds.writeByte(message.role);
+        ds.writeInt(message.time);
+        if (message.type == 0) {
+            ds.writeUTF(message.chat);
+            ds.writeByte(message.color);
+        } else if (message.type == 1) {
+            ds.writeByte(message.receive);
+            ds.writeByte(message.maxCap);
+            ds.writeBoolean(message.isNewMessage);
         }
     }
 

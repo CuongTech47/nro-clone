@@ -4,6 +4,7 @@ package com.ngocrong.backend.character;
 import com.google.gson.Gson;
 import com.ngocrong.backend.bot.Escort;
 import com.ngocrong.backend.clan.Clan;
+import com.ngocrong.backend.clan.ClanMember;
 import com.ngocrong.backend.collection.Card;
 import com.ngocrong.backend.collection.CardTemplate;
 import com.ngocrong.backend.consts.*;
@@ -14,22 +15,19 @@ import com.ngocrong.backend.effect.AmbientEffect;
 import com.ngocrong.backend.effect.EffectChar;
 import com.ngocrong.backend.item.*;
 import com.ngocrong.backend.lib.KeyValue;
+import com.ngocrong.backend.map.Barrack;
 import com.ngocrong.backend.map.BaseBabidi;
 import com.ngocrong.backend.map.MapManager;
-import com.ngocrong.backend.map.tzone.Home;
-import com.ngocrong.backend.map.tzone.MapSingle;
-import com.ngocrong.backend.map.tzone.TMap;
+import com.ngocrong.backend.map.tzone.*;
 import com.ngocrong.backend.mob.Mob;
 import com.ngocrong.backend.model.*;
 import com.ngocrong.backend.network.Message;
-import com.ngocrong.backend.network.Service;
 import com.ngocrong.backend.network.Session;
 import com.ngocrong.backend.repository.GameRepo;
 import com.ngocrong.backend.server.DragonBall;
 import com.ngocrong.backend.server.Server;
 import com.ngocrong.backend.shop.Shop;
 import com.ngocrong.backend.skill.Skill;
-import com.ngocrong.backend.map.tzone.Zone;
 import com.ngocrong.backend.skill.SkillBook;
 import com.ngocrong.backend.skill.SpecialSkill;
 import com.ngocrong.backend.task.Task;
@@ -42,6 +40,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.awt.*;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -144,6 +144,11 @@ public class Char {
     private boolean isTrading;
     private boolean isNewMember;
     private boolean isAutoPlay;
+    private boolean isSkillSpecial;
+    private boolean isBuaTriTue, isBuaManhMe, isBuaDaTrau, isBuaOaiHung, isBuaBatTu, isBuaDeoDai, isBuaThuHut,
+            isBuaDeTu, isBuaTriTue3, isBuaTriTue4;
+    private boolean setThienXinHang, setKirin, setSongoku, setPicolo, setOcTieu, setPikkoroDaimao, setKakarot, setCaDic, setThanLinh;
+    private boolean isGoBack;
     //obj
     public Zone zone;
     private String name;
@@ -163,11 +168,13 @@ public class Char {
     private Status status;
     private CrackBall crackBall;
     public Shop shop;
-    private MagicTree magicTree;
+    public MagicTree magicTree;
     private SkillBook studying;
     private Timestamp resetTime;
     private SpecialSkill specialSkill;
     private Session session;
+    private Invite invite;
+
     //    private PowerInfo accumulatedPoint;
     // byte
     private byte classId;
@@ -178,7 +185,7 @@ public class Char {
     private byte ship;
     private byte typeTraining;
     private byte bag = -1;
-    private byte typePk;
+    public byte typePk;
     private byte flag;
     private byte commandTransport;
     private String captcha;
@@ -748,6 +755,13 @@ public class Char {
         setTypePk((byte) 0);
     }
 
+    private void setTypePk(byte typePk) {
+        this.typePk = typePk;
+        if (zone != null) {
+            zone.mapService.playerSetTypePk(this);
+        }
+    }
+
     public void setDefaultPart() {
         setDefaultHead();
         setDefaultBody();
@@ -1166,6 +1180,15 @@ public class Char {
         setListAccessMap();
     }
 
+    public void initAchievement() {
+        Server server = DragonBall.getInstance().getServer();
+        int size = server.getAchievements().size();
+        this.achievements = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            this.achievements.add(new Achievement(i));
+        }
+    }
+
     private void addItemTime(ItemTime item) {
         synchronized (this.itemTimes) {
             for (ItemTime itm : this.itemTimes) {
@@ -1195,9 +1218,9 @@ public class Char {
         } else if (map.mapID == MapName.RUNG_KARIN) {
             z = new KarinForest(map, zoneID, this);
         } else if (map.mapID == MapName.DONG_NAM_KARIN) {
-            z = new SoutheastKarin(map, zoneID);
+//            z = new SoutheastKarin(map, zoneID);
         } else if (map.mapID == MapName.THAP_KARIN) {
-            z = new KarinTower(map, zoneID, typeTraining);
+//            z = new KarinTower(map, zoneID, typeTraining);
         } else {
             z = new MapSingle(map, zoneID);
         }
@@ -1280,7 +1303,7 @@ public class Char {
         if (map.isMapSingle()) {
             enterMapSingle(map);
         } else if (map.isBarrack()) {
-            clan.barrack.enterMap(mapId, this);
+            clan.barrack.enterMap(mapID, this);
         } else {
             int zoneId = 0;
             if (isGoBack()) {
@@ -1619,4 +1642,653 @@ public class Char {
 //        }
 //    }
 //}
+
+    public void setTypePK(byte typePk) {
+        this.typePk = typePk;
+        if (zone != null) {
+            zone.mapService.playerSetTypePk(this);
+        }
+    }
+
+    public void taskNext() {
+        taskMain.index++;
+        taskMain.count = 0;
+        service.taskNext();
+    }
+
+    protected boolean isLang() {
+        return zone.map.mapID == 1 || zone.map.mapID == 27 || zone.map.mapID == 72 || zone.map.mapID == 10
+                || zone.map.mapID == 17 || zone.map.mapID == 22 || zone.map.mapID == 32 || zone.map.mapID == 38
+                || zone.map.mapID == 43 || zone.map.mapID == 48;
+    }
+
+    public void killed(Object killer) {
+        throwItem(killer);
+    }
+
+
+    public void throwItem(Message ms) {
+        if (isDead) {
+            return;
+        }
+        if (isTrading) {
+            return;
+        }
+    }
+
+    public void throwItem(Object obj) {
+        if (isHuman()) {
+            int gold = characterInfo.getLevel() * 1000;
+            if (gold > this.gold) {
+                gold = (int) this.gold;
+            }
+            if (gold == 0) {
+                return;
+            }
+            int itemID = Utils.getItemGoldByQuantity(gold);
+            addGold(-gold);
+            Item item = new Item(itemID);
+            item.setDefaultOptions();
+            item.quantity = gold;
+            ItemMap itemMap = new ItemMap(zone.autoIncrease++);
+            itemMap.item = item;
+            itemMap.x = this.x;
+            itemMap.y = zone.map.collisionLand(x, y);
+            itemMap.playerID = this.id;
+            zone.addItemMap(itemMap);
+            zone.mapService.addItemMap(itemMap);
+        }
+    }
+
+    public void throwItem(Item item, byte type) {
+        if (characterInfo.getPower() < 1500000) {
+            service.serverMessage("Bạn chưa đủ sức mạnh để vứt vật phẩm vui lòng thử lại sau");
+            return;
+        }
+        if (zone.map.isMapSingle()) {
+            service.serverMessage("Không thể vứt vật phẩm ở đây");
+            return;
+        }
+        if (item.typeThrow == 2) {
+            service.serverMessage("Không thể bỏ vật phẩm này");
+            return;
+        }
+        Item[] items;
+        if (type == 0) {
+            items = itemBody;
+        } else {
+            items = itemBag;
+        }
+        item.lock.lock();
+        try {
+            int index = item.indexUI;
+            if (items[index] == null) {
+                return;
+            }
+
+            History history = new History(this.id, History.THROW_ITEM);
+            history.setBefores(gold, diamond, diamondLock);
+            history.setAfters(gold, diamond, diamondLock);
+            history.addItem(item);
+            history.setZone(zone);
+            history.setExtras("Bỏ ra đất");
+            history.save();
+
+            items[index] = null;
+            ItemMap itemMap = new ItemMap(zone.autoIncrease++);
+            itemMap.item = item;
+            itemMap.x = (short) (Utils.nextInt(-10, 10) + this.x);
+            itemMap.y = zone.map.collisionLand(itemMap.x, this.y);
+            itemMap.playerID = this.id;
+            zone.addItemMap(itemMap);
+            if (type == 0) {
+                service.setItemBody();
+                updateSkin();
+                characterInfo.setCharacterInfo();
+                service.loadPoint();
+                zone.mapService.playerLoadBody(this);
+                zone.mapService.updateBody((byte) 0, this);
+            } else {
+                zone.mapService.throwItem(this, itemMap);
+            }
+            if (items[index] == null) {
+                sort(index, true);
+            }
+        } finally {
+            item.lock.unlock();
+        }
+    }
+
+    public void sort(int index, boolean isUpdate) {
+        int index2 = -1;
+        for (int i = index; i < this.numberCellBag; i++) {
+            if (this.itemBag[i] != null) {
+                index2 = i;
+            }
+        }
+        if (index2 != -1) {
+            this.itemBag[index] = this.itemBag[index2];
+            this.itemBag[index].indexUI = index;
+            this.itemBag[index2] = null;
+        }
+        if (isUpdate) {
+            service.setItemBag();
+        }
+    }
+
+    private void addGold(long gold) {
+        this.gold += gold;
+        service.addGold(gold);
+    }
+
+    public void startDie() {
+        try {
+            if (itemLoot != null) {
+                dropItemSpe();
+//                if (zone instanceof ZBlackDragonBall) {
+//                    ZBlackDragonBall z = (ZBlackDragonBall) zone;
+//                    z.itemBlackDragonBall.isPickedUp = false;
+//                    z.service.addItemMap(z.itemBlackDragonBall);
+//                    z.itemBlackDragonBall.countDown = 60;
+//                    z.setPlayerHolding(null);
+//                }
+            }
+            if (this.typePk == 3) {
+                Char playerPk = zone.findCharByID(this.testCharId);
+                clearPk();
+                playerPk.clearPk();
+                resultPk((byte) 1);
+                playerPk.resultPk((byte) 0);
+            }
+            if (this.mobMe != null) {
+                this.mobMe.timeLive = 0;
+            }
+            if (isTrading) {
+                trader.service.serverMessage(Language.TRADE_FAIL);
+                service.serverMessage(Language.TRADE_FAIL);
+                trader.clearTrade();
+                clearTrade();
+            }
+            if (this.isMonkey) {
+                timeOutIsMonkey();
+            }
+            if (this.hold != null) {
+                this.hold.close();
+            }
+            if (isRecoveryEnergy) {
+                stopRecoveryEnery();
+            }
+            isSkillSpecial = false;
+            isCharge = false;
+            this.seconds = 0;
+            this.isFreeze = false;
+            this.isCritFirstHit = false;
+            this.statusMe = 5;
+            this.characterInfo.setHp(0);
+            this.isDead = true;
+            this.y = zone.map.collisionLand(x, y);
+            clearEffect();
+            Message ms = new Message(Cmd.ME_DIE);
+            DataOutputStream ds = ms.getWriter();
+            ds.writeByte(this.typePk);
+            ds.writeShort(this.x);
+            ds.writeShort(this.y);
+            ds.writeLong(this.characterInfo.getPower());
+            service.sendMessage(ms);
+            ms.cleanup();
+
+            ms = new Message(Cmd.PLAYER_DIE);
+            ds = ms.getWriter();
+            ds.writeInt(this.id);
+            ds.writeByte(this.typePk);
+            ds.writeShort(this.x);
+            ds.writeShort(this.y);
+            zone.mapService.sendMessage(ms, this);
+            ms.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+
+        }
+    }
+    private void dropItemSpe() {
+        if (itemLoot != null) {
+            itemLoot = null;
+            updateBag();
+            if (getPhuX() > 0) {
+                setPhuX(0);
+                characterInfo.setCharacterInfo();
+                service.loadPoint();
+            }
+        }
+    }
+
+
+    public boolean meCanAttack() {
+        return !isDead && !isFreeze && !isSleep && !isHeld && select != null && !isStone;
+    }
+
+    public boolean meCanMove() {
+        return !isDead && !isBlind && !isFreeze && !isSleep && !isCharge && !isStone
+                && !(hold != null && hold.getDetainee() == this);
+    }
+
+    public void updateEveryOneSeconds() {
+        try {
+            long now = System.currentTimeMillis();
+            if (specialSkill != null) {
+                boolean isUpdate = false;
+                for (Skill skill : skills) {
+                    if (skill.isCooldown()) {
+                        if ((specialSkill.id == 4 && skill.template.id == SkillName.TU_PHAT_NO)
+                                || (specialSkill.id == 6 && skill.template.id == SkillName.HUYT_SAO)
+                                || (specialSkill.id == 14 && skill.template.id == SkillName.QUA_CAU_KENH_KHI)
+                                || (specialSkill.id == 23 && skill.template.id == SkillName.TRI_THUONG)
+                                || (specialSkill.id == 24 && skill.template.id == SkillName.MAKANKOSAPPO)
+                                || (specialSkill.id == 25 && skill.template.id == SkillName.DE_TRUNG)
+                                || (specialSkill.id == 28 && skill.template.id == SkillName.KHIEN_NANG_LUONG)
+                                || (specialSkill.id == 13 && skill.template.id == SkillName.THAI_DUONG_HA_SAN)) {
+                            int p = (int) ((now - skill.lastTimeUseThisSkill) * 100 / skill.coolDown);
+                            if (p + specialSkill.param >= 100) {
+                                skill.lastTimeUseThisSkill = now - skill.coolDown;
+                                isUpdate = true;
+                            }
+                            break;
+                        }
+                    }
+                }
+                if (isUpdate) {
+                    service.updateCoolDown(skills);
+                }
+            }
+            if (!isDead) {
+                if (isHuman()) {
+                    if (zone != null && zone.map.checkBlock(this.x, this.y)) {
+                        characterInfo.recovery(CharacterInfo.ALL, -10, true);
+                        if (characterInfo.getHp() <= 0) {
+                            startDie();
+                        }
+                    }
+                }
+                if (characterInfo.getOptions()[162] > 0) {
+                    List<Char> list = zone.getListChar(Zone.TYPE_HUMAN, Zone.TYPE_PET);
+                    if (list.size() > 1) {
+                        for (Char _c : list) {
+                            if (_c.isDead) {
+                                continue;
+                            }
+                            int d = Utils.getDistance(this.x, this.y, _c.x, _c.y);
+                            if (d < DISTANCE_EFFECT) {
+                                _c.characterInfo.recovery(characterInfo.MP, characterInfo.getOptions()[162], true);
+                            }
+                        }
+                    }
+                }
+            }
+//            if (callDragon != null) {
+//                if (now - callDragon.time >= 300000) {
+//                    callDragon.close();
+//                }
+//            }
+            try {
+                this.timePlayed++;
+                if (isMonkey) {
+                    if (this.timeIsMoneky > 0) {
+                        this.timeIsMoneky--;
+                    }
+                    if (this.timeIsMoneky == 0) {
+                        this.timeOutIsMonkey();
+                    }
+                }
+                if (invite != null) {
+                    invite.update();
+                }
+            } catch (Exception e) {
+                logger.error("update every one second - block 1");
+            }
+            try {
+                boolean isFlag = false;
+                if (this.x < 24) {
+                    this.x = 24;
+                    isFlag = true;
+                }
+                if (this.x > zone.map.width - 24) {
+                    this.x = (short) (zone.map.width - 24);
+                    isFlag = true;
+                }
+                if (this.y < 0) {
+                    this.y = 24;
+                    isFlag = true;
+                }
+                if (this.y > zone.map.height - 24) {
+                    this.y = zone.map.collisionLand(x, (short) 24);
+                    isFlag = true;
+                }
+                if (isFlag) {
+                    if (zone.mapService != null) {
+                        zone.mapService.setPosition(this, (byte) 0);
+                    }
+                }
+            } catch (Exception e) {
+                logger.error("update every one second - block 2");
+            }
+            try {
+                updateMessageTime();
+                updateAmulet();
+                updateTimeLiveMobMe();
+                if (this.freezSeconds > 0) {
+                    this.freezSeconds--;
+                    if (this.freezSeconds == 0) {
+                        this.isFreeze = false;
+                    }
+                }
+                updateItemTime();
+            } catch (Exception e) {
+                logger.error("update every one second - block 3");
+            }
+        } catch (Exception e) {
+            logger.error("updateEveryOneSeconds error", e.getCause());
+        }
+    }
+
+    private void updateTimeLiveMobMe() {
+        if (this.mobMe != null) {
+            if (this.mobMe.timeLive > 0) {
+                if (!isSetPikkoroDaimao()) {
+                    this.mobMe.timeLive--;
+                }
+
+            }
+            if (this.mobMe.timeLive == 0) {
+                zone.mapService.mobMeUpdate(this, null, -1, (byte) -1, (byte) 7);
+                this.mobMe = null;
+            }
+        }
+    }
+
+    private void updateAmulet() {
+        if (amulets != null) {
+            if (!amulets.isEmpty()) {
+                ArrayList<Amulet> listRemove = new ArrayList<>();
+                long now = System.currentTimeMillis();
+                boolean isBuaTriTue = false;
+                boolean isBuaManhMe = false;
+                boolean isBuaDaTrau = false;
+                boolean isBuaOaiHung = false;
+                boolean isBuaBatTu = false;
+                boolean isBuaDeoDai = false;
+                boolean isBuaThuHut = false;
+                boolean isBuaDeTu = false;
+                boolean isBuaTriTue3 = false;
+                boolean isBuaTriTue4 = false;
+                for (Amulet amulet : amulets) {
+                    if (amulet.expiredTime < now) {
+                        listRemove.add(amulet);
+                    } else {
+                        switch (amulet.id) {
+                            case 213:
+                                isBuaTriTue = true;
+                                break;
+
+                            case 214:
+                                isBuaManhMe = true;
+                                break;
+
+                            case 215:
+                                isBuaDaTrau = true;
+                                break;
+
+                            case 216:
+                                isBuaOaiHung = true;
+                                break;
+
+                            case 217:
+                                isBuaBatTu = true;
+                                break;
+
+                            case 218:
+                                isBuaDeoDai = true;
+                                break;
+
+                            case 219:
+                                isBuaThuHut = true;
+                                break;
+
+                            case 522:
+                                isBuaDeTu = true;
+                                break;
+
+                            case 671:
+                                isBuaTriTue3 = true;
+                                break;
+
+                            case 672:
+                                isBuaTriTue4 = true;
+                                break;
+                        }
+                    }
+                }
+                setBuaBatTu(isBuaBatTu);
+                setBuaDaTrau(isBuaDaTrau);
+                setBuaDeTu(isBuaDeTu);
+                setBuaManhMe(isBuaManhMe);
+                setBuaDeoDai(isBuaDeoDai);
+                setBuaOaiHung(isBuaOaiHung);
+                setBuaThuHut(isBuaThuHut);
+                setBuaTriTue(isBuaTriTue);
+                setBuaTriTue3(isBuaTriTue3);
+                setBuaTriTue4(isBuaTriTue4);
+                if (listRemove.size() > 0) {
+                    amulets.removeAll(listRemove);
+                }
+            }
+        }
+    }
+
+    private void updateMessageTime() {
+        if (messageTimes != null) {
+            synchronized (messageTimes) {
+                ArrayList<MessageTime> removes = new ArrayList<>();
+                for (MessageTime ms : messageTimes) {
+                    ms.update();
+                    if (ms.getTime() <= 0) {
+                        removes.add(ms);
+                    }
+                }
+                messageTimes.removeAll(removes);
+            }
+        }
+    }
+
+
+    public boolean addItem(Item item) {
+        if (item.template.getType() == Item.TYPE_GOLD) {
+            addGold(item.quantity);
+            return true;
+        }
+        if (item.template.getType() == Item.TYPE_DIAMOND) {
+            addDiamond(item.quantity);
+            return true;
+        }
+        if (item.template.getType() == Item.TYPE_DIAMOND_LOCK) {
+            addDiamondLock(item.quantity);
+            return true;
+        }
+        if (item.template.getType() == Item.TYPE_AMULET) {
+            Amulet amulet = getAmulet(item.id);
+            if (amulet != null) {
+                amulet.expiredTime += item.quantity;
+            } else {
+                amulet = new Amulet();
+                amulet.id = item.id;
+                amulet.expiredTime = System.currentTimeMillis() + item.quantity;
+                addAmulet(amulet);
+            }
+            return true;
+        }
+        if (item.template.isUpToUp()) {
+            int maxQuantity = Server.getMaxQuantityItem();
+            int index = getIndexBagById(item.id);
+            if (index != -1) {
+                Item item2 = this.itemBag[index];
+                boolean flag = false;
+                for (ItemOption o : item2.options) {
+                    if (o.optionTemplate.id == 1 || o.optionTemplate.id == 31 || o.optionTemplate.id == 11 || o.optionTemplate.id == 12 || o.optionTemplate.id == 13) {
+                        for (ItemOption o2 : item.options) {
+                            if (o.optionTemplate.id == o2.optionTemplate.id) {
+                                o.param += o2.param;
+                                service.setItemBag();
+                                flag = true;
+                            }
+                        }
+                    }
+                }
+                if (flag) {
+                    return true;
+                }
+                if (item2.quantity + item.quantity > maxQuantity) {
+                    return false;
+                }
+                item2.quantity += item.quantity;
+                if (item.template.getType() == Item.TYPE_DAUTHAN) {
+                    service.setItemBag();
+                } else {
+                    service.updateBag(index, item2.quantity);
+                }
+                return true;
+            }
+        }
+        for (int i = 0; i < itemBag.length; i++) {
+            if (itemBag[i] == null) {
+                itemBag[i] = item;
+                item.indexUI = i;
+                service.setItemBag();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private int getIndexBagById(int id) {
+        for (int i = 0; i < this.itemBag.length; i++) {
+            Item item = this.itemBag[i];
+            if (item != null && item.id == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private void addAmulet(Amulet amulet) {
+        this.amulets.add(amulet);
+    }
+
+    private Amulet getAmulet(int id) {
+        for (Amulet amulet : amulets) {
+            if (amulet.id == id) {
+                return amulet;
+            }
+        }
+        return null;
+    }
+
+    private void addDiamondLock(int diamondLock) {
+        this.diamondLock += diamondLock;
+        service.loadInfo();
+    }
+
+    private void addDiamond(int diamond) {
+        this.diamond += diamond;
+        service.loadInfo();
+    }
+
+    public void setListAccessMap() {
+        listAccessMap.clear();
+        if (gender == 0) {
+            listAccessMap.add(21);
+        }
+        if (gender == 1) {
+            listAccessMap.add(22);
+        }
+        if (gender == 2) {
+            listAccessMap.add(23);
+        }
+        if (taskMain.id >= 1) {
+            listAccessMap.add(0);
+            listAccessMap.add(7);
+            listAccessMap.add(14);
+        }
+        if (taskMain.id >= 2) {
+            listAccessMap.add(1);
+            listAccessMap.add(8);
+            listAccessMap.add(15);
+        }
+        if (taskMain.id > 3 || (taskMain.id == 3 && taskMain.index >= 1)) {
+            listAccessMap.add(42);
+            listAccessMap.add(43);
+            listAccessMap.add(44);
+        }
+        if (taskMain.id >= 6) {
+            listAccessMap.add(2);
+            listAccessMap.add(9);
+            listAccessMap.add(16);
+
+            listAccessMap.add(24);
+            listAccessMap.add(25);
+            listAccessMap.add(26);
+        }
+        if (taskMain.id >= 7) {
+            listAccessMap.add(3);
+            listAccessMap.add(11);
+            listAccessMap.add(17);
+        }
+        if (taskMain.id >= 8) {
+            listAccessMap.add(4);
+            listAccessMap.add(12);
+            listAccessMap.add(18);
+        }
+        if (taskMain.id > 8 || (taskMain.id == 8 && taskMain.index >= 3)) {
+            listAccessMap.add(47);
+        }
+        if (taskMain.id > 9 || (taskMain.id == 9 && taskMain.index >= 2)) {
+            listAccessMap.add(46);
+        }
+        if (taskMain.id >= 11) {
+            listAccessMap.add(5);
+            listAccessMap.add(13);
+            listAccessMap.add(20);
+        }
+        if (taskMain.id >= 13) {
+            listAccessMap.add(27);
+            listAccessMap.add(28);
+            listAccessMap.add(29);
+
+            listAccessMap.add(31);
+            listAccessMap.add(32);
+            listAccessMap.add(33);
+
+            listAccessMap.add(35);
+            listAccessMap.add(36);
+            listAccessMap.add(37);
+        }
+        if (taskMain.id >= 15) {
+            listAccessMap.add(30);
+            listAccessMap.add(34);
+            listAccessMap.add(38);
+        }
+        if (this.typeTraining >= 2) {
+            listAccessMap.add(45);
+        }
+        if (characterInfo.getPower() < 1500000) {
+            listAccessMap.add(111);
+        }
+    }
+
+    public Skill getSkillByID(int id) {
+        for (Skill skill : skills) {
+            if (skill.template.id == id) {
+                return skill;
+            }
+        }
+        return null;
+    }
 }

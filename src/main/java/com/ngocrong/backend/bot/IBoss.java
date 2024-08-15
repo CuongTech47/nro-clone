@@ -8,4 +8,9 @@ public interface IBoss {
     void move();
 
     void chat(String chat);
+
+
+
+
+
 }

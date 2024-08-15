@@ -374,6 +374,24 @@ public class Zone extends Thread{
         }
     }
 
+    public void addItemMap(ItemMap itemMap) {
+        if (itemMap.item.template.getType() == 22) {
+            lockSatellite.writeLock().lock();
+            try {
+                satellites.add(itemMap);
+            } finally {
+                lockSatellite.writeLock().unlock();
+            }
+        } else {
+            lockItemMap.writeLock().lock();
+            try {
+                items.add(itemMap);
+            } finally {
+                lockItemMap.writeLock().unlock();
+            }
+        }
+    }
+
 
 //    public void sendMessage(Message ms, Char _char) {
 //        zone.lockChar.readLock().lock();

@@ -10,10 +10,12 @@ import com.ngocrong.backend.mob.Mob;
 import com.ngocrong.backend.model.BgItem;
 import com.ngocrong.backend.model.Npc;
 import com.ngocrong.backend.model.Waypoint;
+import com.ngocrong.backend.server.Config;
 import com.ngocrong.backend.server.DragonBall;
 import com.ngocrong.backend.server.Server;
 import com.ngocrong.backend.map.tzone.TMap;
 import com.ngocrong.backend.map.tzone.Zone;
+import com.ngocrong.backend.util.Utils;
 import org.apache.log4j.Logger;
 
 import java.io.DataOutputStream;
@@ -148,7 +150,7 @@ public class Service implements IService{
         }
     }
 
-    protected Message messageSubCommand(int command) {
+    public static Message messageSubCommand(int command) {
         try {
             Message message = new Message(Cmd.SUB_COMMAND);
             message.getWriter().writeByte(command);
@@ -254,9 +256,9 @@ public class Service implements IService{
             }
             dos.writeShort(map.positionBgItems.length);
             for (BgItem bg : map.positionBgItems) {
-                dos.writeShort(bg.getId());
-                dos.writeShort(bg.getX());
-                dos.writeShort(bg.getY());
+                dos.writeShort(bg.id);
+                dos.writeShort(bg.x);
+                dos.writeShort(bg.y);
             }
             dos.writeShort(map.effects.length);
             for (KeyValue<String, String> k : map.effects) {
@@ -388,6 +390,106 @@ public class Service implements IService{
             sendMessage(ms);
             ms.cleanup();
         } catch (Exception ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void openUISay(int npcId, String say, short avatar) {
+        try {
+            Message mss = new Message(Cmd.OPEN_UI_SAY);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeShort(npcId);
+            ds.writeUTF(say);
+            ds.writeShort(avatar);
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void sendSmallVersion() {
+        try {
+            Message mss = new Message(Cmd.SMALLIMAGE_VERSION);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeShort(small.length);
+            for (byte ver : small) {
+                ds.writeByte(ver);
+            }
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+    public void sendBGSmallVersion() {
+        try {
+            Message mss = new Message(Cmd.BGITEM_VERSION);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeShort(bg.length);
+            for (byte ver : bg) {
+                ds.writeByte(ver);
+            }
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+    public void sendResVersion() {
+        try {
+            Server server = DragonBall.getInstance().getServer();
+            Message mss = new Message(Cmd.GET_IMAGE_SOURCE);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeByte(0);
+            ds.writeInt(server.resVersion[session.getZoomLevel() - 1]);
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+    public void download(String path) {
+        try {
+            String str = path.replace("\\", "/").replace("resources/data/" + session.getZoomLevel(), "");
+            str = Utils.cutPng(str);
+            Message mss = new Message(Cmd.GET_IMAGE_SOURCE);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeByte(2);
+            ds.writeUTF(str);
+            byte[] ab = Utils.getFile(path);
+            ds.writeInt(ab.length);
+            ds.write(ab);
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("download error", ex);
+        }
+    }
+
+    public void sendVersion() {
+        try {
+            Server server = DragonBall.getInstance().getServer();
+            Config config = server.getConfig();
+            Message mss = messageNotMap(Cmd.UPDATE_VERSION);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeByte(config.getDataVersion());
+            ds.writeByte(config.getMapVersion());
+            ds.writeByte(config.getSkillVersion());
+            ds.writeByte(config.getItemVersion());
+            ds.writeByte(server.powers.size());
+            for (long sm : server.powers) {
+                ds.writeLong(sm);
+            }
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
             logger.error("failed!", ex);
         }
     }
