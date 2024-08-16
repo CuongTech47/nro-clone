@@ -19,7 +19,7 @@ public class Tab {
 
 
     public void addItem(ItemTemplate item) {
-        switch (item.getGender()) {
+        switch (item.gender) {
             case 0:
                 TRAI_DAT.add(item);
                 break;

@@ -1,6 +1,7 @@
 package com.ngocrong.backend.character;
 
 import com.google.gson.annotations.SerializedName;
+import com.ngocrong.backend.bot.TrongTai;
 import com.ngocrong.backend.clan.ClanMember;
 import com.ngocrong.backend.clan.ClanReward;
 import com.ngocrong.backend.collection.Card;
@@ -109,7 +110,7 @@ public class CharacterInfo {
 
     // Các tùy chọn và phần thưởng
     private transient int[] options;
-    private ArrayList<Integer> damageOptions;
+    private ArrayList<Integer> damageOptions ;
     private ArrayList<Integer> hpOptions;
     private ArrayList<Integer> mpOptions;
 
@@ -162,17 +163,15 @@ public class CharacterInfo {
             this.baseDefense = 0;
             this.power = 0;
             this.potential = 0;
+        }else if (_character instanceof TrongTai){
+            this.baseHP = 500;
+            this.baseMP = 500;
+            this.baseDamage = 0;
+            this.baseCritical = 0;
+            this.baseDefense = 0;
+            this.power = 0;
+            this.potential = 0;
         }
-
-//        } else if (_character instanceof TrongTai) {
-//            this.baseHP = 500;
-//            this.baseMP = 500;
-//            this.baseDamage = 0;
-//            this.baseCritical = 0;
-//            this.baseDefense = 0;
-//            this.power = 0;
-//            this.potential = 0;
-//        }
 
         this.fullHP = this.baseHP;
         this.fullMP = this.baseMP;
@@ -342,180 +341,148 @@ public class CharacterInfo {
 
     public void setCharacterInfo() {
         Server server = DragonBall.getInstance().getServer();
-        initializeOptions(server);
-        resetStats();
-        int upgradeMin = -1;
-        int giapLuyenTap = initializeItemsAndSetOptions(upgradeMin);
-        processAmbientEffects();
-        processCardsAndMiniDisciple();
-        applyFusionOptions();
-        calculateFinalStats(giapLuyenTap);
-        applyClanRewards();
-        applyPhuX();
-        applyFoodAndColdEffects();
-        finalizeStats();
-
-    }
-
-    private void finalizeStats() {
-        if(this.hpFullTemp <= 0) this.hpFullTemp = 1;
-        if (this.mpFullTemp <= 0) this.mpFullTemp = 1;
-        if (this.hpFullTemp > Integer.MAX_VALUE) this.hpFullTemp = Integer.MAX_VALUE;
-        if (this.mpFullTemp > Integer.MAX_VALUE) this.mpFullTemp = Integer.MAX_VALUE;
-
-        this.fullHP = this.hpFullTemp;
-        this.fullMP = this.mpFullTemp;
-
-        if (this.hp > this.fullHP) this.hp = this.fullHP;
-        if (this.mp > this.fullMP) this.mp = this.fullMP;
-    }
-
-    private void applyFoodAndColdEffects() {
-        boolean isUnaffectedCold = false;
-//        if (_character.isHaveFood()) {
-//            this.fullDamage += this.fullDamage / 10;
-//        }
-        if (_character.zone != null && _character.zone.map.isCold()) {
-            if (!isUnaffectedCold) {
-                this.hpFullTemp /= 2;
-                this.fullDamage /= 2;
-            }
-        }
-    }
-
-    private void applyPhuX() {
-        int phuX = _character.getPhuX();
-        if (phuX > 0) {
-            this.hpFullTemp *= phuX;
-            this.mpFullTemp *= phuX;
-            this.fullDamage *= phuX;
-        }
-    }
-
-    private void applyClanRewards() {
-        if (_character.clan != null) {
-            ClanMember mem = _character.clan.getMember(_character.getId());
-            if (mem != null) {
-                for (ClanReward clanReward : mem.rewards) {
-                    applyClanReward(clanReward);
-                }
-            }
-        }
-    }
-
-    private void applyClanReward(ClanReward clanReward) {
-        switch (clanReward.getStar()) {
-            case 1 -> this.fullDamage += fullDamage * 15 / 100;
-            case 2 -> this.hpFullTemp += hpFullTemp * 20 / 100;
-            case 3 -> this.mpFullTemp += mpFullTemp * 20 / 100;
-            case 4 -> options[101] += 20;
-            case 5 -> options[108] += 10;
-            case 6 -> options[94] += 10;
-            case 7 -> {
-                options[95] += 10;
-                options[96] += 10;
-            }
-        }
-    }
-
-    private int initializeItemsAndSetOptions(int upgradeMin) {
-        int giapLuyenTap = -1;
-        int n = 0;
-        if (_character.itemBody != null) {
-            for (Item item : _character.itemBody) {
-                if (item == null) continue;
-                n += processItem(item);
-            }
-        }
-        if (n == 5) _character.setIdEffSetItem((short) upgradeMin);
-        return giapLuyenTap;
-    }
-
-
-    private void initializeOptions(Server server) {
         this.options = new int[server.iOptionTemplates.size()];
-        resetOptions(damageOptions);
-        resetOptions(hpOptions);
-        resetOptions(mpOptions);
-    }
-
-    private void resetStats() {
+        if (damageOptions == null) {
+            damageOptions = new ArrayList<>();
+        } else {
+            damageOptions.clear();
+        }
+        if (hpOptions == null) {
+            hpOptions = new ArrayList<>();
+        } else {
+            hpOptions.clear();
+        }
+        if (mpOptions == null) {
+            mpOptions = new ArrayList<>();
+        } else {
+            mpOptions.clear();
+        }
         this.speed = 6;
         this.hpFullTemp = this.baseHP;
         this.mpFullTemp = this.baseMP;
         this.fullDamage = this.baseDamage;
         this.fullCritical = this.baseCritical;
         this.fullDefense = this.baseDefense * 4;
-    }
-
-    private int processItem (Item item) {
-        if (item.template.getType()  < 5) return 1;
-        if (item.isNhapThe && !_character.isNhapThe()) return 0;
-
-        ArrayList<ItemOption> options = item.getItemOptions();
-        for (ItemOption option : options) {
-            addOption(option.optionTemplate.id, option.param);
-            processItemOption(option);
-        }
-        return 0;
-    }
-
-    private void processItemOption(ItemOption option) {
-        int id = option.optionTemplate.id;
-        int param = option.param;
-
-        boolean isHaveEquipInvisible;
-        boolean isHaveEquipTransformIntoStone;
-        boolean isHaveEquipTransformIntoChocolate;
-        boolean isHaveEquipTeleport;
-        boolean isVoHinh;
-        boolean isUnaffectedCold;
-        boolean isDoSaoPhaLe;
-        boolean isKhangTDHS;
-        boolean isHaveEquipSelfExplosion;
-
+        int giapLuyenTap = -1;
+        boolean isMacGiapLuyenTap = false;
+        boolean isVoHinh = false;
+        boolean isUnaffectedCold = false;
+        boolean isHaveEquipTeleport = false;
+        boolean isHaveEquipSelfExplosion = false;
+        boolean isHaveEquipInvisible = false;
+        boolean isHaveEquipTransformIntoChocolate = false;
+        boolean isHaveEquipTransformIntoStone = false;
+        boolean isHaveEquipMiNuong = false;
+        boolean isHaveEquipBulma = false;
+        boolean isHaveEquipXinbato = false;
+        boolean isHaveEquipBuiBui = false;
+        boolean isKhangTDHS = false;
+        boolean isDoSaoPhaLe = false;
+        int setThienXinHang = 0, setKirin = 0, setSongoku = 0, setPicolo = 0, setOcTieu = 0, setPikkoroDaimao = 0, setKakarot = 0, setCaDic = 0, setNappa = 0;
+        int setThanLinh = 0;
         int upgradeMin = -1;
-
-        int setThienXinHang = 0, setKirin = 0, setSongoku = 0, setPicolo = 0, setOcTieu = 0, setPikkoroDaimao = 0, setKakarot = 0, setCaDic = 0, setNappa = 0 , setThanLinh = 0;
-        switch (id) {
-            case 25 -> isHaveEquipInvisible = true;
-            case 26 -> isHaveEquipTransformIntoStone = true;
-            case 29 -> isHaveEquipTransformIntoChocolate = true;
-            case 33 -> isHaveEquipTeleport = true;
-            case 105 -> isVoHinh = true;
-            case 106 -> isUnaffectedCold = true;
-            case 110 -> isDoSaoPhaLe = true;
-            case 116 -> isKhangTDHS = true;
-            case 153 -> isHaveEquipSelfExplosion = true;
-            case 72 -> {
-                if (param >= 0 && (upgradeMin == -1 || upgradeMin > param)) {
-                    upgradeMin = param;
+        int n = 0;
+        if (_character.itemBody != null) {
+            for (Item item : _character.itemBody) {
+                if (item != null) {
+                    if (item.template.type < 5) {
+                        n++;
+                    }
+                    if (item.isNhapThe && !_character.isNhapThe()) {
+                        continue;
+                    }
+                    if (item.template.type == 32) {
+                        if (giapLuyenTap == -1) {
+                            giapLuyenTap = item.id;
+                            isMacGiapLuyenTap = true;
+                        }
+                    }
+                    if (item.id == 464 || item.id == 584) {
+                        isHaveEquipBulma = true;
+                    }
+                    if (item.id == 860) {
+                        isHaveEquipMiNuong = true;
+                    }
+                    if (item.id == 458) {
+                        isHaveEquipXinbato = true;
+                    }
+                    if (item.id == 575) {
+                        isHaveEquipBuiBui = true;
+                    }
+                    if (item.template.isThanLinh()) {
+                        setThanLinh++;
+                    }
+                    ArrayList<ItemOption> options = item.getOptions();
+                    for (ItemOption o : options) {
+                        int id = o.optionTemplate.id;
+                        int param = o.param;
+                        addOption(id, param);
+                        if (id == 72) {
+                            if (upgradeMin == -1 || upgradeMin > param) {
+                                upgradeMin = param;
+                            }
+                        }
+                        if (id == 110) {
+                            isDoSaoPhaLe = true;
+                        }
+                        if (id == 116) {
+                            isKhangTDHS = true;
+                        }
+                        if (id == 127) {
+                            setThienXinHang++;
+                        }
+                        if (id == 128) {
+                            setKirin++;
+                        }
+                        if (id == 129) {
+                            setSongoku++;
+                        }
+                        if (id == 130) {
+                            setPicolo++;
+                        }
+                        if (id == 131) {
+                            setOcTieu++;
+                        }
+                        if (id == 132) {
+                            setPikkoroDaimao++;
+                        }
+                        if (id == 133) {
+                            setKakarot++;
+                        }
+                        if (id == 134) {
+                            setCaDic++;
+                        }
+                        if (id == 135) {
+                            setNappa++;
+                        }
+                        if (id == 25) {
+                            isHaveEquipInvisible = true;
+                        }
+                        if (id == 26) {
+                            isHaveEquipTransformIntoStone = true;
+                        }
+                        if (id == 105) {
+                            isVoHinh = true;
+                        }
+                        if (id == 106) {
+                            isUnaffectedCold = true;
+                        }
+                        if (id == 29) {
+                            isHaveEquipTransformIntoChocolate = true;
+                        }
+                        if (id == 33) {
+                            isHaveEquipTeleport = true;
+                        }
+                        if (id == 153) {
+                            isHaveEquipSelfExplosion = true;
+                        }
+                    }
                 }
             }
-            case 127 -> setThienXinHang++;
-            case 128 -> setKirin++;
-            case 129 -> setSongoku++;
-            case 130 -> setPicolo++;
-            case 131 -> setOcTieu++;
-            case 132 -> setPikkoroDaimao++;
-            case 133 -> setKakarot++;
-            case 134 -> setCaDic++;
-            case 135 -> setNappa++;
         }
-
-    }
-
-    private int updateGiapLuyenTap(Item item, int giapLuyenTap) {
-        boolean isMacGiapLuyenTap ;
-        if (item.template.getType() == 32 && giapLuyenTap == -1) {
-            giapLuyenTap = item.id;
-            isMacGiapLuyenTap = true;
+        if (n == 5) {
+            _character.setIdEffSetItem((short) upgradeMin);
         }
-        return giapLuyenTap;
-    }
-
-    private void processAmbientEffects() {
-
         List<AmbientEffect> ambientEffects = _character.getAmbientEffects();
         if (ambientEffects != null) {
             for (AmbientEffect am : ambientEffects) {
@@ -523,24 +490,30 @@ public class CharacterInfo {
                 addOption(o[0], o[1]);
             }
         }
-    }
-
-    private void processCardsAndMiniDisciple() {
-        processCards();
-        processMiniDisciple();
-    }
-
-    private void processMiniDisciple() {
-        MiniDisciple mini = _character.getMiniDisciple();
-        if (mini != null && mini.item != null) {
-            ArrayList<ItemOption> options = mini.item.getItemOptions();
-            for (ItemOption option : options) {
-                addOption(option.optionTemplate.id, option.param);
-            }
-        }
-    }
-
-    private void processCards() {
+        _character.setVoHinh(isVoHinh);
+        _character.setDoSaoPhaLe(isDoSaoPhaLe);
+        _character.setUnaffectedCold(isUnaffectedCold);
+        _character.setHaveEquipTeleport(isHaveEquipTeleport);
+        _character.setHaveEquipSelfExplosion(isHaveEquipSelfExplosion);
+        _character.setHaveEquipInvisible(isHaveEquipInvisible);
+        _character.setHaveEquipTransformIntoChocolate(isHaveEquipTransformIntoChocolate);
+        _character.setHaveEquipTransformIntoStone(isHaveEquipTransformIntoStone);
+        _character.setHaveEquipBulma(isHaveEquipBulma);
+        _character.setHaveEquipMiNuong(isHaveEquipMiNuong);
+        _character.setHaveEquipBuiBui(isHaveEquipBuiBui);
+        _character.setHaveEquipXinbato(isHaveEquipXinbato);
+        _character.setKhangTDHS(isKhangTDHS);
+        // set kich hoat
+        _character.setSetCaDic(setCaDic == 5);
+        _character.setSetKakarot(setKakarot == 5);
+        _character.setSetKirin(setKirin == 5);
+        _character.setSetNappa(setNappa == 5);
+        _character.setSetOcTieu(setOcTieu == 5);
+        _character.setSetPicolo(setPicolo == 5);
+        _character.setSetPikkoroDaimao(setPikkoroDaimao == 5);
+        _character.setSetSongoku(setSongoku == 5);
+        _character.setSetThienXinHang(setThienXinHang == 5);
+        _character.setSetThanLinh(setThanLinh == 5);
         ArrayList<Card> cards = _character.getCards();
         if (cards != null) {
             for (Card c : cards) {
@@ -553,116 +526,220 @@ public class CharacterInfo {
                 }
             }
         }
-    }
-
-    private void applyFusionOptions() {
-        if (_character.isNhapThe() && _character.getMyDisciple() != null) {
-            if (_character.getTypePorata() == 1) {
-                Item item = _character.getIemInBag(ItemName.BONG_TAI_PORATA_CAP_2);
+        MiniDisciple mini = _character.getMiniDisciple();
+        if (mini != null) {
+            if (mini.item != null) {
+                ArrayList<ItemOption> options = mini.item.getOptions();
+                for (ItemOption o : options) {
+                    addOption(o.optionTemplate.id, o.param);
+                }
+            }
+        }
+        if (_character.isNhapThe() && _character.myDisciple != null) {
+            if (_character.typePorata == 1) {
+                Item item = _character.getItemInBag(ItemName.BONG_TAI_PORATA_CAP_2);
                 if (item != null) {
-                    ArrayList<ItemOption> options = item.getItemOptions();
+                    ArrayList<ItemOption> options = item.getOptions();
                     for (ItemOption itemOption : options) {
                         addOption(itemOption.optionTemplate.id, itemOption.param);
                     }
                 }
             }
         }
-    }
-
-
-    private void resetOptions(List<Integer> optionList) {
-        if (optionList == null) {
-            optionList = new ArrayList<>();
-        } else {
-            optionList.clear();
-        }
-    }
-
-    private void calculateFinalStats(int giapLuyenTap) {
         this.fullDamage += this.options[0];
         this.hpFullTemp += ((this.options[2] + this.options[22]) * 1000L) + this.options[6] + this.options[48];
         this.mpFullTemp += ((this.options[2] + this.options[23]) * 1000L) + this.options[7] + this.options[48];
         this.fullCritical += this.options[14] + this.options[192];
+        for (int param : damageOptions) {
+            this.fullDamage += Utils.percentOf(this.fullDamage, param);
+        }
+        for (int param : hpOptions) {
+            this.hpFullTemp += Utils.percentOf(this.hpFullTemp, param);
+        }
+        for (int param : mpOptions) {
+            this.mpFullTemp += Utils.percentOf(this.mpFullTemp, param);
+        }
+        if (_character.isMonkey()) {
+            this.fullCritical += 100;
+        }
+        this.fullDefense += this.options[47];
+        if (_character.itemBag != null) {
+            for (Item item : _character.itemBag) {
+                if (item != null) {
+                    if (item.template.type == 32) {
+                        if (giapLuyenTap == -1) {
+                            ArrayList<ItemOption> options = item.getOptions();
+                            for (ItemOption option : options) {
+                                if (option.optionTemplate.id == 9) {
+                                    if (option.param > 0) {
+                                        giapLuyenTap = item.id;
+                                    }
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        int dameAdd = 0;
+        switch (giapLuyenTap) {
+            case 529:
+            case 534:
+                dameAdd = 10;
+                break;
 
-        applyPercentModifiers(damageOptions, this.fullDamage );
-        applyPercentModifiers(hpOptions, this.hpFullTemp);
-        applyPercentModifiers(mpOptions, this.mpFullTemp);
+            case 530:
+            case 535:
+                dameAdd = 20;
+                break;
 
-        applyCharacterSpecificModifiers();
-        applyDefenseModifiers(giapLuyenTap);
-    }
-
-    private void applyDefenseModifiers(int giapLuyenTap) {
-        int dameAdd = calculateDefenseBasedDamage(giapLuyenTap);
-
-        this.fullDamage += Utils.percentOf(this.fullDamage,(dameAdd - _character.getDameDown()));
-
-
+            case 531:
+            case 536:
+                dameAdd = 30;
+                break;
+        }
+        if (isMacGiapLuyenTap) {
+            dameAdd *= -1;
+        }
+        this.accuracy = this.options[10];
+        this.accuracyPercent = this.options[18];
+        this.evasion = this.options[17];
+        this.evasionPercent = this.options[108];
+        this.fullDamage += Utils.percentOf(this.fullDamage, (dameAdd - _character.getDameDown()));
         if (this.options[155] > 0) {
             this.hpFullTemp /= 2;
             this.mpFullTemp /= 2;
             this.fullDamage /= 2;
         }
-
-        applyFusionBonuses();
-    }
-
-    private void applyFusionBonuses() {
-        if (_character.isNhapThe() && _character.getMyDisciple() != null) {
-            Disciple disciple = _character.getMyDisciple();
-            this.hpFullTemp += disciple.getCharacterInfo().fullHP;
-            this.mpFullTemp += disciple.getCharacterInfo().fullMP;
-            this.fullDamage += disciple.getCharacterInfo().fullDamage;
-
-            if (disciple.typeDisciple >0) {
+        if (_character.isNhapThe() && _character.myDisciple != null) {
+            Disciple disciple = _character.myDisciple;
+            this.hpFullTemp += disciple.characterInfo.getFullHP();
+            this.mpFullTemp += disciple.characterInfo.getFullMP();
+            this.fullDamage += disciple.characterInfo.fullDamage;
+            if (disciple.typeDisciple > 0) {
                 this.hpFullTemp += Utils.percentOf(this.hpFullTemp, 10);
                 this.mpFullTemp += Utils.percentOf(this.mpFullTemp, 10);
-                this.fullDamage += Utils.percentOf(this.fullDamage,10);
+                this.fullDamage += Utils.percentOf(this.fullDamage, 10);
             }
-
-            if (_character.isSetNappa()) {
-                this.hpFullTemp += Utils.percentOf(this.hpFullTemp, 80);
-            }
-
-            if (_character.isMonkey()) {
-               this.hpFullTemp += 2;
-               this.mpFullTemp += 2;
-               int skillLevel = _character.getSkill(13).point;
-                this.fullDamage += Utils.percentOf(this.fullDamage, skillLevel *5L);
-                this.speed +=2;
-            }
-            if (_character.zone instanceof GravityRoom) {
-                this.speed = 2;
-            }
-
         }
+        if (_character.isSetNappa()) {
+            this.hpFullTemp += Utils.percentOf(this.hpFullTemp, 80);
+        }
+        if (_character.isMonkey()) {
+            this.hpFullTemp *= 2;
+            this.mpFullTemp *= 2;
+            int skillLevel = _character.getSkill(13).point;
+            this.fullDamage += Utils.percentOf(this.fullDamage, skillLevel * 5L);
+            this.speed += 2;
+        }
+        if (_character.zone instanceof GravityRoom) {
+            this.speed = 2;
+        }
+        if (_character.isHuytSao()) {
+            long hpAdd = Utils.percentOf(this.hpFullTemp, this._character.getHpPercent());
+            this.hpFullTemp += hpAdd;
+        }
+        if (_character.isBoHuyet()) {
+            this.hpFullTemp *= 2;
+        }
+        if (_character.isBoKhi()) {
+            this.mpFullTemp *= 2;
+        }
+        if (_character.isCuongNo()) {
+            this.fullDamage *= 2;
+        }
+        if (_character.clan != null) {
+            ClanMember mem = _character.clan.getMember(_character.getId());
+            if (mem != null) {
+                for (ClanReward clanReward : mem.rewards) {
+                    switch (clanReward.getStar()) {
+                        case 1:
+                            this.fullDamage += fullDamage * 15 / 100;
+                            break;
+                        case 2:
+                            this.hpFullTemp += hpFullTemp * 20 / 100;
+                            break;
+                        case 3:
+                            this.mpFullTemp += mpFullTemp * 20 / 100;
+                            break;
+                        case 4:
+                            options[101] += 20;
+                            break;
+                        case 5:
+                            options[108] += 10;
+                            break;
+                        case 6:
+                            options[94] += 10;
+                            break;
+                        case 7:
+                            options[95] += 10;
+                            options[96] += 10;
+                            break;
+                    }
+                }
+            }
+        }
+        int phuX = _character.getPhuX();
+        if (phuX > 0) {
+            this.hpFullTemp *= phuX;
+            this.mpFullTemp *= phuX;
+            this.fullDamage *= phuX;
+        }
+        if (_character.isHaveFood()) {
+            this.fullDamage += this.fullDamage / 10;
+        }
+        if (_character.zone != null && _character.zone.map.isCold()) {
+            if (!isUnaffectedCold) {
+                this.hpFullTemp /= 2;
+                this.fullDamage /= 2;
+            }
+        }
+
+        if (this.hpFullTemp <= 0) {
+            this.hpFullTemp = 1;
+        }
+        if (this.mpFullTemp <= 0) {
+            this.mpFullTemp = 1;
+        }
+        if (this.hpFullTemp > Integer.MAX_VALUE) {
+            this.hpFullTemp = Integer.MAX_VALUE;
+        }
+        if (this.mpFullTemp > Integer.MAX_VALUE) {
+            this.mpFullTemp = Integer.MAX_VALUE;
+        }
+        this.fullHP = this.hpFullTemp;
+        this.fullHP = this.mpFullTemp;
+        if (this.hp > this.fullHP) {
+            this.hp = this.fullHP;
+        }
+        if (this.mp > this.fullMP) {
+            this.mp = this.fullMP;
+        }
+
+
     }
 
-    private int calculateDefenseBasedDamage(int giapLuyenTap) {
-        int dameAdd = 0;
-        boolean isMacGiapLuyenTap = false;
-        switch (giapLuyenTap) {
-            case 529, 534 -> dameAdd = 10;
-            case 530, 535 -> dameAdd = 20;
-            case 531, 536 -> dameAdd = 30;
-        }
-        if (isMacGiapLuyenTap) dameAdd *= -1;
-        return dameAdd;
-    }
 
-    private void applyCharacterSpecificModifiers() {
-        if(_character.isMonkey()) {
-            this.fullCritical += 100;
-        }
 
-        this.fullCritical += this.options[47];
-    }
 
-    private void applyPercentModifiers(ArrayList<Integer> options, long stat) {
-        for (int param : options) {
-            stat += Utils.percentOf(stat, param);
-        }
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public void applyCharLevelPercent() {
         try {
@@ -693,4 +770,46 @@ public class CharacterInfo {
     public String getStrLevel() {
         return Caption.getCaption(_character.getClassId()).get(this.level) + "+" + (this.levelPercent / 100L) + "." + (this.levelPercent % 100L) + "%";
     }
+
+    public void addPowerOrPotential(byte type, long exp) {
+        if (this.power >= this.powerLimitMark.getPower()) {
+            return;
+        }
+        if (this.power + exp >= this.powerLimitMark.getPower()) {
+            exp = this.powerLimitMark.getPower() - this.power;
+        }
+        if (exp <= 0) {
+            return;
+        }
+        switch (type) {
+            case POWER_AND_POTENTIAL:
+                this.power += exp;
+                this.potential += exp;
+                break;
+
+            case POWER:
+                this.power += exp;
+                break;
+
+            case POTENTIAL:
+                this.potential += exp;
+                break;
+        }
+        // update level
+        if (type == POWER || type == POWER_AND_POTENTIAL) {
+            Server server = DragonBall.getInstance().getServer();
+            if (this.level < server.powers.size() - 1) {
+                if (this.power >= server.powers.get(this.level + 1)) {
+                    this.level++;
+                    if (_character.isDisciple()) {
+                        Disciple p = (Disciple) _character;
+                        p.master.service.chat(p, "Sự phụ ơi, con lên cấp rồi");
+                        setMaxStamina();
+                    }
+                }
+            }
+        }
+        _character.service.addExp(type, exp);
+    }
+
 }

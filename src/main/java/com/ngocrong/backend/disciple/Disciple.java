@@ -5,6 +5,7 @@ import com.ngocrong.backend.consts.SkillName;
 import com.ngocrong.backend.lib.KeyValue;
 import com.ngocrong.backend.skill.Skill;
 import com.ngocrong.backend.skill.SkillPet;
+import com.ngocrong.backend.skill.Skills;
 import com.ngocrong.backend.util.Utils;
 import org.apache.log4j.Logger;
 import com.ngocrong.backend.character.CharacterInfo;
@@ -90,5 +91,48 @@ public class Disciple extends Char {
             skill.coolDown = 1300;
         }
         getSkills().add(skill);
+    }
+
+    public void move() {
+        if (isDead() || zone == null) {
+            return;
+        }
+        if (isBlind() || isFreeze() || isSleep() || isCharge() || isStone()) {
+            return;
+        }
+        if (this.discipleStatus == 0) {
+            followMaster();
+        }
+    }
+
+    public void addTarget(Char _char) {
+        if (_char == this || _char == master) {
+            return;
+        }
+        if (!this.listTarget.contains(_char)) {
+            this.listTarget.add(_char);
+            if (zone != null) {
+                String chat = String.format("Mi làm ta nổi giận rồi %s", _char.getName());
+                zone.mapService.chat(this, chat);
+            }
+        }
+    }
+
+    public void learnSkill() {
+        try {
+            if (skillOpened < SkillPet.list.size()) {
+                SkillPet skillPet = SkillPet.list.get(skillOpened);
+                if (characterInfo.getPower() >= skillPet.powerRequire) {
+                    byte skillID = skillPet.skills[Utils.nextInt(skillPet.skills.length)];
+                    Skill skill = Skills.getSkill(skillID, (byte) 1);
+                    if (skill != null) {
+                        skillOpened++;
+                        addSkill(skill.clone());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("learn skill error", e);
+        }
     }
 }

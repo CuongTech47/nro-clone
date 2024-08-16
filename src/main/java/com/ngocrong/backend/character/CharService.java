@@ -4,8 +4,11 @@ package com.ngocrong.backend.character;
 import com.ngocrong.backend.clan.Clan;
 import com.ngocrong.backend.clan.ClanMember;
 import com.ngocrong.backend.clan.ClanMessage;
+import com.ngocrong.backend.collection.Card;
+import com.ngocrong.backend.collection.CardTemplate;
 import com.ngocrong.backend.consts.Cmd;
 import com.ngocrong.backend.consts.Language;
+import com.ngocrong.backend.disciple.Disciple;
 import com.ngocrong.backend.effect.EffectChar;
 import com.ngocrong.backend.item.Item;
 import com.ngocrong.backend.item.ItemOption;
@@ -941,6 +944,262 @@ public class CharService  extends Service {
             ds.writeByte(message.receive);
             ds.writeByte(message.maxCap);
             ds.writeBoolean(message.isNewMessage);
+        }
+    }
+
+    public void achievement(byte type, byte index) {
+        try {
+            Message ms = new Message(Cmd.ACHIEVEMENT);
+            DataOutputStream ds = ms.getWriter();
+            ds.writeByte(type);
+            if (type == 0) {
+                ds.writeByte(player.achievements.size());
+                for (Achievement achive : player.achievements) {
+                    ds.writeUTF(achive.getName());
+                    ds.writeUTF(achive.getContent());
+                    ds.writeShort(achive.getReward());
+                    ds.writeBoolean(achive.isFinish());
+                    ds.writeBoolean(achive.isRewarded());
+                }
+            }
+            if (type == 1) {
+                ds.writeByte(index);
+            }
+            ds.flush();
+            sendMessage(ms);
+            ms.cleanup();
+        } catch (Exception ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void chat(Char _char, String text) {
+        try {
+            Message mss = new Message(Cmd.CHAT_MAP);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeInt(_char.getId());
+            ds.writeUTF(text);
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void addExp(byte type, long exp) {
+        try {
+            Message mss = new Message(Cmd.PLAYER_UP_EXP);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeByte(type);
+            ds.writeLong(exp);
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void changeBodyMob(Mob mob, byte type) {
+        try {
+            Message msg = new Message(Cmd.CHAGE_MOD_BODY);
+            DataOutputStream ds = msg.getWriter();
+            ds.writeByte(type);
+            ds.writeInt(mob.mobId);
+            if (type == 1) {
+                ds.writeShort(mob.body);
+            }
+            ds.flush();
+            sendMessage(msg);
+            msg.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void autoPlay(boolean canAutoPlay) {
+        try {
+            Message ms = new Message(Cmd.AUTOPLAY);
+            DataOutputStream ds = ms.getWriter();
+            ds.writeBoolean(canAutoPlay);
+            ds.flush();
+            sendMessage(ms);
+            ms.cleanup();
+        } catch (Exception ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void viewCollectionBook() {
+        try {
+            Message mss = new Message(Cmd.RADA_CARD);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeByte(0);
+            List<Card> cards = player.getCards();
+            ds.writeShort(cards.size());
+            for (Card card : cards) {
+                CardTemplate cardT = card.template;
+                ds.writeShort(card.id);
+                ds.writeShort(cardT.icon);
+                ds.writeByte(cardT.rank);
+                ds.writeByte(card.amount);
+                ds.writeByte(cardT.max_amount);
+                ds.writeByte(cardT.type);
+                if (cardT.type == 0) {
+                    ds.writeShort(cardT.templateID);
+                } else {
+                    ds.writeShort(cardT.head);
+                    ds.writeShort(cardT.body);
+                    ds.writeShort(cardT.leg);
+                    ds.writeShort(cardT.bag);
+                }
+                ds.writeUTF(cardT.name);
+                ds.writeUTF(cardT.info);
+                ds.writeByte(card.level);
+                ds.writeBoolean(card.isUse);
+                ds.writeByte(cardT.options.size());
+                int i = 0;
+                for (ItemOption option : cardT.options) {
+                    int[] format = option.format();
+                    ds.writeShort(format[0]);
+                    ds.writeInt(format[1]);
+                    ds.writeByte(option.activeCard);
+                    i++;
+                }
+            }
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void useCard(int id, boolean isUse) {
+        try {
+            Message mss = new Message(Cmd.RADA_CARD);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeByte(1);
+            ds.writeShort(id);
+            ds.writeBoolean(isUse);
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void setIDAuraEff(int playerID, short effID) {
+        try {
+            Message mss = new Message(Cmd.RADA_CARD);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeByte(4);
+            ds.writeInt(playerID);
+            ds.writeShort(effID);
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void fusion(Char _char, byte type) {
+        try {
+            Message msg = new Message(Cmd.FUSION);
+            DataOutputStream ds = msg.getWriter();
+            ds.writeByte(type);
+            ds.writeInt(_char.getId());
+            ds.flush();
+            sendMessage(msg);
+            msg.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void loadSkill() {
+        try {
+            Message mss = messageSubCommand(Cmd.ME_LOAD_SKILL);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeByte(player.getSkills().size());
+            for (Skill skill : player.getSkills()) {
+                ds.writeShort(skill.id);
+            }
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void setItemBox() {
+        try {
+            Message mss = new Message(Cmd.BOX);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeByte(0);
+            ds.writeByte(player.itemBox.length);
+            for (Item item : player.itemBox) {
+                if (item != null) {
+                    ds.writeShort(item.id);
+                    ds.writeInt(item.quantity);
+                    ds.writeUTF(item.info);
+                    ds.writeUTF(item.content);
+                    ArrayList<ItemOption> options = item.getDisplayOptions();
+                    ds.writeByte(options.size());
+                    for (ItemOption option : options) {
+                        int[] format = option.format();
+                        ds.writeShort(format[0]);
+                        ds.writeInt(format[1]);
+                    }
+                } else {
+                    ds.writeShort(-1);
+                }
+            }
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void playerLoadAo(Char _char) {
+        try {
+            Message mss = Service.messageSubCommand(Cmd.PLAYER_LOAD_AO);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeInt(_char.getId());
+            ds.writeLong(_char.characterInfo.getHp());
+            ds.writeLong(_char.characterInfo.getFullHP());
+            ds.writeShort(_char.getEff5buffhp());
+            ds.writeShort(_char.getEff5buffmp());
+            ds.writeShort(_char.getBody());
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void playerLoadQuan(Char _char) {
+        try {
+            Message mss = Service.messageSubCommand(Cmd.PLAYER_LOAD_QUAN);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeInt(_char.getId());
+            ds.writeLong(_char.characterInfo.getHp());
+            ds.writeLong(_char.characterInfo.getFullHP());
+            ds.writeShort(_char.getEff5buffhp());
+            ds.writeShort(_char.getEff5buffmp());
+            ds.writeShort(_char.getLeg());
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
         }
     }
 

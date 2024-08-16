@@ -3,6 +3,7 @@ package com.ngocrong.backend.top;
 import com.ngocrong.backend.character.Char;
 import com.ngocrong.backend.consts.Cmd;
 import com.ngocrong.backend.network.Message;
+import lombok.Getter;
 import org.apache.log4j.Logger;
 
 import java.io.DataOutputStream;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
+@Getter
 public abstract class Top {
     public static final byte TYPE_NONE = 1;
     public static final byte TYPE_THACH_DAU = 0;
@@ -150,4 +151,6 @@ public abstract class Top {
         }
 
     }
+
+
 }

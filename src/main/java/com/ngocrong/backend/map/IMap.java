@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 @Data
 public abstract class IMap<E>{
-    private boolean running;
+    public boolean running;
 
 //    @Getter
 

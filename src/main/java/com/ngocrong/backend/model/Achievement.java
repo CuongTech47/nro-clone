@@ -21,13 +21,13 @@ public class Achievement {
     private long count;  // Số lần hoàn thành thành tựu
 
     @SerializedName("rewarded")
-    private boolean rewarded;  // Đánh dấu nếu đã nhận phần thưởng
+    private boolean isRewarded;  // Đánh dấu nếu đã nhận phần thưởng
 
     // Constructor khởi tạo thành tựu mới với ID tương ứng
     public Achievement(int id) {
         this.id = id;
         this.count = 0;
-        this.rewarded = false;
+        this.isRewarded = false;
         initializeTemplate();
     }
 
@@ -49,7 +49,7 @@ public class Achievement {
 
     // Đánh dấu thành tựu đã nhận thưởng
     public void setRewarded(boolean rewarded) {
-        this.rewarded = rewarded;
+        this.isRewarded = rewarded;
     }
 
     // Kiểm tra xem thành tựu đã hoàn thành hay chưa
@@ -64,7 +64,7 @@ public class Achievement {
 
     // Kiểm tra thành tựu đã nhận thưởng hay chưa
     public boolean isRewarded() {
-        return this.rewarded;
+        return this.isRewarded;
     }
 
     // Lấy tên thành tựu
@@ -80,5 +80,22 @@ public class Achievement {
     public void initTemplate() {
         Server server = DragonBall.getInstance().getServer();
         this.template = server.getAchievements().get(this.id);
+    }
+
+    public boolean isFinish() {
+        return this.count >= template.getMaxCount();
+    }
+
+    public void setIsRewarded(boolean b) {
+        this.isRewarded = isRewarded;
+    }
+
+
+    public String getContent() {
+        return String.format(template.getContent() + " (%s/%s)", Utils.formatNumber(count), Utils.formatNumber(template.getMaxCount()));
+    }
+
+    public void addCount(int i) {
+        this.count += i;
     }
 }

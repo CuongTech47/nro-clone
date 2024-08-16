@@ -1,13 +1,18 @@
 package com.ngocrong.backend.network;
 
 import com.ngocrong.backend.character.Char;
+import com.ngocrong.backend.clan.ClanImage;
 import com.ngocrong.backend.consts.Cmd;
 import com.ngocrong.backend.consts.Info;
+import com.ngocrong.backend.effect.Effect;
+import com.ngocrong.backend.effect.EffectData;
 import com.ngocrong.backend.item.ItemMap;
 import com.ngocrong.backend.item.ItemTime;
 import com.ngocrong.backend.lib.KeyValue;
 import com.ngocrong.backend.mob.Mob;
+import com.ngocrong.backend.mob.MobTemplate;
 import com.ngocrong.backend.model.BgItem;
+import com.ngocrong.backend.model.Caption;
 import com.ngocrong.backend.model.Npc;
 import com.ngocrong.backend.model.Waypoint;
 import com.ngocrong.backend.server.Config;
@@ -277,7 +282,7 @@ public class Service implements IService{
         }
     }
 
-    public void openUIConfirm(byte npcTemplateID, String say, short avatar, ArrayList<KeyValue> menus) {
+    public void openUIConfirm(int npcTemplateID, String say, short avatar, ArrayList<KeyValue> menus) {
         try {
             Message mss = new Message(Cmd.OPEN_UI_CONFIRM);
             DataOutputStream ds = mss.getWriter();
@@ -486,6 +491,249 @@ public class Service implements IService{
             for (long sm : server.powers) {
                 ds.writeLong(sm);
             }
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void size(int size) {
+        try {
+            Message mss = new Message(Cmd.GET_IMAGE_SOURCE);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeByte(1);
+            ds.writeShort(size);
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void downloadOk() {
+        try {
+            Server server = DragonBall.getInstance().getServer();
+            Message mss = new Message(Cmd.GET_IMAGE_SOURCE);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeByte(3);
+            ds.writeInt(server.resVersion[session.getZoomLevel() - 1]);
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void setLinkListServer() {
+        try {
+            Server server = DragonBall.getInstance().getServer();
+            Config config = server.getConfig();
+            Message ms = messageNotLogin(Cmd.CLIENT_INFO);
+            DataOutputStream ds = ms.getWriter();
+            ds.writeUTF(config.getListServers());
+            ds.writeByte(0);
+            ds.flush();
+            sendMessage(ms);
+            ms.cleanup();
+        } catch (Exception ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    private Message messageNotLogin(byte clientInfo) {
+        try {
+            Message ms = new Message(Cmd.NOT_LOGIN);
+            ms.getWriter().writeByte(clientInfo);
+            return ms;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    public void updateData() {
+        try {
+            Server server = DragonBall.getInstance().getServer();
+            Config config = server.getConfig();
+            Message ms = new Message(Cmd.UPDATE_DATA);
+            DataOutputStream ds = ms.getWriter();
+            ds.writeByte(config.getDataVersion());
+            ds.writeInt(server.CACHE_DART.length);
+            ds.write(server.CACHE_DART);
+            ds.writeInt(server.CACHE_ARROW.length);
+            ds.write(server.CACHE_ARROW);
+            ds.writeInt(server.CACHE_EFFECT.length);
+            ds.write(server.CACHE_EFFECT);
+            ds.writeInt(server.CACHE_IMAGE.length);
+            ds.write(server.CACHE_IMAGE);
+            ds.writeInt(server.CACHE_PART.length);
+            ds.write(server.CACHE_PART);
+            ds.writeInt(server.CACHE_SKILL.length);
+            ds.write(server.CACHE_SKILL);
+            ds.flush();
+            sendMessage(ms);
+            ms.cleanup();
+        } catch (Exception ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void createChar() {
+        sendMessage(new Message(Cmd.CREATE_PLAYER));
+    }
+
+    public void requestIcon(Message ms) {
+        try {
+            int id = ms.getReader().readInt();
+            if (id < 0 || id >= small.length) {
+                return;
+            }
+            byte[] ab = Utils.getFile(String.format("resources/image/%d/small/Small%d.png", session.getZoomLevel(), id));
+            if (ab == null) {
+                return;
+            }
+            Message mss = new Message(Cmd.REQUEST_ICON);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeInt(id);
+            ds.writeInt(ab.length);
+            ds.write(ab);
+            ds.flush();
+            sendMessage(mss);
+            mss.cleanup();
+        } catch (IOException ex) {
+            logger.error("request icon error", ex);
+        }
+    }
+
+    public void getBag(Message ms) {
+        try {
+            Server server = DragonBall.getInstance().getServer();
+            byte id = ms.getReader().readByte();
+            ClanImage clanImage = server.getClanImageByID(id);
+            if (clanImage != null) {
+                Message mss = new Message(Cmd.GET_BAG);
+                DataOutputStream ds = mss.getWriter();
+                ds.writeByte(id);
+                int lent = clanImage.idImages.length;
+                ds.writeByte(lent - 1);
+                for (int i = 1; i < lent; i++) {
+                    ds.writeShort(clanImage.idImages[i]);
+                }
+                ds.flush();
+                sendMessage(mss);
+                mss.cleanup();
+            }
+        } catch (IOException ex) {
+            logger.error("get bag err", ex);
+        }
+    }
+
+    public void requestMobTemplate(Message ms) {
+        try {
+            int id = ms.getReader().readByte();
+            MobTemplate tm = Mob.getMobTemplate(id);
+            if (tm != null && tm.isData && tm.mobTemplateId != 70) {
+                byte[] data = tm.data;
+                byte[] img = tm.img[session.getZoomLevel() - 1];
+                Message mss = new Message(Cmd.REQUEST_NPCTEMPLATE);
+                DataOutputStream ds = mss.getWriter();
+                ds.writeByte(tm.mobTemplateId);
+                ds.writeByte(tm.new1);
+                ds.writeInt(data.length);
+                ds.write(data);
+                ds.writeInt(img.length);
+                ds.write(img);
+                if (tm.dataBoss != null) {
+                    ds.writeByte(1);
+                    ds.write(tm.dataBoss);
+                } else {
+                    ds.writeByte(0);
+                }
+                ds.flush();
+                sendMessage(mss);
+                mss.cleanup();
+            }
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void updateCaption(Message ms) {
+        try {
+            byte planet = ms.getReader().readByte();
+            ArrayList<String> captions = (ArrayList<String>) Caption.getCaption(planet);
+            if (captions != null) {
+                Message mss = new Message(Cmd.UPDATE_CAPTION);
+                DataOutputStream ds = mss.getWriter();
+                ds.writeByte(captions.size());
+                for (String cap : captions) {
+                    ds.writeUTF(cap);
+                }
+                ds.flush();
+                sendMessage(mss);
+                mss.cleanup();
+            }
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+
+    }
+
+    public void requestEffectData(Message ms) {
+        try {
+            short id = ms.getReader().readShort();
+            EffectData effData = Effect.getEfDataById(id);
+            if (effData != null) {
+                Message mss = new Message(Cmd.GET_EFFDATA);
+                DataOutputStream ds = mss.getWriter();
+                ds.writeShort(effData.ID);
+                ds.writeInt(effData.data.length);
+                ds.write(effData.data);
+                byte[] ab = effData.img[session.getZoomLevel() - 1];
+                ds.writeInt(ab.length);
+                ds.write(ab);
+                ds.flush();
+                sendMessage(mss);
+                mss.cleanup();
+            }
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void resetPoint() {
+        try {
+            Message msg = new Message(Cmd.RESET_POINT);
+            DataOutputStream ds = msg.getWriter();
+            ds.writeShort(player.getX());
+            ds.writeShort(player.getY());
+            ds.flush();
+            sendMessage(msg);
+            msg.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void requestBackgroundItem(Message ms) {
+        try {
+            int id = ms.getReader().readShort();
+            if (id < 0 || id >= bg.length) {
+                return;
+            }
+            byte[] ab = Utils.getFile(String.format("resources/image/%d/background/%d.png", session.getZoomLevel(), id));
+            if (ab == null) {
+                return;
+            }
+            Message mss = new Message(Cmd.BACKGROUND_TEMPLATE);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeShort(id);
+            ds.writeInt(ab.length);
+            ds.write(ab);
             ds.flush();
             sendMessage(mss);
             mss.cleanup();

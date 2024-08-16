@@ -77,7 +77,7 @@ public class ClanMember {
             Item item = keyValue.getValue();
             this.receiveDonate++;
             _char.addItem(item);
-            _char.service.serverMessage(String.format("Bạn nhận được %s từ %s", item.template.getName(), name));
+            _char.service.serverMessage(String.format("Bạn nhận được %s từ %s", item.template.name, name));
         }
         items.clear();
     }

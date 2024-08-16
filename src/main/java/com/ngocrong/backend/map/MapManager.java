@@ -7,7 +7,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -39,10 +41,7 @@ public class MapManager implements Runnable{
         }
         return instance;
     }
-    @Override
-    public void run() {
 
-    }
     public void openBaseBabidi() {
         LocalDateTime localNow = LocalDateTime.now();
         ZoneId currentZone = ZoneId.of("Asia/Ho_Chi_Minh");
@@ -71,4 +70,54 @@ public class MapManager implements Runnable{
         return maps.get(id);
     }
 
+    public void close() {
+        for (TMap t : maps.values()) {
+            try {
+                t.close();
+            } catch (Exception e) {
+                logger.error("close", e);
+            }
+        }
+    }
+
+    public void update() {
+        List<IMap> removes = new ArrayList<>();
+        for (IMap iMap : list.values()) {
+            try {
+                if (iMap.running) {
+                    iMap.update();
+                } else {
+                    removes.add(iMap);
+                }
+            } catch (Exception e) {
+                logger.error("update error", e);
+            }
+        }
+        for (IMap iMap : removes) {
+            removeObj(iMap);
+        }
+    }
+
+    private void removeObj(IMap iMap) {
+        list.remove(iMap.getId(), iMap);
+    }
+
+    @Override
+    public void run() {
+        while (running) {
+            long delay = 1000;
+            try {
+                long l1 = System.currentTimeMillis();
+                update();
+                long l2 = System.currentTimeMillis();
+                long l3 = l2 - l1;
+                if (l3 > delay) {
+                    continue;
+                }
+                Thread.sleep(delay - l3);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

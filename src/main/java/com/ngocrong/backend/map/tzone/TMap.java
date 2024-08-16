@@ -139,7 +139,7 @@ public class TMap {
         }
     }
 
-    private Zone getZoneByID(int id) {
+    public Zone getZoneByID(int id) {
         lock.readLock().lock();
         try {
             for (Zone z : zones) {
@@ -190,7 +190,7 @@ public class TMap {
         return blocks[py / 24 * tmw + px / 24];
     }
 
-    private int tileTypeAtPixel(short px, short py) {
+    public int tileTypeAtPixel(short px, short py) {
         int result;
         try {
             result = this.types[py / 24 * this.tmw + px / 24];
@@ -343,5 +343,54 @@ public class TMap {
                 break;
             }
         }
+    }
+
+    public void close() {
+        lock.readLock().lock();
+        try {
+            for (Zone z : this.zones) {
+                z.running = false;
+            }
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    public boolean isFuture() {
+        return mapID == 102 || mapID == 92 || mapID == 93 || mapID == 94 || mapID == 96 || mapID == 97 || mapID == 98 || mapID == 99 || mapID == 100 || mapID == 103;
+    }
+
+    public boolean isNappa() {
+        return mapID == 63 || mapID == 64 || mapID == 65 || mapID == 66 || mapID == 67 || mapID == 68 || mapID == 69 || mapID == 70 || mapID == 71 || mapID == 72 || mapID == 73 || mapID == 74 || mapID == 75 || mapID == 76 || mapID == 77 || mapID == 79 || mapID == 80 || mapID == 81 || mapID == 82 || mapID == 83;
+    }
+
+    public boolean isCantGoBack() {
+        return isBarrack() || isBaseBabidi() || isTreasure() || isClanTerritory() || isBlackDragonBall() || isDauTruong();
+    }
+
+    public Object findWaypoint(short x, short y) {
+        for (Waypoint way : waypoints) {
+            if (x >= way.minX && x <= way.maxX && y >= way.minY && y <= way.maxY) {
+                return way;
+            }
+        }
+        return null;
+    }
+
+    public Waypoint getWaypointByNextID(int mapID) {
+        for (Waypoint way : waypoints) {
+            if (way.next == mapID) {
+                return way;
+            }
+        }
+        return null;
+    }
+
+    public int randomZoneID() {
+        return zones.get(Utils.nextInt(zones.size())).zoneID;
+    }
+
+    public boolean isHome() {
+        return mapID == 21 || mapID == 22 || mapID == 23;
     }
 }

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.ngocrong.backend.model.MagicTree;
 import org.apache.log4j.Logger;
 
 import com.google.common.base.CharMatcher;
@@ -54,67 +55,18 @@ public class User {
         if (server.isMaintained) {
             return 5;
         }
-        if (!isValidUsername(username)) {
+        if (!isUsernameValid(username)) {
             return 6;
         }
-        UserEntity userData = authenticateUser(username, password);
-        if (userData == null) {
-            return 0;
-        }
-        initializeUser(userData);
-        return handleExistingSessions(username);
-    }
-
-    public byte createChar(String name, byte gender, short hair) {
-        try {
-            if (!isValidCharacterName(name)) {
-                return 1;
-            }
-            if (isReservedName(name)) {
-                return 5;
-            }
-            if (isNameExists(name)) {
-                return 4;
-            }
-
-            gender = validateGender(gender);
-            hair = selectHairStyle(gender, hair);
-
-            PlayerEntity data = initializePlayerData(name, gender, hair);
-            GameRepo.getInstance().playerRepo.save(data);
-
-            return 0;
-        } catch (Exception ex) {
-            logger.error("Character creation failed!", ex);
-            return 3;
-        }
-    }
-
-    public void close() {
-        session = null;
-        password = null;
-        username = null;
-    }
-
-    private boolean isValidUsername(String username) {
-        return CharMatcher.javaLetterOrDigit().matchesAllOf(username);
-    }
-
-    private UserEntity authenticateUser(String username, String password) {
         List<UserEntity> userDataList = GameRepo.getInstance().userRepo.findByUsernameAndPassword(username, password);
-        return userDataList.isEmpty() ? null : userDataList.get(0);
-    }
+        if (userDataList.isEmpty()) {
+            return 0;
+        }
+        UserEntity userData = userDataList.get(0);
+        populateUserData(userData);
 
-    private void initializeUser(UserEntity userData) {
-        this.id = userData.getId();
-        this.status = userData.getStatus();
-        this.lockTime = userData.getLockTime();
-    }
-
-    private int handleExistingSessions(String username) {
-        List<User> userList = SessionManager.findUser(username);
-        if (!userList.isEmpty()) {
-            disconnectExistingSessions(userList);
+        if (isUserLoggedIn()) {
+            disconnectExistingSessions();
             return 3;
         }
         if (status == 1) {
@@ -126,51 +78,51 @@ public class User {
         return 1;
     }
 
-    private void disconnectExistingSessions(List<User> userList) {
-        userList.forEach(user -> user.getSession().disconnect());
+    private boolean isUserLoggedIn() {
+        return !SessionManager.findUser(username).isEmpty();
     }
 
-    private boolean isValidCharacterName(String name) {
-        int length = name.length();
-        Pattern pattern = Pattern.compile("^[a-z0-9]+$");
-        Matcher matcher = pattern.matcher(name);
-        return length >= 5 && length <= 15 && matcher.find();
+    private void populateUserData(UserEntity userData) {
+        setId(userData.getId());
+        setStatus(userData.getStatus());
+        setLockTime(userData.getLockTime());
     }
 
-    private boolean isReservedName(String name) {
-        return name.contains("admin") || name.contains("server");
+    private boolean isUsernameValid(String username) {
+        return CharMatcher.javaLetterOrDigit().matchesAllOf(username);
     }
 
-    private boolean isNameExists(String name) {
-        return !GameRepo.getInstance().playerRepo.findByName(name).isEmpty();
-    }
-
-    private byte validateGender(byte gender) {
-        return (gender < 0 || gender > 2) ? 0 : gender;
-    }
-
-    private short selectHairStyle(byte gender, short hair) {
-        int[] hairOptions = HAIR_ID[gender];
-        for (int hairOption : hairOptions) {
-            if (hairOption == hair) {
-                return hair;
+    public byte createChar(String name, byte gender, short hair) {
+        try {
+            if (!isNameValid(name)) {
+                return 1;
             }
+            if (isNameRestricted(name)) {
+                return 5;
+            }
+            if (isNameTaken(name)) {
+                return 4;
+            }
+
+            gender = validateGender(gender);
+            hair = validateHair(gender, hair);
+
+            PlayerEntity data = initializePlayerData(name, gender, hair);
+            GameRepo.getInstance().playerRepo.save(data);
+            return 0;
+        } catch (Exception ex) {
+            logger.error("Failed to create character!", ex);
         }
-        return (short) hairOptions[0];
+        return 3;
     }
 
     private PlayerEntity initializePlayerData(String name, byte gender, short hair) {
         Config config = DragonBall.getInstance().getServer().getConfig();
-        List<Item> itemBodys = initializeItems(gender);
-        List<Item> itemBoxs = initializeBoxItems();
-//        MagicTree magicTree = new MagicTree();
-        CharacterInfo info = new CharacterInfo(gender);
-        info.recovery(CharacterInfo.ALL, 100, false);
-        info.setSatamina();
-
         Gson gson = new Gson();
+        ArrayList<Item> itemBodys = initializeItems(gender, true);
+        ArrayList<Item> itemBoxs = initializeItems(gender, false);
+
         PlayerEntity data = new PlayerEntity();
-        data.userId = id;
         data.serverId = config.getServerID();
         data.name = name;
         data.gender = gender;
@@ -179,24 +131,113 @@ public class User {
         data.task = "{\"id\":0,\"index\":0,\"count\":0}";
         data.gold = 2000L;
         data.diamond = 20;
-
+        data.diamondLock = 0;
+        data.itemBag = "[]";
         data.itemBody = gson.toJson(itemBodys);
         data.itemBox = gson.toJson(itemBoxs);
+        data.boxCrackBall = "[]";
         data.map = gson.toJson(LOCATION[gender]);
-        data.info = gson.toJson(info);
-//        data.magicTree = gson.toJson(magicTree);
+        data.skill = "[]";
+        data.info = gson.toJson(new CharacterInfo(gender));
+        data.clan = -1;
+        data.shortcut = "[-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]";
+        data.magicTree = gson.toJson(new MagicTree());
         data.numberCellBag = 20;
         data.numberCellBox = 20;
+        data.friend = "[]";
+        data.enemy = "[]";
+        data.ship = 0;
+        data.fusion = 1;
+        data.porata = 0;
+        data.itemTime = "[]";
+        data.amulet = "[]";
         data.achievement = gson.toJson(initializeAchievements());
-        data.createTime = new Timestamp(System.currentTimeMillis());
-        data.resetTime = data.createTime;
+        data.timePlayed = 0;
+        data.typeTrainning = 0;
+        data.online = 0;
+        data.timeAtSplitFusion = 0L;
+        data.head2 = -1;
+        data.body = -1;
+        data.leg = -1;
+        data.collectionBook= "[]";
+        data.countNumberOfSpecialSkillChanges = 0;
+        data.createTime = data.resetTime = new Timestamp(System.currentTimeMillis());
         return data;
     }
 
-    private List<Item> initializeItems(byte gender) {
-        List<Item> items = new ArrayList<>();
-        items.add(createItem(gender == 0 ? 0 : gender == 1 ? 1 : 2, 0));
-        items.add(createItem(gender == 0 ? 6 : gender == 1 ? 7 : 8, 1));
+    private byte validateGender(byte gender) {
+        if (gender < 0 || gender > 2) {
+            return 0;
+        }
+        return gender;
+    }
+
+    private short validateHair(byte gender, short hair) {
+        int[] hairOptions = HAIR_ID[gender];
+        for (int option : hairOptions) {
+            if (option == hair) {
+                return (short) option;
+            }
+        }
+        return (short) hairOptions[0];
+    }
+
+    private boolean isNameTaken(String name) {
+        return !GameRepo.getInstance().playerRepo.findByName(name).isEmpty();
+    }
+
+    private boolean isNameRestricted(String name) {
+        return name.contains("admin") || name.contains("server");
+    }
+
+    private boolean isNameValid(String name) {
+        int len = name.length();
+        return len >= 5 && len <= 15 && name.matches("^[a-z0-9]+$");
+    }
+
+    public void close() {
+        session = null;
+        password = null;
+        username = null;
+    }
+
+  
+
+
+
+
+
+    private void disconnectExistingSessions() {
+        List<User> userList = SessionManager.findUser(username);
+        for (User user : userList) {
+            user.getSession().disconnect();
+        }
+    }
+
+
+
+
+
+    private ArrayList<Item> initializeItems(byte gender, boolean isBodyItems) {
+        ArrayList<Item> items = new ArrayList<>();
+        if (isBodyItems) {
+            switch (gender) {
+                case 0 -> {
+                    items.add(createItem(0, 0));
+                    items.add(createItem(6, 1));
+                }
+                case 1 -> {
+                    items.add(createItem(1, 0));
+                    items.add(createItem(7, 1));
+                }
+                case 2 -> {
+                    items.add(createItem(2, 0));
+                    items.add(createItem(8, 1));
+                }
+            }
+        } else {
+            items.add(createItem(12, 0));
+        }
         return items;
     }
 
@@ -216,12 +257,13 @@ public class User {
 
     private List<Achievement> initializeAchievements() {
         List<Achievement> achievements = new ArrayList<>();
-        int totalAchievements = DragonBall.getInstance().getServer().getAchievements().size();
-        for (int i = 0; i < totalAchievements; i++) {
+        for (int i = 0; i < DragonBall.getInstance().getServer().getAchievements().size(); i++) {
             achievements.add(new Achievement(i));
         }
         return achievements;
     }
+
+
 
 
 }

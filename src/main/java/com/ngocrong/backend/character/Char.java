@@ -24,6 +24,7 @@ import com.ngocrong.backend.model.*;
 import com.ngocrong.backend.network.Message;
 import com.ngocrong.backend.network.Session;
 import com.ngocrong.backend.repository.GameRepo;
+import com.ngocrong.backend.server.Config;
 import com.ngocrong.backend.server.DragonBall;
 import com.ngocrong.backend.server.Server;
 import com.ngocrong.backend.shop.Shop;
@@ -31,7 +32,11 @@ import com.ngocrong.backend.skill.Skill;
 import com.ngocrong.backend.skill.SkillBook;
 import com.ngocrong.backend.skill.SpecialSkill;
 import com.ngocrong.backend.task.Task;
+import com.ngocrong.backend.task.TaskText;
+import com.ngocrong.backend.top.Top;
+import com.ngocrong.backend.top.TopInfo;
 import com.ngocrong.backend.util.Utils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import lombok.Getter;
 import lombok.Setter;
@@ -92,6 +97,7 @@ public class Char {
     private int percentDamageBonus;
     private int phuX;
 
+
     //ARR ITEM
     public Item[] itemBody;
     public Item[] itemBag;
@@ -112,6 +118,8 @@ public class Char {
     public ArrayList<Friend> friends;
     public Menu menu;
     public ArrayList<Friend> enemies;
+    private ArrayList<KeyValue> listMapTransport;
+
     // sort
     private short head, headDefault;
     private short body;
@@ -124,31 +132,37 @@ public class Char {
     private short countNumberOfSpecialSkillChanges;
 
     //bool
-    private boolean isNhapThe;
-    private boolean isMonkey;
-    private boolean isHaveMount;
-    private boolean isDead;
-    private boolean isCharge, isRecoveryEnergy;
-    private boolean isCold;
-    private boolean setNappa;
-    private boolean isLoggedOut;
-    private boolean isHeld;
-    private boolean isHaveEquipInvisible, isHaveEquipTransformIntoChocolate, isHaveEquipTransformIntoStone,
-            isHaveEquipMiNuong, isHaveEquipBulma, isHaveEquipXinbato, isHaveEquipBuiBui, isDoSaoPhaLe;
-    private boolean isFreeze, isSleep, isBlind, isProtected, isHuytSao, isCritFirstHit;
-    private boolean isStone;
-    private boolean isChocolate;
-    private boolean isMask;
-    private boolean isInvisible;
-    private boolean isCuongNo, isBoHuyet, isGiapXen, isBoKhi, isAnDanh, isMayDo, isDuoiKhi, isPudding, isXucXich, isKemDau, isMiLy, isSushi;
-    private boolean isTrading;
     private boolean isNewMember;
-    private boolean isAutoPlay;
-    private boolean isSkillSpecial;
+    private boolean isNhapThe;
+    private boolean isLoggedOut;
+    private boolean isMask;
+    private boolean isFreeze, isSleep, isBlind, isProtected, isHuytSao, isHeld, isCritFirstHit;
     private boolean isBuaTriTue, isBuaManhMe, isBuaDaTrau, isBuaOaiHung, isBuaBatTu, isBuaDeoDai, isBuaThuHut,
             isBuaDeTu, isBuaTriTue3, isBuaTriTue4;
-    private boolean setThienXinHang, setKirin, setSongoku, setPicolo, setOcTieu, setPikkoroDaimao, setKakarot, setCaDic, setThanLinh;
+    private boolean isDead;
+    private boolean isKhangTDHS;
+    private boolean isHaveMount;
     private boolean isGoBack;
+    private boolean isCuongNo, isBoHuyet, isGiapXen, isBoKhi, isAnDanh, isMayDo, isDuoiKhi, isPudding, isXucXich, isKemDau, isMiLy, isSushi;
+    private boolean isNoNeedToConfirm;
+    private boolean isVoHinh;
+    private boolean isUnaffectedCold;
+    private boolean isChocolate, isStone;
+    private boolean isSkillSpecial;
+    private boolean isTrading;
+    private boolean isCharge, isRecoveryEnergy;
+    private boolean isMonkey;
+    private boolean isHaveEquipTeleport;
+    private boolean isHaveEquipSelfExplosion;
+    private boolean isExploded;
+    private boolean isAutoPlay;
+    private boolean setThienXinHang, setKirin, setSongoku, setPicolo, setOcTieu, setPikkoroDaimao, setKakarot, setCaDic,
+            setNappa, setThanLinh;
+    private boolean isCold;
+    private boolean isMod;
+    private boolean isHaveEquipInvisible, isHaveEquipTransformIntoChocolate, isHaveEquipTransformIntoStone,
+            isHaveEquipMiNuong, isHaveEquipBulma, isHaveEquipXinbato, isHaveEquipBuiBui, isDoSaoPhaLe;
+    private boolean isInvisible;
     //obj
     public Zone zone;
     private String name;
@@ -174,6 +188,7 @@ public class Char {
     private SpecialSkill specialSkill;
     private Session session;
     private Invite invite;
+    private KeyValue currMap;
 
     //    private PowerInfo accumulatedPoint;
     // byte
@@ -348,10 +363,10 @@ public class Char {
         setDefaultPart();
         if (itemBody != null) {
             if (itemBody[0] != null) {
-                this.body = itemBody[0].template.getPart();
+                this.body = itemBody[0].template.part;
             }
             if (itemBody[1] != null) {
-                this.leg = itemBody[1].template.getPart();
+                this.leg = itemBody[1].template.part;
             }
         }
         if (this.isStone) {
@@ -364,7 +379,7 @@ public class Char {
             this.leg = 414;
         } else if (isNhapThe && !isMonkey) {
             this.isMask = true;
-            if (itemBody != null && itemBody[5] != null && itemBody[5].template.getPart() == -1 && itemBody[5].isNhapThe) {
+            if (itemBody != null && itemBody[5] != null && itemBody[5].template.part == -1 && itemBody[5].isNhapThe) {
                 ItemTemplate template = itemBody[5].template;
                 this.head = template.head;
                 this.body = template.body;
@@ -410,7 +425,7 @@ public class Char {
             }
         } else if (!this.isMonkey) {
             if (itemBody != null && itemBody[5] != null && !itemBody[5].isNhapThe) {
-                this.head = itemBody[5].template.getPart();
+                this.head = itemBody[5].template.part;
                 if (this.head == -1) {
                     this.isMask = true;
                     ItemTemplate template = itemBody[5].template;
@@ -502,7 +517,7 @@ public class Char {
                     break;
             }
         } else if (itemBody.length > 8 && itemBody[8] != null) {
-            switch (itemBody[8].template.getId()) {
+            switch (itemBody[8].template.id) {
                 case ItemName.LUOI_HAI_THAN_CHET:
                     this.bag = ClanImageName.LUOI_HAI_THAN_CHET_72;
                     break;
@@ -625,7 +640,7 @@ public class Char {
 
 //
 
-    private void setTimeForItemtime(int i, int seconds) {
+    public void setTimeForItemtime(int i, int seconds) {
         synchronized (this.itemTimes) {
             for (ItemTime itemTime : this.itemTimes) {
                 if (itemTime.id == id) {
@@ -820,6 +835,7 @@ public class Char {
 
             ArrayList<Item> bodys = new ArrayList<>();
             for (Item item : this.itemBody) {
+                System.out.println("item :: " + item);
                 if (item != null) {
                     bodys.add(item);
                 }
@@ -1189,7 +1205,7 @@ public class Char {
         }
     }
 
-    private void addItemTime(ItemTime item) {
+    public void addItemTime(ItemTime item) {
         synchronized (this.itemTimes) {
             for (ItemTime itm : this.itemTimes) {
                 if (itm.id == item.id) {
@@ -1233,7 +1249,7 @@ public class Char {
         this.idMount = -1;
         for (Item item : this.itemBody) {
             if (item != null) {
-                if (item.template.getType() == 23 || item.template.getType() == 24) {
+                if (item.template.type == 23 || item.template.type == 24) {
                     this.isHaveMount = true;
                     this.idMount = item.template.mountID;
                     return;
@@ -1776,7 +1792,7 @@ public class Char {
         }
     }
 
-    private void addGold(long gold) {
+    public void addGold(long gold) {
         this.gold += gold;
         service.addGold(gold);
     }
@@ -2101,19 +2117,19 @@ public class Char {
 
 
     public boolean addItem(Item item) {
-        if (item.template.getType() == Item.TYPE_GOLD) {
+        if (item.template.type == Item.TYPE_GOLD) {
             addGold(item.quantity);
             return true;
         }
-        if (item.template.getType() == Item.TYPE_DIAMOND) {
+        if (item.template.type == Item.TYPE_DIAMOND) {
             addDiamond(item.quantity);
             return true;
         }
-        if (item.template.getType() == Item.TYPE_DIAMOND_LOCK) {
+        if (item.template.type == Item.TYPE_DIAMOND_LOCK) {
             addDiamondLock(item.quantity);
             return true;
         }
-        if (item.template.getType() == Item.TYPE_AMULET) {
+        if (item.template.type == Item.TYPE_AMULET) {
             Amulet amulet = getAmulet(item.id);
             if (amulet != null) {
                 amulet.expiredTime += item.quantity;
@@ -2149,7 +2165,7 @@ public class Char {
                     return false;
                 }
                 item2.quantity += item.quantity;
-                if (item.template.getType() == Item.TYPE_DAUTHAN) {
+                if (item.template.type == Item.TYPE_DAUTHAN) {
                     service.setItemBag();
                 } else {
                     service.updateBag(index, item2.quantity);
@@ -2290,5 +2306,1858 @@ public class Char {
             }
         }
         return null;
+    }
+
+    public void removeItem(int index, int quantity) {
+        Item item = this.itemBag[index];
+        if (item != null) {
+            int quant = item.quantity;
+            quant -= quantity;
+            if (quant <= 0) {
+                this.itemBag[index] = null;
+                quant = 0;
+            } else {
+                item.quantity = quant;
+            }
+            service.updateBag(index, quant);
+        }
+    }
+
+    public boolean isBagFull() {
+        for (Item item : this.itemBag) {
+            if (item == null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public Item getItemInBag(int thoiVang) {
+        for (Item item : this.itemBag) {
+            if (item != null && item.id == id) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    public void checkMove(Message mss) {
+        try {
+            long now = System.currentTimeMillis();
+            int s = (int) (now - lastTick) / 1000;
+            int seconds = mss.getReader().readInt();
+            int m = 100 / (characterInfo.getSpeed() / 2);
+            if (tickMove != 100 || Math.abs(seconds - s) > 2 || s < m) {
+                numCheck++;
+            }
+            tickMove = 0;
+        } catch (IOException ex) {
+            logger.error("check move", ex);
+        }
+    }
+
+    public void requestPean() {
+        if (isAutoPlay && !magicTree.isUpgrade) {
+            boolean flag2 = false;
+            for (int j = 0; j < this.itemBag.length; j++) {
+                Item item = this.itemBag[j];
+                if (item != null && item.template.type == 6) {
+                    flag2 = true;
+                    break;
+                }
+            }
+            if (!flag2 && magicTree != null) {
+                magicTree.harvest(this);
+            }
+        }
+    }
+
+    public void achievement(Message mss) {
+        try {
+            if (zone.map.mapID != 47 && zone.map.mapID != 84) {
+                return;
+            }
+            byte index = mss.getReader().readByte();
+            if (index < 0 || index >= achievements.size()) {
+                return;
+            }
+            Achievement achive = this.achievements.get(index);
+            if (achive.isFinish() && !achive.isRewarded()) {
+                int reward = achive.getReward();
+                achive.setIsRewarded(true);
+                addDiamondLock(reward);
+                service.achievement((byte) 1, index);
+            }
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void finishLoadMap() {
+        if (taskMain != null && taskMain.id == 4 && taskMain.index == 0) {
+            taskNext();
+        }
+        //}
+        int mapID = -1;
+
+        if (zone != null) {
+            mapID = zone.map.mapID;
+        }
+
+        if (mapID == 39 || mapID == 40 || mapID == 41) {
+            String petName = new String[]{"Puaru", "Piano", "Icarus"}[gender];
+            service.openUISay((short) NpcName.CON_MEO, String.format(
+                    "Chào mừng bạn đến với thế giới Ngọc Rồng!\nMình là %s sẽ đồng hành cùng bạn ở thế giới này\nĐể di chuyển, hãy chạm 1 lần vào nơi muốn đến",
+                    petName), (short) getPetAvatar());
+        }
+        if (taskMain != null) {
+            Task task = taskMain;
+            if (task.id == 0 && task.index == 1 && task.mapTasks[1] == mapID) {
+                String text = TaskText.TASK_0_1[gender];
+                service.openUISay(NpcName.CON_MEO, text, getPetAvatar());
+                taskNext();
+            }
+            if (mapID == 47) {
+                if (task.id == 8 && task.index == 3) {
+                    updateTask(9);
+                }
+            }
+            if (mapID == 46) {
+                if (task.id == 9 && task.index == 2) {
+                    taskNext();
+                }
+            }
+            if (task.id == 11 && task.index == 0) {
+                int map = (new int[]{5, 13, 20})[gender];
+                if (mapID == map) {
+                    taskNext();
+                }
+            }
+        }
+        loadEffectFreeze();
+        loadEffectSkillOnMob();
+        if (this.mobMe != null) {
+            service.mobMeUpdate(this, null, -1, (byte) -1, (byte) 0);
+        }
+        if (this.petFollow != null) {
+            service.petFollow(this, (byte) 1);
+        }
+        service.updateBag(this);
+        List<Char> list = zone.getListChar(Zone.TYPE_ALL);
+        for (Char _c : list) {
+            if (_c != this) {
+                service.playerAdd(_c);
+                if (_c.petFollow != null) {
+                    service.petFollow(_c, (byte) 1);
+                }
+                loadEffectSkillPlayer(_c);
+                if (_c.mobMe != null) {
+                    service.mobMeUpdate(_c, null, -1, (byte) -1, (byte) 0);
+                }
+            }
+        }
+        if (isAutoPlay) {
+            service.autoPlay(true);
+        }
+    }
+
+    private void loadEffectSkillOnMob() {
+        List<Mob> list2 = zone.getListMob();
+        for (Mob mob : list2) {
+            if (mob.status == 0) {
+                continue;
+            }
+            if (mob.isBlind) {
+                service.setEffect(null, mob.mobId, Skill.ADD_EFFECT, Skill.MONSTER, (byte) 40);
+            }
+            if (mob.isSleep) {
+                service.setEffect(null, mob.mobId, Skill.ADD_EFFECT, Skill.MONSTER, (byte) 41);
+            }
+            if (mob.isChangeBody) {
+                service.changeBodyMob(mob, (byte) 1);
+            }
+        }
+    }
+
+    private void loadEffectSkillPlayer(Char _char) {
+        if (_char.isSleep) {
+            service.setEffect(null, _char.id, Skill.ADD_EFFECT, Skill.CHARACTER, (byte) 41);
+        }
+        if (_char.isProtected) {
+            service.setEffect(null, _char.id, Skill.ADD_EFFECT, Skill.CHARACTER, (byte) 33);
+        }
+        if (_char.isBlind) {
+            service.setEffect(null, _char.id, Skill.ADD_EFFECT, Skill.CHARACTER, (byte) 40);
+        }
+        if (_char.isRecoveryEnergy) {
+            service.skillNotFocus(_char.id, (short) _char.select.id, (byte) 1, null, null);
+        }
+        if (_char.isHeld && _char.hold.getHolder() == _char) {
+            if (_char.hold.getDetainee() instanceof Mob) {
+                Mob mob = (Mob) _char.hold.getDetainee();
+                service.setEffect(_char.hold, mob.mobId, Skill.ADD_EFFECT, Skill.MONSTER, (byte) 32);
+            } else {
+                Char _c = (Char) _char.hold.getDetainee();
+                service.setEffect(_char.hold, _c.id, Skill.ADD_EFFECT, Skill.CHARACTER, (byte) 32);
+            }
+        }
+        if (_char.isCharge()) {
+            switch (_char.select.template.id) {
+                case SkillName.QUA_CAU_KENH_KHI:
+                case SkillName.MAKANKOSAPPO:
+                    service.skillNotFocus(_char.id, (short) _char.select.id, (byte) 4, null, null);
+                    break;
+
+                case SkillName.BIEN_HINH:
+                    service.skillNotFocus(_char.id, (short) _char.select.id, (byte) 6, null, null);
+                    break;
+
+                case SkillName.TU_PHAT_NO:
+                    service.skillNotFocus(_char.id, (short) _char.select.id, (byte) 7, null, null);
+                    break;
+            }
+        }
+    }
+
+    private void loadEffectFreeze() {
+        ArrayList<Char> chars = new ArrayList<>();
+        ArrayList<Mob> mobs = new ArrayList<>();
+        if (zone != null) {
+            List<Char> list = zone.getListChar(Zone.TYPE_ALL);
+            for (Char _char : list) {
+                if (_char != this) {
+                    if (_char.isFreeze) {
+                        chars.add(_char);
+                    }
+                }
+            }
+            List<Mob> list2 = zone.getListMob();
+            for (Mob mob : list2) {
+                if (mob.isFreeze) {
+                    mobs.add(mob);
+                }
+            }
+        }
+        service.skillNotFocus(this.id, (short) 42, (byte) 0, mobs, chars);
+    }
+
+    private void updateTask(int taskID) {
+        if (taskMain != null) {
+            int power = taskMain.rewardPower;
+            int potential = taskMain.rewardPotential;
+            int gold = taskMain.rewardGold;
+            int gem = taskMain.rewardGem;
+            int gemLock = taskMain.rewardGemLock;
+            if (power > 0) {
+                addExp(CharacterInfo.POWER, power, false, false);
+                service.serverMessage(String.format("Bạn được thưởng %d sức mạnh", power));
+            }
+            if (potential > 0) {
+                addExp(CharacterInfo.POTENTIAL, potential, false, false);
+            }
+            if (gold > 0) {
+                addGold(gold);
+            }
+            if (gem > 0) {
+                addDiamond(gem);
+            }
+            if (gemLock > 0) {
+                addDiamondLock(gem);
+            }
+        }
+        Task task = new Task();
+        task.id = taskID;
+        task.count = 0;
+        task.index = 0;
+        task.initTask(this.gender);
+        taskMain = task;
+        setListAccessMap();
+        service.setTask();
+    }
+
+    public void addExp(byte type, long exp, boolean canX2, boolean isAddForMember) {
+        if (characterInfo.getPower() >= characterInfo.getPowerLimitMark().getPower()) {
+            return;
+        }
+        if (characterInfo.getPower() + exp >= characterInfo.getPowerLimitMark().getPower()) {
+            exp = characterInfo.getPowerLimitMark().getPower() - characterInfo.getPower();
+        }
+        if (canX2) {
+            Server server = DragonBall.getInstance().getServer();
+            Config config = server.getConfig();
+            exp *= config.getExp();
+            if (isDuoiKhi) {
+                exp *= 2;
+            }
+            int mul = 1;
+            if (isBuaTriTue4) {
+                if (isBuaTriTue) {
+                    mul = 6;
+                } else {
+                    mul = 4;
+                }
+            } else if (isBuaTriTue3) {
+                if (isBuaTriTue) {
+                    mul = 5;
+                } else {
+                    mul = 3;
+                }
+            } else if (isBuaTriTue) {
+                mul = 2;
+            }
+            exp *= mul;
+        }
+        if (exp <= 0) {
+            return;
+        }
+        if (isDisciple()) {
+            Disciple disciple = (Disciple) this;
+            int dLevel = this.characterInfo.getLevel() - disciple.master.characterInfo.getLevel();
+            int percent = -20;
+            if (dLevel < 0) {
+                percent = dLevel * 10;
+            }
+            long exp2 = exp;
+            exp2 += exp2 * percent / 100;
+            if (exp2 <= 0) {
+                exp2 = 1;
+            }
+            disciple.master.addExp(type, exp2, canX2, isAddForMember);
+
+        } else if (isAddForMember) {
+            if (clan != null) {
+                exp = exp * 90 / 100;
+                List<Char> list = zone.getMemberSameClan(this);
+                if (list.size() - 1 > 0) {
+                    clan.powerPoint += exp;
+                    for (Char _c : list) {
+                        int d = Math.abs(characterInfo.getLevel() - _c.characterInfo.getLevel());
+                        exp -= exp * (d * 5L) / 100;
+                        _c.addExp(CharacterInfo.POTENTIAL, exp, false, false);
+                    }
+                }
+            }
+        }
+        long prePower = characterInfo.getPower();
+        characterInfo.addPowerOrPotential(type, exp);
+        Top topPower = Top.getTop(Top.TOP_POWER);
+        if (topPower != null) {
+            if (characterInfo.getPower() > topPower.getLowestScore()) {
+                TopInfo in = topPower.getTopInfo(this.id);
+                if (in != null) {
+                    in.score = characterInfo.getPower();
+                    in.head = this.head;
+                    in.body = this.body;
+                    in.leg = this.leg;
+                    in.info = String.format("Sức mạnh: %s", Utils.currencyFormat(characterInfo.getPower()));
+                } else {
+                    in = new TopInfo();
+                    in.playerID = this.id;
+                    in.name = this.name;
+                    in.score = characterInfo.getPower();
+                    in.head = this.head;
+                    in.body = this.body;
+                    in.leg = this.leg;
+                    in.info = String.format("Sức mạnh: %s", Utils.currencyFormat(characterInfo.getPower()));
+                    in.info2 = "";
+                    topPower.addTopInfo(in);
+                }
+                topPower.updateLowestScore();
+            }
+        }
+        if (!isDisciple()) {
+            if (prePower < 1500000 && characterInfo.getPower() >= 1500000) {
+                setListAccessMap();
+            }
+        }
+        if (taskMain != null) {
+            if (taskMain.id == 7 && taskMain.index == 0) {
+                if (characterInfo.getPower() >= 16000) {
+                    taskNext();
+                }
+            }
+            if (taskMain.id == 8 && taskMain.index == 0) {
+                if (characterInfo.getPower() >= 40000) {
+                    taskNext();
+                }
+            }
+            if (taskMain.id == 14 && taskMain.index == 0) {
+                if (characterInfo.getPower() >= 200000) {
+                    taskNext();
+                }
+            }
+            if (taskMain.id == 15 && taskMain.index == 0) {
+                if (characterInfo.getPower() >= 500000) {
+                    taskNext();
+                }
+            }
+        }
+    }
+
+    public void collectionBookACtion(Message ms) {
+        try {
+            byte action = ms.getReader().readByte();
+            int id = -1;
+            if (ms.getReader().available() > 0) {
+                id = ms.getReader().readShort();
+            }
+            if (action == 0) {
+                service.viewCollectionBook();
+            }
+            if (action == 1) {
+                Card c = getCollectionCard(id);
+                if (c != null) {
+                    if (c.level > 0) {
+                        if (!c.isUse) {
+                            long size = cards.stream().filter(a -> a.isUse).count();
+                            if (size >= 3) {
+                                return;
+                            }
+                        }
+                        c.isUse = !c.isUse;
+                        service.useCard(c.id, c.isUse);
+                        characterInfo.setCharacterInfo();
+                        service.loadPoint();
+                        zone.mapService.playerLoadBody(this);
+                        int eff = idAuraEff;
+                        setAuraEffect();
+                        if (eff != idAuraEff) {
+                            zone.mapService.setIDAuraEff(this.id, this.idAuraEff);
+                        }
+                    }
+                    return;
+                }
+
+            }
+        } catch (IOException ex) {
+            logger.error("collectionBookAction error!", ex);
+        }
+    }
+
+    private Card getCollectionCard(int id) {
+        for (Card c : cards) {
+            if (c.id == id) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    public void specialSkill(Message mss) {
+        try {
+            byte index = mss.getReader().readByte();
+            if (index == 0) {
+                menus.clear();
+                StringBuilder sb = new StringBuilder();
+                sb.append("Nội tại là một kỹ năng bị động hỗ trợ đặc biệt");
+                sb.append("\n");
+                sb.append("Bạn có muốn mở hoặc thay đổi nội tại không?");
+                menus.add(new KeyValue(1111, "Xem\ntất cả\nNội Tại"));
+                menus.add(new KeyValue(1112, "Mở\nNội Tại"));
+                menus.add(new KeyValue(1113, "Mở VIP"));
+                menus.add(new KeyValue(CMDMenu.CANCEL, "Từ chối"));
+                service.openUIConfirm(NpcName.CON_MEO,sb.toString(),getPetAvatar(),menus);
+            }
+        } catch (IOException ex) {
+            logger.debug("special skill error", ex);
+        }
+    }
+
+    public void mapTransport(Message ms) {
+        if (escortedPerson != null) {
+            service.serverMessage(String.format("Bạn đang hộ tống %s, không thể thực hiện.", escortedPerson.getName()));
+            return;
+        }
+        if (listMapTransport == null) {
+            return;
+        }
+        lock.lock();
+        try {
+            int index = ms.getReader().readByte();
+            if (index < 0 || index >= listMapTransport.size()) {
+                return;
+            }
+            int cmd = getCommandTransport();
+            if (cmd == 0) {
+                Item item = itemBag[capsule];
+                if (item != null && (item.id == 193 || item.id == 194)) {
+                    if (item.id == 193) {
+                        removeItem(capsule, 1);
+                    }
+                } else {
+                    return;
+                }
+                KeyValue<Integer, String> keyValue = listMapTransport.get(index);
+                int mapID = keyValue.getKey();
+                TMap curr = zone.map;
+                Zone z = zone;
+                String planet = "";
+                switch (curr.planet) {
+                    case 0:
+                        planet = "Trái đất";
+                        break;
+
+                    case 1:
+                        planet = "Namêc";
+                        break;
+
+                    case 2:
+                        planet = "Xay da";
+                        break;
+                }
+                if (curr.isCold()) {
+                    planet = "Cold";
+                } else if (curr.isFuture()) {
+                    planet = "Tương lai";
+                } else if (curr.isNappa()) {
+                    planet = "Fide";
+                }
+                isGoBack = currMap == keyValue;
+                TMap map = zone.map;
+                if (!map.isCantGoBack()) {
+                    currMap = new KeyValue(curr.mapID, "Về chỗ cũ: " + curr.name, planet);
+                } else {
+                    currMap = null;
+                }
+                teleport(mapID);
+                currZoneId = z.zoneID;
+                listMapTransport = null;
+            } else if (cmd == 1) {
+//                if (MapManager.getInstance().blackDragonBall == null) {
+//                    service.serverMessage2("Đã kết thúc");
+//                    return;
+//                }
+                KeyValue<Integer, String> keyValue = listMapTransport.get(index);
+                int mapID = keyValue.getKey();
+                TMap map = MapManager.getInstance().getMap(mapID);
+                short x = calculateX(map);
+                zone.leave(this);
+                this.x = x;
+                this.y = map.collisionLand(x, (short) 24);
+                int zoneID = map.getZoneID();
+                map.enterZone(this, zoneID);
+            }
+
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void move(Message ms) {
+        try {
+            tickMove++;
+            if (tickMove > 105) {
+                numCheck++;
+            }
+            if (tickMove == 1) {
+                lastTick = System.currentTimeMillis();
+            }
+            if (this.isRecoveryEnergy) {
+                stopRecoveryEnery();
+            }
+            if (!meCanMove()) {
+                return;
+            }
+            if (taskMain != null) {
+                if (taskMain.id == 0 && taskMain.index == 0) {
+                    String text = TaskText.TASK_0_0[gender];
+                    service.openUISay(NpcName.CON_MEO, text, getPetAvatar());
+                    taskNext();
+                }
+            }
+            if (this.hold != null) {
+                if (this.hold.getHolder() == this) {
+                    this.hold.close();
+                } else {
+                    return;
+                }
+            }
+            byte type = ms.getReader().readByte();// 0 duoi dat, 1 bay
+            this.preX = this.x;
+            this.preY = this.y;
+            this.x = ms.getReader().readShort();
+            if (ms.getReader().available() > 0) {
+                this.y = ms.getReader().readShort();
+            }
+
+            if (this.mobMe != null) {
+                this.mobMe.x = this.x;
+                this.mobMe.y = (short) (this.y - 40);
+            }
+            if (type == 0) {
+                this.y = zone.map.collisionLand(this.x, this.y);
+            } else {
+                achievements.get(5).addCount(Utils.getDistance(this.preX, this.preY, this.x, this.y) / 10);// Khinh công
+                // thành thạo
+                if ((zone.map.tileTypeAtPixel(this.x, this.y)) == TMap.T_EMPTY) {
+                    if (!this.isHaveMount) {
+//                        info.mp -= this.info.originalMP / 100 * (!isMonkey ? 1 : 2);
+                        characterInfo.setMp(characterInfo.getMp() - this.characterInfo.getBaseMP() / 100 * (!isMonkey ? 1 : 2));
+                        if (this.characterInfo.getMp() < 0) {
+                            this.characterInfo.setMp(0);
+                        }
+                    }
+                }
+            }
+            if (myDisciple != null && myDisciple.discipleStatus == 0) {
+                myDisciple.move();
+            }
+            if (miniDisciple != null) {
+                miniDisciple.move();
+            }
+            if (escortedPerson != null) {
+                escortedPerson.move();
+            }
+            this.zone.mapService.move(this);
+            this.lastTimeMove = System.currentTimeMillis();
+            if ((this.x <= 24 || this.x >= this.zone.map.width - 24 || this.y < 0
+                    || this.y >= this.zone.map.height - 24) && zone.map.findWaypoint(x, y) == null) {
+                this.x = this.preX;
+                this.y = this.preY;
+                zone.mapService.setPosition(this, (byte) 0);
+            }
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void chatMap(Message ms) {
+        try {
+            String text = ms.getReader().readUTF();
+            if (!text.isEmpty()) {
+                if (text.length() > 100) {
+                    return;
+                }
+                if (myDisciple != null && !isNhapThe) {
+                    String tmp = Utils.unaccent(text);
+                    if (tmp.equalsIgnoreCase("di theo") || tmp.equalsIgnoreCase("follow")) {
+                        petStatus((byte) 0);
+                    }
+                    if (tmp.equalsIgnoreCase("bao ve") || text.equalsIgnoreCase("protect")) {
+                        petStatus((byte) 1);
+                    }
+                    if (tmp.equalsIgnoreCase("tan cong") || tmp.equalsIgnoreCase("attack")) {
+                        petStatus((byte) 2);
+                    }
+                    if (tmp.equalsIgnoreCase("ve nha") || tmp.equalsIgnoreCase("go home")) {
+                        petStatus((byte) 3);
+                    }
+                    String words = "ten con la ";
+                    if (tmp.startsWith(words)) {
+                        String name = text.substring(words.length()).trim();
+                        if (StringUtils.isBlank(tmp)) {
+                            return;
+                        }
+                        int length = name.length();
+                        if (length >= 5 && length <= 15) {
+                            int index = getIndexBagById(400);
+                            if (index == -1) {
+                                return;
+                            }
+                            removeItem(index, 1);
+                            myDisciple.setName(name);
+                            zone.mapService.playerLoadAll(myDisciple);
+                            service.chat(myDisciple, "Cảm ơn sư phụ, tên con từ nay sẽ là " + name);
+                        } else {
+                            service.serverMessage("Tên không hợp lệ!");
+                        }
+                        return;
+                    }
+
+                }
+                zone.mapService.chat(this, text);
+            }
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    private void petStatus(byte status) {
+        if (myDisciple != null) {
+            myDisciple.discipleStatus = status;
+            if (isNhapThe) {
+                service.serverMessage("Không thể thực hiện");
+                return;
+            }
+            switch (status) {
+                case 0:
+                    service.chat(myDisciple, "Ok con theo sư phụ");
+                    break;
+
+                case 1:
+                    service.chat(myDisciple, "Ok con sẽ bảo vệ sư phụ");
+                    break;
+
+                case 2:
+                    service.chat(myDisciple, "Ok sư phụ để con lo cho");
+                    break;
+
+                case 3:
+                    if (myDisciple.zone != null) {
+                        service.chat(myDisciple, "Ok con về, bibi sư phụ");
+                        if (!myDisciple.isDead()) {
+                            myDisciple.clearEffect();
+                            if (myDisciple.isMonkey()) {
+                                myDisciple.timeOutIsMonkey();
+                            }
+                            Utils.setTimeout(() -> {
+                                if (myDisciple.zone != null) {
+                                    zone.leave(myDisciple);
+                                }
+                            }, 2000);
+                        }
+                    }
+                    break;
+
+                case 4:
+                    myDisciple.discipleStatus = 3;
+                    if (zone.map.isDauTruong() || isDead() || myDisciple.isDead()) {
+                        service.serverMessage("Không thể thực hiện");
+                        return;
+                    }
+                    long now = System.currentTimeMillis();
+                    if (now - timeAtSplitFusion >= 600000) {
+                        typePorata = 0;
+                        fusion((byte) 4);
+                    } else {
+                        long timeAgo = 600000 - (now - timeAtSplitFusion);
+                        service.serverMessage(String.format("Chỉ có thể thực hiện sau %s", Utils.timeAgo((int) (timeAgo / 1000))));
+                    }
+                    break;
+
+                case 5:
+                    if (gender != 1) {
+                        return;
+                    }
+                    if (myDisciple.isDead()) {
+                        service.serverMessage("Không thể thực hiện");
+                        return;
+                    }
+                    if (!isNhapThe) {
+                        long power = myDisciple.characterInfo.getPower();
+                        if (power > 0) {
+                            addExp(CharacterInfo.ALL, power, false, false);
+                        }
+                        fusion((byte) 5);
+                        deleteDisciple();
+                    } else {
+                        service.serverMessage("Không thể thực hiện");
+                    }
+                    break;
+            }
+            if (myDisciple != null && myDisciple.isDead()) {
+                service.chat(myDisciple, "Sư phụ ơi cho con đậu thần");
+            }
+        }
+    }
+
+    private void deleteDisciple() {
+        try {
+            if (myDisciple != null) {
+                if (myDisciple.zone != null) {
+                    myDisciple.zone.leave(myDisciple);
+                }
+                GameRepo.getInstance().discipleRepo.deleteById(myDisciple.getId());
+                myDisciple = null;
+            }
+            service.petInfo((byte) 0);
+        } catch (Exception e) {
+            logger.error("failed!", e);
+        }
+    }
+
+    private void fusion(byte type) {
+        if (type != 5) {
+            this.fusionType = type;
+        }
+        if (type == 4 || type == 6) {// hợp thể
+            if (!isNhapThe) {
+                myDisciple.clearEffect();
+                if (myDisciple.isMonkey()) {
+                    myDisciple.timeOutIsMonkey();
+                }
+                if (zone != null) {
+                    zone.leave(myDisciple);
+                }
+                myDisciple.discipleStatus = 3;
+                this.isNhapThe = true;
+                if (type == 4) {
+                    ItemTime item = new ItemTime(ItemTimeName.HOP_THE, gender == 1 ? 3901 : 3790, 600, true);
+                    addItemTime(item);
+                }
+            }
+
+        } else if (type == 1) {// tách hợp thể
+            if (isNhapThe) {
+                this.isNhapThe = false;
+                myDisciple.discipleStatus = 1;
+                if (zone != null && !zone.map.isMapSingle()) {
+                    myDisciple.followMaster();
+                    zone.enter(myDisciple);
+                }
+            }
+        }
+        lastTimeUsePorata = System.currentTimeMillis();
+        updateSkin();
+        myDisciple.characterInfo.setCharacterInfo();
+        characterInfo.setCharacterInfo();
+        service.loadPoint();
+        zone.mapService.playerLoadBody(this);
+        zone.mapService.updateBody((byte) 0, this);
+        if (isNhapThe) {
+            characterInfo.recovery(CharacterInfo.ALL, 100, true);
+        }
+        zone.mapService.fusion(this, type);
+    }
+
+    public void requestChangeMap() {
+        lock.lock();
+        try {
+            if (this.isDead) {
+                return;
+            }
+            Waypoint way = (Waypoint) zone.map.findWaypoint(this.x, this.y);
+            if (way != null) {
+                int mapID = way.next;
+                boolean flag = false;
+                if (zone.map.isBarrack() || zone.map.isTreasure()) {
+                    List<Mob> list2 = zone.getListMob();
+                    for (Mob mob : list2) {
+                        if (!mob.isDead()) {
+                            flag = true;
+                            break;
+                        }
+                    }
+                    if (!flag) {
+                        List<Char> list = zone.getListChar(Zone.TYPE_BOSS);
+                        flag = !list.isEmpty();
+                    }
+                    TMap map = MapManager.getInstance().getMap(mapID);
+                    if (flag) {
+                        way = map.getWaypointByNextID(zone.map.mapID);
+                        if (way != null) {
+                            this.x = way.x;
+                            this.y = way.y;
+                        } else {
+                            this.x = this.preX;
+                            this.y = this.preY;
+                        }
+                        service.resetPoint();
+                        service.serverMessage("Chưa hạ hết đối thủ");
+                    } else {
+                        this.x = way.x;
+                        this.y = way.y;
+                        if (map.isBarrack() || map.isTreasure()) {
+                            if (clan != null) {
+                                if (map.isBarrack()) {
+                                    zone.leave(this);
+                                    clan.barrack.enterMap(mapID, this);
+                                } else if (map.isTreasure()) {
+                                    zone.leave(this);
+                                    clan.treasure.enterMap(mapID, this);
+                                }
+                            } else {
+                                goHome();
+                            }
+                        } else {
+                            zone.leave(this);
+                            int zoneId = map.getZoneID();
+                            map.enterZone(this, zoneId);
+                        }
+                    }
+                } else {
+                    TMap map = MapManager.getInstance().getMap(mapID);
+                    if (checkCanEnter(mapID)) {
+                        zone.leave(this);
+                        this.x = way.x;
+                        this.y = way.y;
+                        if (map.isMapSingle()) {
+                            enterMapSingle(map);
+                        } else {
+                            int zoneId = map.getZoneID();
+                            map.enterZone(this, zoneId);
+                        }
+                    } else {
+                        way = map.getWaypointByNextID(zone.map.mapID);
+                        if (way != null) {
+                            this.x = way.x;
+                            this.y = way.y;
+                        } else {
+                            this.x = this.preX;
+                            this.y = this.preY;
+                        }
+                        service.resetPoint();
+                        service.serverMessage("Bạn chưa thể đến khu vực này");
+                    }
+                }
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+
+    public boolean isHaveFood() {
+        return isPudding() || isXucXich() || isKemDau() || isMiLy() || isSushi();
+    }
+
+    public long getTotalGem() {
+        return (long) getDiamond() + (long) getDiamondLock();
+    }
+
+    public void subDiamond(int diamond) {
+        if (this.diamondLock < diamond) {
+            diamond -= this.diamondLock;
+            this.diamondLock = 0;
+            this.diamond -= diamond;
+        } else {
+            this.diamondLock -= diamond;
+        }
+        service.loadInfo();
+    }
+
+    public void transformIntoChocolate(short damage, int time) {
+        isChocolate = true;
+        this.dameDown = dameDown;
+        ItemTime item = new ItemTime(ItemTimeName.SOCOLA, 4127, time, false);
+        addItemTime(item);
+        updateSkin();
+        if (dameDown == 0) {
+            characterInfo.setCharacterInfo();
+            service.loadPoint();
+            zone.mapService.playerLoadBody(this);
+        }
+        zone.mapService.updateBody((byte) 0, this);
+    }
+
+    public boolean useSkill(Object obj) {
+        long now = System.currentTimeMillis();
+        lastAttack = now;
+        Skill skill = this.select;
+        long manaUse = skill.manaUse;
+        if (this.select.template.manaUseType == 1) {
+            manaUse = Utils.percentOf(this.characterInfo.getFullMP(), manaUse);
+        }
+        if (isBoss()) {
+            manaUse = 0;
+        }
+        if (skill.template.id == SkillName.TRI_THUONG) {
+            if (obj instanceof Char) {
+                if (achievements != null) {
+                    achievements.get(14).addCount(1);// kỹ năng thành thạo
+                }
+                skill.lastTimeUseThisSkill = now;
+                Char _char = (Char) obj;
+                int distance = Utils.getDistance(0, 0, skill.dx, skill.dy);
+                List<Char> list = zone.getListChar(Zone.TYPE_HUMAN, Zone.TYPE_PET);
+                for (Char _c : list) {
+                    if (_c != this) {
+                        int distance2 = Utils.getDistance(_c.x, _c.y, _char.x, _char.y);
+                        if (distance2 < distance) {
+                            zone.mapService.chat(_c, String.format("Cảm ơn %s đã cứu mình", this.name));
+                            _c.revival(skill.damage);
+                        }
+                    }
+                }
+                this.characterInfo.recovery(CharacterInfo.HP, skill.damage, true);
+                characterInfo.setMp(characterInfo.getMp() - manaUse);
+            }
+            return false;
+        }
+        if (skill.template.id == SkillName.KAIOKEN) {
+            long percent = this.characterInfo.getHp() * 100 / this.characterInfo.getFullHP();
+            if (percent <= 10) {
+                return false;
+            }
+            this.characterInfo.recovery(CharacterInfo.HP, -10, true);
+        }
+        if (skill.template.id == SkillName.TROI) {
+            if (obj instanceof Mob) {
+                Mob mob = (Mob) obj;
+                if (mob.hold != null) {
+                    return false;
+                }
+            } else {
+                Char _c = (Char) obj;
+                if (_c.hold != null) {
+                    return false;
+                }
+            }
+            skill.lastTimeUseThisSkill = now;
+            Hold hold = new Hold(this.zone, this, obj, skill.damage);
+            hold.start();
+            if (specialSkill != null) {
+                if (specialSkill.id == 7) {
+                    setPercentDamageBonus(specialSkill.param);
+                }
+            }
+            this.isCritFirstHit = true;
+            characterInfo.setMp(characterInfo.getMp() - manaUse);
+            return false;
+        }
+        return true;
+    }
+
+    private void revival(short damage) {
+        if (this.isDead) {
+            this.statusMe = 1;
+            this.isDead = false;
+            service.sendMessage(new Message(Cmd.ME_LIVE));
+            zone.mapService.playerLoadLive(this);
+        }
+        this.characterInfo.recovery(CharacterInfo.ALL, damage, true);
+    }
+
+    public void kill(Object victim) {
+        if (victim instanceof Char) {
+            Char v = (Char) victim;
+            if (!isAnDanh && isHuman() && v.isHuman()) {
+                v.addEnemy(this);
+            }
+            if (isHuman() && v.isBoss()) {
+//                if (v instanceof Broly) {
+//                    Broly broly = (Broly) v;
+//                    if (broly.isSuper) {
+//                        if (myDisciple == null) {
+//                            createDisciple(1);
+//                        }
+//                    }
+//                }
+            }
+            if (isHuman() && v.isHuman()) {
+                if (testCharId == v.id && v.testCharId == this.id && betAmount == 0) {
+//                    removeEnemy(v);
+                }
+                if (zone.map.isBaseBabidi() && this.flag != v.flag) {
+                    addAccumulatedPoint(5);
+                    v.addAccumulatedPoint(-5);
+                }
+            }
+        } else {
+            Mob mob = (Mob) victim;
+            if (achievements != null) {
+//                if (mob.templateId == MobName.MOC_NHAN) {
+//                    achievements.get(7).addCount(1);// tập luyện bài bản
+//                }
+//                if (mob.type == 4) {
+//                    achievements.get(6).addCount(1);// thợ săn thiện xạ
+//                }
+//                if (mob.levelBoss != 0) {
+//                    achievements.get(12).addCount(1);// đánh bại siêu quái
+//                }
+            }
+            if (taskMain != null) {
+                Task task = taskMain;
+                switch (task.id) {
+                    case 1:
+//                        if (task.index == 0) {
+//                            if (mob.templateId == MobName.MOC_NHAN) {
+//                                updateTaskCount(1);
+//                            }
+//                        }
+                        break;
+
+                    case 6:// nhiệm vụ
+//                        if (task.index <= 2) {
+//                            int[][] mobTask = {{MobName.KHUNG_LONG_ME, MobName.LON_LOI_ME, MobName.QUY_DAT_ME}, {MobName.LON_LOI_ME, MobName.QUY_DAT_ME, MobName.KHUNG_LONG_ME}, {MobName.QUY_DAT_ME, MobName.KHUNG_LONG_ME, MobName.LON_LOI_ME}};
+//                            int mobId = mobTask[gender][task.index];
+//                            if (mob.templateId == mobId) {
+//                                updateTaskCount(1);
+//                            }
+//                        }
+//                        break;
+
+                    case 7:// nhiệm vụ giải cứu
+//                        if (task.index == 1) {
+//                            int mobId = (new int[]{MobName.THAN_LAN_BAY, MobName.PHI_LONG, MobName.QUY_BAY})[gender];
+//                            if (mob.templateId == mobId) {
+//                                updateTaskCount(1);
+//                            }
+//                        }
+                        break;
+
+                    case 13: {// nhiem vu danh heo
+//                        int[] mobs = {MobName.HEO_RUNG, MobName.HEO_DA_XANH, MobName.HEO_XAYDA};
+//                        if (task.index < 3 && mob.templateId == mobs[task.index]) {
+//                            List<Char> mems = zone.getMemberSameClan(this);
+//                            if (mems.size() - 1 >= 2) {
+//                                updateTaskCount(1);
+//                            }
+//                        }
+//                        break;
+                    }
+
+                    case 15: {// nhiem vu bulon
+//                        int[] mobs = {MobName.BULON, MobName.UKULELE, MobName.QUY_MAP};
+//                        if (task.index > 0 && task.index < 4 && mob.templateId == mobs[task.index - 1]) {
+//                            List<Char> mems = zone.getMemberSameClan(this);
+//                            if (mems.size() - 1 >= 2) {
+//                                updateTaskCount(1);
+//                            }
+//                        }
+//                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    private void createDisciple(int type) {
+        try {
+            if (myDisciple == null) {
+                lastAttack = System.currentTimeMillis();
+                Disciple disciple = new Disciple();
+                disciple.typeDisciple = (byte) type;
+                disciple.setId(-this.id);
+                disciple.setName("Đệ tử");
+                disciple.itemBody = new Item[10];
+                disciple.setClassId((byte) Utils.nextInt(3));
+                disciple.setGender(disciple.getClassId());
+                if (type != 0) {
+                    disciple.setClassId(this.gender);
+                    disciple.setGender(disciple.getClassId());
+                }
+                disciple.characterInfo = new CharacterInfo(disciple);
+                disciple.characterInfo.setCharacter(disciple);
+                disciple.characterInfo.setPowerLimited();
+                disciple.characterInfo.applyCharLevelPercent();
+                disciple.characterInfo.setSatamina();
+                disciple.setSkills(new ArrayList<>());
+                disciple.skillOpened = 0;
+                disciple.learnSkill();
+                disciple.discipleStatus = 0;
+                disciple.characterInfo.setCharacterInfo();
+                disciple.characterInfo.recovery(CharacterInfo.ALL, 100, false);
+                disciple.service = new CharService(disciple);
+                disciple.setDefaultPart();
+                myDisciple = disciple;
+                disciple.saveData();
+                disciple.setMaster(this);
+                disciple.followMaster();
+                service.petInfo((byte) 1);
+                zone.enter(myDisciple);
+                service.chat(myDisciple, "Sư phụ hãy nhận con làm đệ tử");
+            }
+        } catch (Exception ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    private void learnSkill(Skill skill, int type, int index, Item item) {
+        try {
+            if (type == 0) {
+                skills.add(skill.clone());
+            }
+            if (type == 1) {
+                skills.set(index, skill.clone());
+            }
+        } catch (CloneNotSupportedException ex) {
+            logger.error("failed!", ex);
+        }
+        characterInfo.recovery(CharacterInfo.ALL, 100, false);
+        service.loadSkill();
+        int indexItem = item.indexUI;
+        removeItem(indexItem, 1);
+        service.updateBag(indexItem, 0);
+        service.serverMessage("Bạn học thành công " + skill.template.name + " cấp " + skill.point);
+    }
+
+    private void addEnemy(Char _char) {
+        Friend _check = enemies.stream().filter(f -> f.getName().equals(_char.name)).findAny().orElse(null);
+        if (_check != null) {
+            return;
+        }
+        Friend friend = new Friend();
+        friend.setId(_char.getId());
+        friend.setName(_char.getName());
+        friend.setHead(_char.getHead());
+        friend.setBody(_char.getBody());
+       
+        friend.setBag(_char.getBag());
+        friend.setLeg(_char.getLeg()); 
+        friend.setPower(_char.characterInfo.getPower()); 
+        this.enemies.add(friend);
+    }
+
+    public void mapOffline() {
+        if (this.isDead) {
+            return;
+        }
+        int mapId = 0;
+        short x = 0;
+        short y = 0;
+        if ((this.gender == 0 && zone.map.mapID == 0) || (this.gender == 1 && zone.map.mapID == 7)
+                || (this.gender == 2 && zone.map.mapID == 14)) {
+            switch (this.gender) {
+                case 0:
+                    mapId = 21;
+                    x = 456;
+                    y = 336;
+                    break;
+
+                case 1:
+                    mapId = 22;
+                    x = 168;
+                    y = 336;
+                    break;
+
+                case 2:
+                    mapId = 23;
+                    x = 432;
+                    y = 336;
+                    break;
+            }
+        }
+        if (zone.map.mapID == 21) {
+            mapId = 0;
+            x = 288;
+            y = 432;
+        }
+        if (zone.map.mapID == 22) {
+            mapId = 7;
+            x = 384;
+            y = 432;
+        }
+        if (zone.map.mapID == 23) {
+            mapId = 14;
+            x = 540;
+            y = 408;
+        }
+
+        if (zone.map.mapID == 39) {
+            mapId = 21;
+            x = 100;
+            y = 336;
+        }
+        if (zone.map.mapID == 40) {
+            mapId = 22;
+            x = 100;
+            y = 336;
+        }
+        if (zone.map.mapID == 41) {
+            mapId = 23;
+            x = 100;
+            y = 336;
+        }
+        this.zone.leave(this);
+        this.x = x;
+        this.y = y;
+        int zoneId = 0;
+        TMap map = MapManager.getInstance().getMap(mapId);
+        if (!map.isMapSingle()) {
+            zoneId = map.getZoneID();
+            map.enterZone(this, zoneId);
+        } else {
+            enterMapSingle(map);
+        }
+    }
+
+    public void getItem(Message ms) {
+        try {
+            byte type = ms.getReader().readByte();
+            byte index = ms.getReader().readByte();
+            switch (type) {
+
+                case Item.BOX_BAG:
+                    itemBoxToBag(index);
+                    break;
+
+                case Item.BAG_BODY:
+                    itemBagToBody(index);
+                    break;
+
+                case Item.BAG_BOX:
+                    itemBagToBox(index);
+                    break;
+
+                case Item.BODY_BAG:
+                    itemBodyToBag(index);
+                    break;
+
+                case Item.BODY_BOX:
+                    itemBodyToBox(index);
+                    break;
+
+                case Item.BOX_BODY:
+//                     itemBoxBody(index);
+                    break;
+
+                case Item.BAG_PET:
+                    itemBagToPet(index);
+                    break;
+
+                case Item.PET_BAG:
+                    itemPetToBag(index);
+                    break;
+            }
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    private void itemPetToBag(byte index) {
+        if (myDisciple == null) {
+            return;
+        }
+        if (isDead) {
+            return;
+        }
+        if (isTrading) {
+            service.serverMessage(Language.TRADE_FAIL2);
+            return;
+        }
+        if (index < 0 || index > myDisciple.itemBody.length) {
+            return;
+        }
+        Item item = myDisciple.itemBody[index];
+        if (item != null) {
+            if (getSlotNullInBag() == 0) {
+                service.serverMessage2(Language.ME_BAG_FULL);
+                return;
+            }
+            for (int i = 0; i < this.itemBag.length; i++) {
+                if (this.itemBag[i] == null) {
+                    this.itemBag[i] = item.clone();
+                    this.itemBag[i].indexUI = i;
+                    myDisciple.itemBody[index] = null;
+                    myDisciple.characterInfo.setCharacterInfo();
+                    if (isNhapThe) {
+                        characterInfo.setCharacterInfo();
+                    }
+                    myDisciple.updateSkin();
+                    service.setItemBag();
+                    service.petInfo((byte) 2);
+                    if (myDisciple.isMask()) {
+                        zone.mapService.updateBody((byte) 0, myDisciple);
+                    } else {
+                        zone.mapService.updateBody((byte) -1, myDisciple);
+                    }
+                    service.loadPoint();
+                    zone.mapService.playerLoadBody(myDisciple);
+                    myDisciple.update(item.template.type);
+                    return;
+                }
+            }
+        }
+    }
+
+    private void itemBagToPet(byte index) {
+        if (myDisciple == null) {
+            return;
+        }
+        if (isDead) {
+            return;
+        }
+        if (isTrading) {
+            service.serverMessage(Language.TRADE_FAIL2);
+            return;
+        }
+        if (myDisciple.characterInfo.getPower() < 1500000) {
+            service.serverMessage(String.format("Yêu cầu sức mạnh đệ tử %s trở lên", 1500000));
+            return;
+        }
+        if (index < 0 || index > this.itemBag.length) {
+            return;
+        }
+        Item item = this.itemBag[index];
+        if (item != null) {
+            if (item.template.isSuPhu()) {
+                service.serverMessage("Chỉ dành cho sự phụ");
+                return;
+            }
+            if (item.template.gender <= 2 && item.template.gender != myDisciple.getGender()) {
+                service.serverMessage(Language.WE_CANT_USE_EQUIP);
+                return;
+            }
+            if (item.require > myDisciple.characterInfo.getPower()) {
+                service.serverMessage("Sức mạnh không đạt yêu cầu.");
+                return;
+            }
+            byte type = item.template.type;
+            if (type == 32) {
+                type = 6;
+            } else if (type == 23 || type == 24) {
+                type = 7;
+            } else if (type == 11) {
+                type = 8;
+            } else if (type == 40) {
+                type = 9;
+            }
+            if (type >= this.itemBody.length) {
+                return;
+            }
+            Item item2 = myDisciple.itemBody[type];
+            myDisciple.itemBody[type] = item.clone();
+            myDisciple.itemBody[type].indexUI = type;
+            if (item2 != null) {
+                Item clone = item2.clone();
+                this.itemBag[index] = clone;
+                this.itemBag[index].indexUI = index;
+            } else {
+                this.itemBag[index] = null;
+                sort(index, false);
+            }
+            myDisciple.characterInfo.setCharacterInfo();
+            if (isNhapThe) {
+                characterInfo.setCharacterInfo();
+            }
+            myDisciple.updateSkin();
+            service.setItemBag();
+            service.petInfo((byte) 2);
+            if (myDisciple.isMask()) {
+                zone.mapService.updateBody((byte) 0, myDisciple);
+            } else {
+                zone.mapService.updateBody((byte) -1, myDisciple);
+            }
+            zone.mapService.playerLoadBody(myDisciple);
+            myDisciple.update(item.template.type);
+        }
+    }
+
+    private void itemBodyToBox(byte index) {
+        if (isDead) {
+            return;
+        }
+        if (isTrading) {
+            service.serverMessage(Language.TRADE_FAIL2);
+            return;
+        }
+        if (index < 0 || index > this.itemBody.length) {
+            return;
+        }
+        Item item = this.itemBody[index];
+        if (item != null) {
+            if (getSlotNullInBox() == 0) {
+                service.serverMessage2(Language.ME_BOX_FULL);
+                return;
+            }
+            for (int i = 0; i < this.itemBox.length; i++) {
+                if (this.itemBox[i] == null) {
+                    this.itemBox[i] = item.clone();
+                    this.itemBox[i].indexUI = i;
+                    this.itemBody[index] = null;
+                    characterInfo.setCharacterInfo();
+                    updateSkin();
+                    service.setItemBox();
+                    service.setItemBody();
+                    if (this.isMask) {
+                        zone.mapService.updateBody((byte) 0, this);
+                    } else {
+                        zone.mapService.updateBody((byte) -1, this);
+                    }
+                    service.loadPoint();
+                    zone.mapService.playerLoadBody(this);
+                    update(item.template.type);
+                    return;
+                }
+            }
+        }
+    }
+
+    private void itemBodyToBag(byte index) {
+        if (isDead) {
+            return;
+        }
+        if (isTrading) {
+            service.serverMessage(Language.TRADE_FAIL2);
+            return;
+        }
+        if (index < 0 || index > this.itemBody.length) {
+            return;
+        }
+        Item item = this.itemBody[index];
+        if (item != null) {
+            if (getSlotNullInBag() == 0) {
+                service.serverMessage2(Language.ME_BAG_FULL);
+                return;
+            }
+            for (int i = 0; i < this.itemBag.length; i++) {
+                if (this.itemBag[i] == null) {
+                    this.itemBag[i] = item.clone();
+                    this.itemBag[i].indexUI = i;
+                    this.itemBody[index] = null;
+                    characterInfo.setCharacterInfo();
+                    updateSkin();
+                    service.setItemBag();
+                    service.setItemBody();
+                    if (this.isMask) {
+                        zone.mapService.updateBody((byte) 0, this);
+                    } else {
+                        zone.mapService.updateBody((byte) -1, this);
+                    }
+                    service.loadPoint();
+                    zone.mapService.playerLoadBody(this);
+                    update(item.template.type);
+                    return;
+                }
+            }
+        }
+    }
+
+    private void itemBagToBox(byte index) {
+        if (index < 0 || index > this.itemBag.length) {
+            return;
+        }
+        if (isDead) {
+            return;
+        }
+        if (!zone.map.isHome()) {
+            return;
+        }
+        if (isTrading) {
+            service.serverMessage(Language.TRADE_FAIL2);
+            return;
+        }
+        Item item = this.itemBag[index];
+        if (item != null) {
+            if (getSlotNullInBox() == 0) {
+                service.serverMessage2(Language.ME_BOX_FULL);
+                return;
+            }
+            int quantityMax = Server.getMaxQuantityItem();
+            int quantityCanAdd = 0;
+            int having = 0;
+            if (item.template.type == Item.TYPE_DAUTHAN) {
+                for (Item itm : itemBox) {
+                    if (itm != null && itm.template.type == Item.TYPE_DAUTHAN) {
+                        having += itm.quantity;
+                    }
+                }
+            } else {
+                having = getQuantityInBoxById(item.id);
+            }
+
+            quantityCanAdd = quantityMax - having;
+            if (quantityCanAdd > item.quantity) {
+                quantityCanAdd = item.quantity;
+            }
+            if (quantityCanAdd <= 0) {
+                return;
+            }
+            boolean added = false;
+            if (item.template.isUpToUp()) {
+                int indexItem = getIndexBoxById(item.id);
+                if (indexItem != -1) {
+                    this.itemBox[indexItem].quantity += quantityCanAdd;
+                    item.quantity -= quantityCanAdd;
+                    // if (item.id == ItemName.TU_DONG_LUYEN_TAP) {
+                    // this.itemBox[indexItem].options.get(0).param += item.options.get(0).param;
+                    // this.itemBox[indexItem].quantity = 1;
+                    // item.quantity = 0;
+                    // }
+                    for (ItemOption o : item.options) {
+                        if (o.optionTemplate.id == 1 || o.optionTemplate.id == 31) {
+                            for (ItemOption o2 : this.itemBox[indexItem].options) {
+                                if (o.optionTemplate.id == o2.optionTemplate.id) {
+                                    o2.param += o.param;
+                                    this.itemBox[indexItem].quantity = 1;
+                                    item.quantity = 0;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (item.quantity <= 0) {
+                        this.itemBag[index] = null;
+                        sort(index, false);
+                    }
+                    added = true;
+                }
+            }
+
+            if (!added) {
+                for (int i = 0; i < this.itemBox.length; i++) {
+                    if (this.itemBox[i] == null) {
+                        this.itemBox[i] = item.clone();
+                        this.itemBox[i].indexUI = i;
+                        this.itemBox[i].quantity = quantityCanAdd;
+                        item.quantity -= quantityCanAdd;
+                        if (item.quantity <= 0) {
+                            this.itemBag[index] = null;
+                            sort(index, false);
+                        }
+                        break;
+                    }
+                }
+            }
+            service.setItemBag();
+            service.setItemBox();
+            if (item.template.type == 23 || item.template.type == 24) {
+                setMount();
+            }
+        }
+    }
+
+    private int getIndexBoxById(int id) {
+        for (int i = 0; i < this.itemBox.length; i++) {
+            Item item = this.itemBox[i];
+            if (item != null && item.id == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private int getQuantityInBoxById(int id) {
+        int quantity = 0;
+        for (Item itm : itemBox) {
+            if (itm != null && itm.id == id) {
+                quantity += itm.quantity;
+            }
+        }
+        return quantity;
+    }
+
+    private int getSlotNullInBox() {
+        int number = 0;
+        for (Item item : this.itemBox) {
+            if (item == null) {
+                number++;
+            }
+        }
+        return number;
+    }
+
+    private void itemBagToBody(byte index) {
+        if (isDead) {
+            return;
+        }
+        if (isTrading) {
+            service.serverMessage(Language.TRADE_FAIL2);
+            return;
+        }
+        if (index < 0 || index > this.itemBag.length) {
+            return;
+        }
+        Item item = this.itemBag[index];
+        if (item != null) {
+            if (item.template.isDeTu()) {
+                service.serverMessage("Chỉ dành cho đệ tử");
+                return;
+            }
+            if (item.template.gender <= 2 && item.template.gender != this.gender) {
+                service.serverMessage(Language.WE_CANT_USE_EQUIP);
+                return;
+            }
+            if (item.require > this.characterInfo.getPower()) {
+                service.serverMessage("Sức mạnh không đạt yêu cầu.");
+                return;
+            }
+            byte type = item.template.type;
+            if (type == 32) {
+                type = 6;
+            } else if (type == 23 || type == 24) {
+                type = 7;
+            } else if (type == 11) {
+                type = 8;
+            } else if (type == 40) {
+                type = 9;
+            }
+            if (type >= this.itemBody.length) {
+                return;
+            }
+            Item item2 = this.itemBody[type];
+            this.itemBody[type] = item.clone();
+            this.itemBody[type].indexUI = type;
+            if (item2 != null) {
+                Item clone = item2.clone();
+                this.itemBag[index] = clone;
+                this.itemBag[index].indexUI = index;
+            } else {
+                this.itemBag[index] = null;
+                sort(index, false);
+            }
+            characterInfo.setCharacterInfo();
+            updateSkin();
+            service.setItemBag();
+            service.setItemBody();
+            if (this.isMask) {
+                zone.mapService.updateBody((byte) 0, this);
+            } else {
+                zone.mapService.updateBody((byte) -1, this);
+            }
+            service.loadPoint();
+            zone.mapService.playerLoadBody(this);
+            update(item.template.type);
+        }
+    }
+
+    public void update(int type) {
+        if (zone != null) {
+            switch (type) {
+                case 0:
+                    zone.mapService.playerLoadAo(this);
+                    break;
+
+                case 1:
+                    zone.mapService.playerLoadQuan(this);
+                    break;
+
+                case 5:
+                    zone.mapService.playerLoadAll(this);
+                    break;
+            }
+        }
+    }
+
+    private void itemBoxToBag(byte index) {
+        if (index < 0 || index > this.itemBox.length) {
+            return;
+        }
+        if (isDead) {
+            return;
+        }
+        if (!zone.map.isHome()) {
+            return;
+        }
+        if (isTrading) {
+            service.serverMessage(Language.TRADE_FAIL2);
+            return;
+        }
+        Item item = this.itemBox[index];
+        if (item != null) {
+            if (getSlotNullInBag() == 0) {
+                service.serverMessage2(Language.ME_BOX_FULL);
+                return;
+            }
+            int quantityCanAdd = 0;
+            int having = 0;
+            int quantityMax = Server.getMaxQuantityItem();
+            if (item.template.type == Item.TYPE_DAUTHAN) {
+                for (Item itm : itemBag) {
+                    if (itm != null && itm.template.type == Item.TYPE_DAUTHAN) {
+                        having += itm.quantity;
+                    }
+                }
+            } else {
+                having = getQuantityInBagById(item.id);
+            }
+            quantityCanAdd = quantityMax - having;
+            if (quantityCanAdd > item.quantity) {
+                quantityCanAdd = item.quantity;
+            }
+            if (quantityCanAdd <= 0) {
+                return;
+            }
+            boolean added = false;
+            if (item.template.isUpToUp()) {
+                int indexItem = getIndexBagById(item.id);
+                if (indexItem != -1) {
+                    this.itemBag[indexItem].quantity += quantityCanAdd;
+                    item.quantity -= quantityCanAdd;
+                    // if (item.id == ItemName.TU_DONG_LUYEN_TAP) {
+                    // this.itemBag[indexItem].options.get(0).param += item.options.get(0).param;
+                    // this.itemBag[indexItem].quantity = 1;
+                    // item.quantity = 0;
+                    // }
+                    for (ItemOption o : item.options) {
+                        if (o.optionTemplate.id == 1 || o.optionTemplate.id == 31) {
+                            for (ItemOption o2 : this.itemBag[indexItem].options) {
+                                if (o.optionTemplate.id == o2.optionTemplate.id) {
+                                    o2.param += o.param;
+                                    this.itemBag[indexItem].quantity = 1;
+                                    item.quantity = 0;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (item.quantity <= 0) {
+                        this.itemBox[index] = null;
+                    }
+                    added = true;
+                }
+            }
+            if (!added) {
+                for (int i = 0; i < this.itemBag.length; i++) {
+                    if (this.itemBag[i] == null) {
+                        this.itemBag[i] = item.clone();
+                        this.itemBag[i].indexUI = i;
+                        this.itemBag[i].quantity = quantityCanAdd;
+                        item.quantity -= quantityCanAdd;
+                        if (item.quantity <= 0) {
+                            this.itemBox[index] = null;
+                        }
+                        break;
+                    }
+                }
+            }
+            if (taskMain != null && taskMain.id == 0 && taskMain.index == 3) {
+                taskNext();
+            }
+            service.setItemBag();
+            service.setItemBox();
+            if (item.template.type == 23 || item.template.type == 24) {
+                setMount();
+            }
+        }
+    }
+
+    private int getSlotNullInBag() {
+        int number = 0;
+        for (Item item : this.itemBag) {
+            if (item == null) {
+                number++;
+            }
+        }
+        return number;
+    }
+
+    private int getQuantityInBagById(int itemId) {
+        int quantity = 0;
+        for (Item itm : itemBag) {
+            if (itm != null && itm.id == itemId) {
+                quantity += itm.quantity;
+            }
+        }
+        return quantity;
+    }
+
+    public void changeOnSkill(Message ms) {
+        try {
+            if (isDead) {
+                return;
+            }
+            byte[] ab = new byte[10];
+            ms.getReader().read(ab);
+            this.shortcut = ab;
+            // service.loadRms(ab);
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void openUIMenu(Message mss) {
+    }
+
+    public void menu(Message ms) {
+        try {
+            if (menus == null) {
+                return;
+            }
+            int npcId = ms.getReader().readUnsignedByte();
+            int menuId = ms.getReader().readUnsignedByte();
+            int optionId = ms.getReader().readUnsignedByte();
+            if (menus.isEmpty() || menuId >= menus.size()) {
+                return;
+            }
+            KeyValue<Integer, String> keyValue = menus.get(menuId);
+            if (keyValue == null) {
+                return;
+            }
+            menus.clear();
+            Npc npc = zone.findNpcByID(npcId);
+            if (npc != null) {
+                confirmKeyValue(keyValue, npc);
+            }
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    private void confirmKeyValue(KeyValue<Integer, String> keyValue, Npc npc) {
+
     }
 }

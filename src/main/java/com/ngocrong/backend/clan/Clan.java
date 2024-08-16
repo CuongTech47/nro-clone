@@ -51,6 +51,7 @@ public class Clan {
     public ReadWriteLock lockMember = new ReentrantReadWriteLock();
     public ReadWriteLock lockMessage = new ReentrantReadWriteLock();
     public Barrack barrack;
+    public Barrack treasure;
 
     public Clan(ClanEntity data) {
         id = data.id;

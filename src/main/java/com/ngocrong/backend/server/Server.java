@@ -17,6 +17,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.ngocrong.backend.bot.BossManager;
+import com.ngocrong.backend.collection.Card;
+import com.ngocrong.backend.repository.GameRepo;
+import com.ngocrong.backend.shop.Consignment;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -78,6 +82,7 @@ import com.ngocrong.backend.util.Utils;
 import lombok.Getter;
 
 public class Server {
+    public static final String VERSION = "0.0.1";
     public byte[][] CACHE_ITEM = new byte[3][];
     public byte[] CACHE_MAP;
     public byte[] CACHE_SKILL;
@@ -127,14 +132,13 @@ public class Server {
         this.achievements = new ArrayList<>();
     }
 
-  
 
-    public void setMaintained(boolean maintained) {
-        this.isMaintained = maintained;
-    }
 
     public void saveData() {
         // Implementation for saving data
+        SessionManager.saveData();
+        ClanManager.getInstance().saveData();
+        Consignment.getInstance().saveData();
     }
 
     public static int getMaxQuantityItem() {
@@ -150,14 +154,14 @@ public class Server {
             start = true;
             Thread auto = new Thread(new AutoSaveData());
             auto.start();
-//            BossManager.bornBoss();
-//            MapManager mapManager = MapManager.getInstance();
+            BossManager.bornBoss();
+            MapManager mapManager = MapManager.getInstance();
 //            mapManager.bornBroly();
-//            mapManager.openBaseBabidi();
+            mapManager.openBaseBabidi();
 //            mapManager.openBlackDragonBall();
 //            mapManager.openMartialArtsFestival();
-//            Thread threadMapManager = new Thread(mapManager);
-//            threadMapManager.start();
+            Thread threadMapManager = new Thread(mapManager);
+            threadMapManager.start();
             logger.debug("Start server Success!");
             while (start) {
                 try {
@@ -195,7 +199,7 @@ public class Server {
             server.close();
             server = null;
 //            Lucky.isRunning = false;
-//            MySQLConnect.close();
+            MySQLConnect.close();
             System.gc();
             logger.debug("End socket");
         } catch (IOException e) {
@@ -249,8 +253,8 @@ public class Server {
         Top.initialize();
 //        initLucky();
         initializeSpecialSkill();
-//        Card.loadTemplate();
-//        Consignment.getInstance().init();
+        Card.loadTemplate();
+        Consignment.getInstance().init();
     }
 
     private void initializeSpecialSkill() {
@@ -1666,4 +1670,20 @@ public class Server {
         }
     }
 
+    public void setOfflineAll() {
+        try {
+            GameRepo.getInstance().playerRepo.setOfflineAll();
+        } catch (Exception ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public ClanImage getClanImageByID(byte id) {
+        for (ClanImage clan : clanImages) {
+            if (clan.id == id) {
+                return clan;
+            }
+        }
+        return null;
+    }
 }

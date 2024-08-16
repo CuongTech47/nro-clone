@@ -46,8 +46,8 @@ public class Item {
     public int indexUI;
     public int id;
     public int quantity;
-    public ArrayList<ItemOption> options;
-
+//    public ArrayList<ItemOption> options;
+    public ArrayList<ItemOption> options = new ArrayList<>();
     public transient String info;
     public transient String content;
     public transient boolean isLock;
@@ -116,13 +116,13 @@ public class Item {
         Server server = DragonBall.getInstance().getServer();
         this.template = server.iTemplates.get(id);
 
-        setTypeThrow(template.getType());
-        setCantSale(template.getType());
+        setTypeThrow(template.type);
+        setCantSale(template.type);
 
         this.info = "";
         this.content = "";
         this.options = new ArrayList<>();
-        this.require = template.getRequire();
+        this.require = template.require;
     }
 
     private void setCantSale(byte type) {
@@ -138,7 +138,7 @@ public class Item {
         }
     }
 
-    private void addItemOption(ItemOption itemOption) {
+    public void addItemOption(ItemOption itemOption) {
         setAttribute(itemOption);
         this.options.add(itemOption);
     }
@@ -174,6 +174,80 @@ public class Item {
         ArrayList<ItemOption> options = new ArrayList<>(this.options);
         if (options.isEmpty()) {
             options.add(new ItemOption(73, 0));
+        }
+        return options;
+    }
+
+    public boolean isCanSaleToConsignment() {
+        return template.type == 14 || template.type == 12 || getItemOption(86) != null;
+    }
+
+    private ItemOption getItemOption(int id) {
+        for (ItemOption option : this.options) {
+            if (option.id == id) {
+                return option;
+            }
+        }
+        return null;
+    }
+
+
+    public Item clone() {
+        Item item = new Item();
+        item.template = this.template;
+        if (this.options != null) {
+            item.options = new ArrayList<>();
+            for (ItemOption option : this.options) {
+                item.addItemOption(new ItemOption(option.optionTemplate.id, option.param));
+            }
+        }
+        item.id = this.id;
+        item.indexUI = this.indexUI;
+        item.quantity = this.quantity;
+        item.content = this.content;
+        item.info = this.info;
+        item.typeThrow = this.typeThrow;
+        item.isLock = this.isLock;
+        item.isCantSaleForPlay = this.isCantSaleForPlay;
+        item.isCantSale = this.isCantSale;
+        item.require = this.require;
+        item.isNhapThe = this.isNhapThe;
+        return item;
+    }
+
+    public int getExpiry() {
+        ItemOption option = getItemOption(93);
+        if (option != null) {
+            return option.param;
+        }
+        return -1;
+    }
+
+    public ArrayList<ItemOption> getOptions() {
+        ArrayList<ItemOption> options = new ArrayList<>();
+        int damage = 0;
+        int hp = 0;
+        int mp = 0;
+        for (ItemOption o : this.options) {
+            int optionID = o.optionTemplate.id;
+            if (optionID == 50) {
+                damage += o.param;
+            } else if (optionID == 77) {
+                hp += o.param;
+            } else if (optionID == 103) {
+                mp += o.param;
+            } else {
+                options.add(o);
+            }
+        }
+        if (damage > 0) {
+            options.add(new ItemOption(50, damage));
+        }
+        if (hp > 0) {
+            options.add(new ItemOption(77, hp));
+        }
+        if (mp > 0) {
+            options.add(new ItemOption(103, mp));
         }
         return options;
     }

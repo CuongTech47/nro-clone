@@ -2,12 +2,14 @@ package com.ngocrong.backend.network;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -80,7 +82,7 @@ public class Session implements ISession {
     public boolean isEnter = false;
     public String deviceInfo;
     private String ip;
-
+    private final Sender sender;
     public Session(Socket socket, String ip, int id) throws IOException {
         this.socket = socket;
         this.ip = ip;
@@ -89,6 +91,11 @@ public class Session implements ISession {
         this.dos = new DataOutputStream(socket.getOutputStream());
         setHandler(new MessageHandler(this));
         this.messageHandler.onConnectOK();
+        setService(new Service(this));
+        sendThread = new Thread(sender = new Sender());
+        collectorThread = new Thread(new MessageCollector());
+        collectorThread.start();
+        Server.ips.put(ip, Server.ips.getOrDefault(ip, 0) + 1);
     }
 
 
@@ -343,6 +350,8 @@ public class Session implements ISession {
                     return false;
                 }
             }
+
+
             Gson gson = new Gson();
             _char = new Char();
             _char.setId(data.id);
@@ -415,7 +424,7 @@ public class Session implements ISession {
                     try {
                         Item item = new Item();
                         item.load(itemBody.getJSONObject(i));
-                        int index = item.template.getType();
+                        int index = item.template.type;
                         if (index == 32) {
                             index = 6;
                         } else if (index == 23 || index == 24) {
@@ -537,6 +546,9 @@ public class Session implements ISession {
             _char.characterInfo.setCharacter(this._char);
             _char.setStatusItemTime();
             _char.myDisciple = loadDisciple(-_char.getId());
+
+
+
         } catch (Exception ex) {
             logger.error("loadChar", ex);
         }
@@ -579,7 +591,7 @@ public class Session implements ISession {
                 for (int i = 0; i < lent; i++) {
                     Item item = new Item();
                     item.load(itemBody.getJSONObject(i));
-                    int index = item.template.getType();
+                    int index = item.template.type;
                     if (index == 32) {
                         index = 6;
                     }
@@ -670,5 +682,159 @@ public class Session implements ISession {
         isConnected = true;
         sendThread.start();
         messageHandler.setService(service);
+    }
+
+    public void setClientType(Message mss) throws IOException {
+        if (!this.isSetClientInfo) {
+            this.zoomLevel = mss.getReader().readByte();
+            this.width = mss.getReader().readInt();
+            this.height = mss.getReader().readInt();
+            device = mss.getReader().readByte();
+            version = mss.getReader().readUTF();
+            if (zoomLevel < 1 || zoomLevel > 4 || mss.getReader().available() > 0) {
+                disconnect();
+                return;
+            }
+            if (!version.equals(Server.VERSION)) {
+                ((Service) this.service).dialogMessage("Vui lòng tải phiên bản mới tại ngocrongonline.com");
+                return;
+            }
+            this.isSetClientInfo = true;
+            Service sv = (Service) this.service;
+            sv.setResource();
+            sv.sendResVersion();
+        }
+    }
+
+    public void getImageSource(Message mss) {
+        try {
+            byte action = mss.getReader().readByte();
+            if (action == 1) {
+                Service sv = (Service) service;
+                String folder = "resources/data/" + zoomLevel;
+                ArrayList<String> datas = new ArrayList<>();
+                File file = new File(folder);
+                addPath(datas, file);
+                sv.size(datas.size());
+                for (String path : datas) {
+                    sv.download(path);
+                }
+                sv.downloadOk();
+                sv.setLinkListServer();
+            }
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    private void addPath(ArrayList<String> datas, File file) {
+        if (file.isFile()) {
+            datas.add(file.getPath());
+        } else {
+            for (File f : Objects.requireNonNull(file.listFiles())) {
+                addPath(datas, f);
+            }
+        }
+    }
+
+    public void finishUpdate() {
+        if (user != null) {
+            if (loadChar()) {
+                if (_char != null) {
+                    enter();
+                } else {
+                    Service sv = (Service) service;
+                    sv.createChar();
+                }
+            }
+        }
+    }
+
+    class MessageCollector implements Runnable {
+
+        @Override
+        public void run() {
+            while (!socket.isClosed() && dis != null) {
+                try {
+                    Message message = readMessage();
+                    try {
+                        if (message.getCommand() == Cmd.GET_SESSION_ID) {
+                            generateKey(10);
+                            sendKey();
+                        } else {
+                            messageHandler.onMessage(message);
+                        }
+                    } finally {
+                        message.cleanup();
+                    }
+                } catch (Exception e) {
+                    break;
+                }
+            }
+            close();
+        }
+
+        private Message readMessage() throws IOException {
+            // read message command
+            byte cmd = dis.readByte();
+            if (isConnected) {
+                cmd = readKey(cmd);
+            }
+            // read size of data
+            int size;
+            if (isConnected) {
+                byte b1 = dis.readByte();
+                byte b2 = dis.readByte();
+                size = (readKey(b1) & 0xff) << 8 | readKey(b2) & 0xff;
+            } else {
+                size = dis.readUnsignedShort();
+            }
+            byte data[] = new byte[size];
+            int len = 0;
+            int byteRead = 0;
+            while (len != -1 && byteRead < size) {
+                len = dis.read(data, byteRead, size - byteRead);
+                if (len > 0) {
+                    byteRead += len;
+                }
+            }
+            if (isConnected) {
+                for (int i = 0; i < data.length; i++) {
+                    data[i] = readKey(data[i]);
+                }
+            }
+            return new Message(cmd, data);
+        }
+    }
+
+    private class Sender implements Runnable {
+
+        private final ArrayList<Message> sendingMessage;
+
+        public Sender() {
+            sendingMessage = new ArrayList<>();
+        }
+
+        public void addMessage(Message message) {
+            sendingMessage.add(message);
+        }
+
+        @Override
+        public void run() {
+            try {
+                while (isConnected()) {
+                    while (sendingMessage.size() > 0) {
+                        Message m = sendingMessage.get(0);
+                        doSendMessage(m);
+                        sendingMessage.remove(0);
+                    }
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                    }
+                }
+            } catch (IOException e) {
+            }
+        }
     }
 }

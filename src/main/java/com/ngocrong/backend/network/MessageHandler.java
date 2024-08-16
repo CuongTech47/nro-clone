@@ -37,134 +37,134 @@ public class MessageHandler implements IMessageHandler{
                     case Cmd.LOGIN2:
                         service.dialogMessage("Đăng ký tài khoản tại Ngọc Rồng Online");
                         break;
-//                    case Cmd.NOT_LOGIN:
-//                        messageNotLogin(mss);
-//                        break;
-//                    case Cmd.NOT_MAP:
-//                        this.messageNotMap(mss);
-//                        break;
-//                    case Cmd.GET_IMAGE_SOURCE:
-//                        session.getImageSource(mss);
-//                        break;
+                    case Cmd.NOT_LOGIN:
+                        messageNotLogin(mss);
+                        break;
+                    case Cmd.NOT_MAP:
+                        this.messageNotMap(mss);
+                        break;
+                    case Cmd.GET_IMAGE_SOURCE:
+                        session.getImageSource(mss);
+                        break;
 //                    case Cmd.LUCKY_ROUND:
 //                        if (_char != null && _char.zone != null) {
 //                            _char.luckyRound(mss);
 //                        }
 //                        break;
-//                    case Cmd.UPDATE_DATA:
-//                        if (session.user != null) {
-//                            service.updateData();
-//                        }
-//                        break;
-//
-//                    case Cmd.CHECK_MOVE:
-//                        if (_char != null && _char.zone != null) {
-//                            _char.checkMove(mss);
-//                        }
-//                        break;
-//                    case Cmd.REQUEST_PEAN:
-//                        if (_char != null && _char.zone != null) {
-//                            _char.requestPean();
-//                        }
-//                        break;
-//                    case Cmd.ACHIEVEMENT:
-//                        if (_char != null && _char.zone != null) {
-//                            _char.achievement(mss);
-//                        }
-//                        break;
-//                    case Cmd.FINISH_UPDATE:
-//                        session.finishUpdate();
-//                        break;
-//                    case Cmd.REQUEST_ICON:
-//                        if (_char != null) {
-//                            service.requestIcon(mss);
-//                        }
-//                        break;
-//                    case Cmd.GET_BAG:
-//                        if (_char != null) {
-//                            service.getBag(mss);
-//                        }
-//                        break;
-//                    case Cmd.REQUEST_NPCTEMPLATE:
-//                        if (_char != null && _char.zone != null) {
-//                            service.requestMobTemplate(mss);
-//                        }
-//                        break;
-//                    case Cmd.UPDATE_CAPTION:
-//                        if (_char != null) {
-//                            service.updateCaption(mss);
-//                        }
-//                        break;
-//                    case Cmd.GET_EFFDATA:
-//                        if (_char != null && _char.zone != null) {
-//                            service.requestEffectData(mss);
-//                        }
-//                        break;
-//                    case Cmd.FINISH_LOADMAP:
-//                        if (_char != null) {
-//                            _char.finishLoadMap();
-//                        }
-//                        break;
-//                    case Cmd.RADA_CARD:
-//                        if (_char != null) {
-//                            _char.collectionBookACtion(mss);
-//                        }
-//                        break;
-//                    case Cmd.SPEACIAL_SKILL:
-//                        if (_char != null) {
-//                            _char.specialSkill(mss);
-//                        }
-//                        break;
-//                    case Cmd.MAP_TRASPORT:
-//                        if (_char != null && _char.zone != null) {
-//                            _char.mapTransport(mss);
-//                        }
-//                        break;
-//                    case Cmd.PLAYER_MOVE:
-//                        if (_char != null && _char.zone != null) {
-//                            _char.move(mss);
-//                        }
-//                        break;
-//                    case Cmd.CHAT_MAP:
-//                        if (_char != null && _char.zone != null) {
-//                            _char.chatMap(mss);
-//                        }
-//                        break;
-//                    case Cmd.MAP_CHANGE:
-//                        if (_char != null && _char.zone != null) {
-//                            _char.requestChangeMap();
-//                        }
-//                        break;
-//                    case Cmd.BACKGROUND_TEMPLATE:
-//                        if (_char != null && _char.zone != null) {
-//                            service.requestBackgroundItem(mss);
-//                        }
-//                        break;
-//                    case Cmd.MAP_OFFLINE:
-//                        if (_char != null && _char.zone != null) {
-//                            _char.mapOffline();
-//                        }
-//                        break;
-//                    case Cmd.GET_ITEM:
-//                        if (_char != null) {
-//                            _char.getItem(mss);
-//                        }
-//                        break;
-//                    case Cmd.CHANGE_ONSKILL:
-//                        if (_char != null) {
-//                            _char.changeOnSkill(mss);
-//                        }
-//                        break;
-//                    case Cmd.OPEN_UI_MENU:
-//                        if (_char != null && _char.zone != null) {
-//                            _char.openUIMenu(mss);
-//                        }
-//                        break;
-//                    case Cmd.MENU:
-//                        if (_char != null && _char.zone != null) {
-//                            _char.menu(mss);
-//                        }
-//                        break;
+                    case Cmd.UPDATE_DATA:
+                        if (session.user != null) {
+                            service.updateData();
+                        }
+                        break;
+
+                    case Cmd.CHECK_MOVE:
+                        if (_char != null && _char.zone != null) {
+                            _char.checkMove(mss);
+                        }
+                        break;
+                    case Cmd.REQUEST_PEAN:
+                        if (_char != null && _char.zone != null) {
+                            _char.requestPean();
+                        }
+                        break;
+                    case Cmd.ACHIEVEMENT:
+                        if (_char != null && _char.zone != null) {
+                            _char.achievement(mss);
+                        }
+                        break;
+                    case Cmd.FINISH_UPDATE:
+                        session.finishUpdate();
+                        break;
+                    case Cmd.REQUEST_ICON:
+                        if (_char != null) {
+                            service.requestIcon(mss);
+                        }
+                        break;
+                    case Cmd.GET_BAG:
+                        if (_char != null) {
+                            service.getBag(mss);
+                        }
+                        break;
+                    case Cmd.REQUEST_NPCTEMPLATE:
+                        if (_char != null && _char.zone != null) {
+                            service.requestMobTemplate(mss);
+                        }
+                        break;
+                    case Cmd.UPDATE_CAPTION:
+                        if (_char != null) {
+                            service.updateCaption(mss);
+                        }
+                        break;
+                    case Cmd.GET_EFFDATA:
+                        if (_char != null && _char.zone != null) {
+                            service.requestEffectData(mss);
+                        }
+                        break;
+                    case Cmd.FINISH_LOADMAP:
+                        if (_char != null) {
+                            _char.finishLoadMap();
+                        }
+                        break;
+                    case Cmd.RADA_CARD:
+                        if (_char != null) {
+                            _char.collectionBookACtion(mss);
+                        }
+                        break;
+                    case Cmd.SPEACIAL_SKILL:
+                        if (_char != null) {
+                            _char.specialSkill(mss);
+                        }
+                        break;
+                    case Cmd.MAP_TRASPORT:
+                        if (_char != null && _char.zone != null) {
+                            _char.mapTransport(mss);
+                        }
+                        break;
+                    case Cmd.PLAYER_MOVE:
+                        if (_char != null && _char.zone != null) {
+                            _char.move(mss);
+                        }
+                        break;
+                    case Cmd.CHAT_MAP:
+                        if (_char != null && _char.zone != null) {
+                            _char.chatMap(mss);
+                        }
+                        break;
+                    case Cmd.MAP_CHANGE:
+                        if (_char != null && _char.zone != null) {
+                            _char.requestChangeMap();
+                        }
+                        break;
+                    case Cmd.BACKGROUND_TEMPLATE:
+                        if (_char != null && _char.zone != null) {
+                            service.requestBackgroundItem(mss);
+                        }
+                        break;
+                    case Cmd.MAP_OFFLINE:
+                        if (_char != null && _char.zone != null) {
+                            _char.mapOffline();
+                        }
+                        break;
+                    case Cmd.GET_ITEM:
+                        if (_char != null) {
+                            _char.getItem(mss);
+                        }
+                        break;
+                    case Cmd.CHANGE_ONSKILL:
+                        if (_char != null) {
+                            _char.changeOnSkill(mss);
+                        }
+                        break;
+                    case Cmd.OPEN_UI_MENU:
+                        if (_char != null && _char.zone != null) {
+                            _char.openUIMenu(mss);
+                        }
+                        break;
+                    case Cmd.MENU:
+                        if (_char != null && _char.zone != null) {
+                            _char.menu(mss);
+                        }
+                        break;
 //                    case Cmd.OPEN_UI_ZONE:
 //                        if (_char != null && _char.zone != null) {
 //                            service.openUIZone();
@@ -405,6 +405,36 @@ public class MessageHandler implements IMessageHandler{
                 }
             } catch (Exception ex) {
                 logger.error(String.format("failed! - CMD: %d", command), ex);
+            }
+        }
+    }
+
+    private void messageNotLogin(Message mss) throws IOException {
+        if (mss != null) {
+            if (session.user != null) {
+                return;
+            }
+            byte command = mss.getReader().readByte();
+            try {
+                switch (command) {
+                    case Cmd.LOGIN:
+                        session.login(mss);
+                        break;
+
+                    case Cmd.CLIENT_INFO:
+                        session.setClientType(mss);
+
+                        break;
+
+//                    case 9:
+//                        //System.out.println("bytes size= " + mss.reader().available());
+//                        break;
+                    default:
+                        logger.debug(String.format("Client %d: messageNotLogin: %d", session.id, command));
+                        break;
+                }
+            } catch (Exception ex) {
+                logger.error(String.format("failed! - notLogin: %d", command), ex);
             }
         }
     }

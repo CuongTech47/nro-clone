@@ -1,10 +1,20 @@
 package com.ngocrong.backend.crackball;
 
+import com.ngocrong.backend.character.Char;
+import com.ngocrong.backend.consts.Cmd;
+import com.ngocrong.backend.item.Item;
+import com.ngocrong.backend.item.ItemOption;
+import com.ngocrong.backend.item.ItemTemplate;
 import com.ngocrong.backend.lib.RandomCollection;
+import com.ngocrong.backend.network.Message;
+import com.ngocrong.backend.server.DragonBall;
 import com.ngocrong.backend.server.SQLStatement;
+import com.ngocrong.backend.server.Server;
 import com.ngocrong.backend.server.mysql.MySQLConnect;
 import org.apache.log4j.Logger;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -50,6 +60,93 @@ public class CrackBall {
                 ps.close();
             }
         } catch (SQLException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    private int[] imgs;
+    private byte typePrice;
+    private int price;
+    private int idTicket;
+    private byte type;
+    private Char player;
+    private byte quantity;
+    private volatile RandomCollection<Reward> rd;
+
+    public void setRandom() {
+        this.rd = randoms.get(this.type);
+    }
+
+    public void show() {
+        try {
+            Message ms = new Message(Cmd.LUCKY_ROUND);
+            DataOutputStream ds = ms.getWriter();
+            ds.writeByte(0);
+            ds.writeByte(imgs.length);
+            for (int idImage : this.imgs) {
+                ds.writeShort(idImage);
+            }
+            ds.writeByte(this.typePrice);
+            ds.writeInt(this.price);
+            ds.writeShort(this.idTicket);
+            ds.flush();
+            player.service.sendMessage(ms);
+            ms.cleanup();
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void result() {
+        try {
+            Item itm = player.getItemInBag(idTicket);
+            int numTicket = 0;
+            if (itm != null) {
+                numTicket = itm.quantity;
+            }
+            int q = this.quantity;
+            if (numTicket > q) {
+                numTicket = q;
+            }
+            q -= numTicket;
+            int price = q * this.price;
+            if (typePrice == 0) {
+                if (player.getGold() < price) {
+                    return;
+                }
+                player.addGold(-price);
+            }
+            if (typePrice == 1) {
+                if (player.getTotalGem() < price) {
+                    return;
+                }
+                player.subDiamond(price);
+            }
+            if (itm != null) {
+                player.removeItem(itm.indexUI, numTicket);
+            }
+            Server server = DragonBall.getInstance().getServer();
+            Message ms = new Message(Cmd.LUCKY_ROUND);
+            DataOutputStream ds = ms.getWriter();
+            ds.writeByte(1);
+            ds.writeByte(quantity);
+            for (int i = 0; i < quantity; i++) {
+                Reward rw = rd.next();
+                ItemTemplate itemTemplate = server.iTemplates.get(rw.getItemId());
+                Item item = new Item(itemTemplate.id);
+                item.setDefaultOptions();
+                item.quantity = rw.getQuantity();
+                int expire = rw.getExpire();
+                if (expire != -1) {
+                    item.addItemOption(new ItemOption(93, expire));
+                }
+                player.boxCrackBall.add(item);
+                ds.writeShort(itemTemplate.iconID);
+            }
+            ds.flush();
+            player.service.sendMessage(ms);
+            ms.cleanup();
+        } catch (IOException ex) {
             logger.error("failed!", ex);
         }
     }

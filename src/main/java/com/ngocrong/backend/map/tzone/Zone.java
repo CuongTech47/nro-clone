@@ -1,12 +1,21 @@
 package com.ngocrong.backend.map.tzone;
 
+import com.ngocrong.backend.bot.Boss;
 import com.ngocrong.backend.bot.Escort;
 import com.ngocrong.backend.character.Char;
+import com.ngocrong.backend.character.CharacterInfo;
+import com.ngocrong.backend.consts.ItemTimeName;
+import com.ngocrong.backend.consts.SkillName;
+import com.ngocrong.backend.disciple.Disciple;
 import com.ngocrong.backend.disciple.MiniDisciple;
 import com.ngocrong.backend.item.ItemMap;
+import com.ngocrong.backend.item.ItemTime;
 import com.ngocrong.backend.map.MapService;
 import com.ngocrong.backend.mob.Mob;
 import com.ngocrong.backend.model.Npc;
+import com.ngocrong.backend.network.Message;
+import com.ngocrong.backend.skill.Skill;
+import com.ngocrong.backend.skill.SpecialSkill;
 import com.ngocrong.backend.task.Task;
 import com.ngocrong.backend.util.Utils;
 import org.apache.log4j.Logger;
@@ -375,7 +384,7 @@ public class Zone extends Thread{
     }
 
     public void addItemMap(ItemMap itemMap) {
-        if (itemMap.item.template.getType() == 22) {
+        if (itemMap.item.template.type == 22) {
             lockSatellite.writeLock().lock();
             try {
                 satellites.add(itemMap);
@@ -392,17 +401,443 @@ public class Zone extends Thread{
         }
     }
 
+    public List<Char> getMemberSameClan(Char _c) {
+        List<Char> list = new ArrayList<>();
+        if (_c != null && _c.clan != null) {
+            lockChar.readLock().lock();
+            try {
+                for (Char _char : chars) {
+                    if (_char.clan == _c.clan) {
+                        list.add(_char);
+                    }
+                }
+            } finally {
+                lockChar.readLock().unlock();
+            }
+        }
+        return list;
+    }
 
-//    public void sendMessage(Message ms, Char _char) {
-//        zone.lockChar.readLock().lock();
-//        try {
-//            for (Char _c : zone.chars) {
-//                if (_c != _char) {
-//                    _c.service.sendMessage(ms);
+    public void attackPlayer(Char _char, Char target) {
+        if (_char.isDead() || (target.isDead() && _char.select.template.id != SkillName.TRI_THUONG)) {
+            return;
+        }
+        ArrayList<Char> targets = new ArrayList<>();
+        targets.add(target);
+        Skill skill = _char.select;
+        if (skill == null) {
+            return;
+        }
+        if (_char.characterInfo.getStamina() <= 0) {
+            _char.service.serverMessage("Thể lực đã cạn, hãy nghỉ ngơi lấy lại sức");
+            return;
+        }
+        long manaUse = skill.manaUse;
+        if (skill.template.manaUseType == 1) {
+            manaUse = Utils.percentOf(_char.characterInfo.getFullMP(), manaUse);
+        }
+        if (_char.isSkillSpecial() || _char.isBoss()) {
+            manaUse = 0;
+        }
+        if (_char.characterInfo.getMp() < manaUse) {
+            _char.service.serverMessage("Không đủ KI đế sử dụng");
+            return;
+        }
+        if (skill.template.type == 3) {
+            return;
+        }
+        int distance1 = Utils.getDistance(_char.getX(), _char.getY(), target.getX(), target.getY());
+        int distance2 = Utils.getDistance(0, 0, skill.dx, skill.dy);
+        //if (!_char.select.isCooldown() || (_char.isSkillSpecial() && ((!_char.isCharge() && _char.getSeconds() == 0) || (_char.getSeconds() >= 500 && _char.getSeconds() <= 1000)))) {
+        if (!skill.isCooldown() || _char.isSkillSpecial()) {
+            int percentDame = skill.damage;
+            boolean isMiss = Utils.nextInt(100) < target.characterInfo.getAccuracyPercent();
+            boolean isCrit = Utils.nextInt(100) < _char.characterInfo.getFullCritical();
+            if (_char.isCritFirstHit()) {
+                isCrit = true;
+                _char.setCritFirstHit(false);
+            }
+            if (target.getHold() != null && target.isHeld() && target.getHold().getDetainee() == target) {
+                isCrit = true;
+            }
+            SpecialSkill sp = _char.getSpecialSkill();
+            switch (skill.template.id) {
+                case SkillName.QUA_CAU_KENH_KHI:
+                    isMiss = false;
+                    break;
+                case SkillName.THOI_MIEN: {
+
+                    _char.characterInfo.setMp(_char.characterInfo.getMp() - manaUse);
+                    mapService.setSkillPaint_2(_char, targets, (byte) skill.id);
+                    ItemTime item = new ItemTime(ItemTimeName.THOI_MIEN, 3782, percentDame, false);
+                    target.addItemTime(item);
+                    target.setSleep(true);
+                    mapService.setEffect(null, target.getId(), Skill.ADD_EFFECT, Skill.CHARACTER, (byte) 41);
+                    if (sp != null) {
+                        if (sp.id == 17) {
+                            _char.setPercentDamageBonus(sp.param);
+                        }
+                    }
+                    return;
+                }
+                case SkillName.DICH_CHUYEN_TUC_THOI: {
+                    _char.setX(target.getX());
+                    _char.setY(target.getY());
+                    mapService.setEffect(null, target.getId(), Skill.ADD_EFFECT, Skill.CHARACTER, (byte) 40);
+                    ItemTime item = new ItemTime(ItemTimeName.DICH_CHUYEN_TUC_THOI, 3779, 3, false);
+                    target.addItemTime(item);
+                    target.setBlind(true);
+                    percentDame = 200 + (skill.point * 10);
+                    _char.setCritFirstHit(true);
+                    if (sp != null) {
+                        if (sp.id == 16) {
+                            _char.setPercentDamageBonus(sp.param);
+                        }
+                    }
+                    break;
+                }
+                case SkillName.BIEN_SOCOLA: {
+                    target.transformIntoChocolate(skill.damage, 30);
+                    _char.characterInfo.setMp(_char.characterInfo.getMp() - manaUse);
+                    mapService.setSkillPaint_2(_char, targets, (byte) skill.id);
+                    _char.setCritFirstHit(true);
+                    if (sp != null) {
+                        if (sp.id == 27) {
+                            _char.setPercentDamageBonus(sp.param);
+                        }
+                    }
+                    return;
+                }
+
+                case SkillName.CHIEU_KAMEJOKO:
+                case SkillName.CHIEU_MASENKO:
+                case SkillName.CHIEU_ANTOMIC:
+                    if (_char.achievements != null) {
+                        _char.achievements.get(4).addCount(1);// Nội công cao cường
+                    }
+                    break;
+                default:
+                    break;
+            }
+            long damageFull = _char.characterInfo.getFullDamage();
+//            if (_char instanceof Broly) {
+//                damageFull = ((Broly) _char).info.hp / 100;
+//            }
+            long dame = damageFull + Utils.percentOf(damageFull, (percentDame - 100));
+            dame = Utils.nextLong(dame - (dame / 10), dame);
+            dame -= Utils.percentOf(dame, target.characterInfo.getOptions()[94]);
+            if ((skill.template.id == SkillName.CHIEU_DAM_GALICK && _char.isSetKakarot()) || (skill.template.id == SkillName.CHIEU_KAMEJOKO && _char.isSetSongoku())) {
+                dame *= 2;
+            }
+            boolean xuyenGiap = false;
+            if (_char.characterInfo.getOptions()[98] > 0 && (skill.template.id == SkillName.CHIEU_KAMEJOKO || skill.template.id == SkillName.CHIEU_MASENKO || skill.template.id == SkillName.CHIEU_ANTOMIC)) {
+                int rd = Utils.nextInt(100);
+                if (rd < _char.characterInfo.getOptions()[98]) {
+                    xuyenGiap = true;
+                }
+            }
+            int pPhanDonCanChien = 0;
+            if (skill.template.id == SkillName.CHIEU_DAM_DRAGON || skill.template.id == SkillName.CHIEU_DAM_DEMON || skill.template.id == SkillName.CHIEU_DAM_GALICK || skill.template.id == SkillName.KAIOKEN || skill.template.id == SkillName.LIEN_HOAN) {
+                if (_char.characterInfo.getOptions()[99] > 0) {
+                    int rd = Utils.nextInt(100);
+                    if (rd < _char.characterInfo.getOptions()[99]) {
+                        xuyenGiap = true;
+                    }
+                }
+                pPhanDonCanChien = _char.characterInfo.getOptions()[15];
+            }
+            if (!xuyenGiap) {
+                dame -= target.characterInfo.getFullDefense();
+            }
+            if (map.isBaseBabidi() && !target.isBoss() && !_char.isBoss()) {
+                dame = target.characterInfo.getFullHP() / 10;
+            }
+            if (dame <= 0) {
+                dame = 1;
+            }
+
+//            if (target instanceof GeneralWhite) {
+//                Mob mob = findMobByTemplateID(22, false);
+//                if (mob != null) {
+//                    isMiss = true;
 //                }
 //            }
-//        } finally {
-//            zone.lockChar.readLock().unlock();
-//        }
-//    }
+            if (target.characterInfo.getOptions()[3] > 0 && (skill.template.id == SkillName.CHIEU_KAMEJOKO || skill.template.id == SkillName.CHIEU_MASENKO || skill.template.id == SkillName.CHIEU_ANTOMIC)) {
+                long mp = Utils.percentOf(dame, target.characterInfo.getOptions()[3]);
+                target.characterInfo.recovery(CharacterInfo.MP, mp);
+                isMiss = true;
+            }
+            if (target.isGiapXen()) {
+                dame /= 2;
+            }
+            if (target.characterInfo.getOptions()[157] > 0) {
+                long pM = target.characterInfo.getMp() * 100 / target.characterInfo.getFullMP();
+                if (pM < 20) {
+                    dame -= Utils.percentOf(dame, target.characterInfo.getOptions()[157]);
+                }
+            }
+            if (sp != null) {
+                if ((sp.id == 1 && skill.template.id == SkillName.CHIEU_DAM_GALICK) || (sp.id == 2 && skill.template.id == SkillName.CHIEU_ANTOMIC) || (sp.id == 3 && _char.isMonkey())
+                        || (sp.id == 11 && skill.template.id == SkillName.CHIEU_DAM_DRAGON) || (sp.id == 12 && skill.template.id == SkillName.CHIEU_KAMEJOKO)
+                        || (sp.id == 21 && skill.template.id == SkillName.CHIEU_DAM_DEMON) || (sp.id == 22 && skill.template.id == SkillName.CHIEU_MASENKO) || (sp.id == 26 && skill.template.id == SkillName.LIEN_HOAN)) {
+                    dame += Utils.percentOf(dame, sp.param);
+                }
+                if (sp.id == 31) {
+                    long pHP = _char.characterInfo.getHp() * 100 / _char.characterInfo.getFullHP();
+                    if (pHP < sp.param) {
+                        isCrit = true;
+                    }
+                }
+            }
+            if (skill.template.id == SkillName.CHIEU_DAM_DRAGON || skill.template.id == SkillName.CHIEU_KAMEJOKO || skill.template.id == SkillName.CHIEU_DAM_DEMON || skill.template.id == SkillName.CHIEU_MASENKO || skill.template.id == SkillName.CHIEU_DAM_GALICK || skill.template.id == SkillName.CHIEU_ANTOMIC || skill.template.id == SkillName.LIEN_HOAN || skill.template.id == SkillName.KAIOKEN) {
+                int percentDamageBonus = _char.getPercentDamageBonus();
+                if (percentDamageBonus > 0) {
+                    dame += Utils.percentOf(dame, percentDamageBonus);
+                    _char.setPercentDamageBonus(0);
+                }
+            }
+            if (skill.template.id == SkillName.MAKANKOSAPPO) {
+                dame = Utils.percentOf(_char.characterInfo.getMp(), percentDame);
+                if (_char.isSetPicolo()) {
+                    dame += dame / 2;
+                }
+                isCrit = false;
+                isMiss = false;
+                _char.characterInfo.setMp(1);
+            } else if (skill.template.id == SkillName.QUA_CAU_KENH_KHI) {
+                long hp = getTotalHP();
+                dame = (hp / 10) + (_char.characterInfo.getFullDamage() * 10);
+                if (target.isBoss()) {
+                    dame /= 2;
+                }
+                if (_char.isSetKirin()) {
+                    dame *= 2;
+                }
+            } else if (skill.template.id == SkillName.LIEN_HOAN) {
+                if (_char.isSetOcTieu()) {
+                    dame += dame / 2;
+                }
+            }
+            if (_char.characterInfo.getOptions()[111] > Utils.nextInt(100)) {
+                isMiss = true;
+            }
+            if (_char.isSkillSpecial()) {
+                isCrit = false;
+            }
+            if (isCrit) {
+                int rd = Utils.nextInt(100);
+                if (rd < target.characterInfo.getOptions()[191]) {
+                    isCrit = false;
+                }
+            }
+            if (isCrit) {
+                dame *= 2;
+                dame += Utils.percentOf(dame, _char.characterInfo.getOptions()[5]);
+            }
+            if (!_char.isSkillSpecial()) {
+//                if (target instanceof Broly) {
+//                    long p = ((Broly) target).info.hpFull / 100;
+//                    if (dame > p) {
+//                        dame = p;
+//                    }
+//                }
+            }
+            if (dame > 0) {
+                long reactDame = Utils.percentOf(dame, target.characterInfo.getOptions()[97] + pPhanDonCanChien);
+                if (reactDame >= _char.characterInfo.getHp()) {
+                    reactDame = _char.characterInfo.getHp() - 1;
+                }
+                if (reactDame > 0) {
+                    if (_char.characterInfo.getHp() > 1) {
+
+                        _char.characterInfo.setHp(_char.characterInfo.getHp() - reactDame);
+                        mapService.attackPlayer(_char, reactDame, false, (byte) 36);
+                    } else if (_char.characterInfo.getHp() == 1) {
+                        mapService.attackPlayer(_char, 0, false, (byte) 36);
+                    }
+                }
+            }
+            if (!isMiss && target.isProtected()) {
+                if (dame > target.characterInfo.getFullHP()) {
+                    target.setTimeForItemtime(0, 0);
+                    target.service.serverMessage("Khiên năng lượng đã vỡ");
+                }
+                dame = 1;
+                if (target.characterInfo.getHp() <= dame) {
+                    isMiss = true;
+                }
+            }
+            if (isMiss) {
+                dame = 0;
+            }
+            if (dame == 0) {
+                isCrit = false;
+            }
+            if (distance1 > distance2 + 50) {
+                dame = 0;
+            }
+//            if (target instanceof MajorMetallitron) {
+//                long p = target.characterInfo.getFullHP() / 100;
+//                if (dame > p) {
+//                    int skillTemplateId = skill.template.id;
+//                    if (skillTemplateId == SkillName.CHIEU_DAM_DRAGON || skillTemplateId == SkillName.CHIEU_DAM_DEMON || skillTemplateId == SkillName.CHIEU_DAM_GALICK) {
+//                        dame = p;
+//                    }
+//                }
+//            }
+            if (dame < 0) {
+                dame = 0;
+            }
+            if (_char.useSkill(target)) {
+                if (!_char.isSkillSpecial()) {
+                    long now = System.currentTimeMillis();
+                    skill.lastTimeUseThisSkill = now;
+                }
+                _char.characterInfo.setMp(_char.characterInfo.getMp() - manaUse);
+                if (!_char.isBoss()) {
+                    _char.characterInfo.updateSatamina(-1);
+                }
+                target.getLock().lock();
+                try {
+                    if (_char.isDead() || target.isDead()) {
+                        return;
+                    }
+                    mapService.setSkillPaint_2(_char, targets, (byte) skill.id);
+                    if (skill.template.id == SkillName.DICH_CHUYEN_TUC_THOI) {
+                        mapService.setPosition(_char, (byte) 1);
+                    }
+                    if (target.myDisciple != null && target.myDisciple.zone == this) {
+                        target.myDisciple.addTarget(_char);
+                    }
+                    if (target.isDisciple()) {
+                        Disciple disciple = (Disciple) target;
+                        disciple.addTarget(_char);
+                    }
+                    if (dame > 0) {
+
+                        target.characterInfo.setHp(target.characterInfo.getHp() - dame);
+                        if (skill.template.id == SkillName.QUA_CAU_KENH_KHI) {
+                            lockMob.readLock().lock();
+                            try {
+                                for (Mob mob : mobs) {
+                                    if (!mob.isDead()) {
+                                        int distance = Utils.getDistance(mob.x, mob.y, target.getX(), target.getY());
+                                        if (distance < distance2) {
+                                            mob.hp -= dame;
+                                            mapService.attackNpc(dame, isCrit, mob, (byte) -1);
+                                            if (mob.hp <= 0) {
+                                                _char.kill(mob);
+                                                mob.startDie(dame, isCrit, _char);
+                                            }
+                                        }
+                                    }
+                                }
+                            } finally {
+                                lockMob.readLock().unlock();
+                            }
+                        }
+                        if (target.isBoss()) {
+                            Boss boss = (Boss) target;
+                            boss.addTarget(_char);
+                        }
+                        _char.characterInfo.recovery(CharacterInfo.HP, Utils.percentOf(dame, _char.characterInfo.getOptions()[95]));
+                        _char.characterInfo.recovery(CharacterInfo.MP, Utils.percentOf(dame, _char.characterInfo.getOptions()[96]));
+                        if (target.isBoss()) {
+                            long exp = dame / 10;
+                            if (exp <= 0) {
+                                exp = 1;
+                            }
+                            _char.addExp(CharacterInfo.POWER_AND_POTENTIAL, exp, true, true);
+                        }
+                    }
+                    mapService.attackPlayer(target, dame, isCrit, (byte) -1);
+                    if (target.characterInfo.getHp() <= 0) {
+                        _char.kill(target);
+                        target.killed(_char);
+                        target.startDie();
+                        if (_char.isAutoPlay()) {
+                            Mob mob = findMob();
+                            if (mob != null) {
+                                _char.setX(mob.x);
+                                _char.setY(mob.y);
+                                mapService.setPosition(_char, (byte) 0);
+                            }
+                        }
+                    }
+                } finally {
+                    target.getLock().unlock();
+                }
+            }
+            _char.setSkillSpecial(false);
+            if (_char.getMobMe() != null) {
+                _char.getMobMe().attack(_char, target);
+            }
+        }
+    }
+
+    private Mob findMob() {
+        lockMob.readLock().lock();
+        try {
+            for (Mob mob : mobs) {
+                if (!mob.isDead()) {
+                    return mob;
+                }
+            }
+        } finally {
+            lockMob.readLock().unlock();
+        }
+        return null;
+    }
+
+    private long getTotalHP() {
+        long totalHP = 0;
+        lockChar.readLock().lock();
+        try {
+            for (Char _c : chars) {
+                if (_c.isHuman()) {
+                    totalHP += _c.characterInfo.getHp();
+                }
+            }
+        } finally {
+            lockChar.readLock().unlock();
+        }
+        lockMob.readLock().lock();
+        try {
+            for (Mob mob : mobs) {
+                totalHP += mob.hp;
+            }
+        } finally {
+            lockMob.readLock().unlock();
+        }
+        return totalHP;
+    }
+
+    private Mob findMobByTemplateID(int id, boolean isDead) {
+        lockMob.readLock().lock();
+        try {
+            for (Mob mob : mobs) {
+                if (mob.isDead() == isDead && mob.templateId == id) {
+                    return mob;
+                }
+            }
+        } finally {
+            lockMob.readLock().unlock();
+        }
+        return null;
+    }
+
+
+    public Npc findNpcByID(int npcId) {
+        lockNpc.readLock().lock();
+        try {
+            for (Npc npc : this.npcs) {
+                if (npc.template.npcTemplateId == npcId) {
+                    return npc;
+                }
+            }
+        } finally {
+            lockNpc.readLock().unlock();
+        }
+        return null;
+    }
 }

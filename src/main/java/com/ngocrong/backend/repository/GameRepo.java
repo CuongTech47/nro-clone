@@ -7,7 +7,7 @@ public class GameRepo {
     public ClanMemberRepo clanMemberRepo;
     public ClanRepo clanRepo;
     public DiscipleRepo discipleRepo;
-
+    public ConsignmentItemRepo consignmentItemRepo;
 
 
     public static GameRepo getInstance() {

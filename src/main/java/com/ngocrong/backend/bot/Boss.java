@@ -3,6 +3,8 @@ package com.ngocrong.backend.bot;
 import com.ngocrong.backend.character.Char;
 import com.ngocrong.backend.character.CharService;
 import com.ngocrong.backend.character.CharacterInfo;
+import com.ngocrong.backend.consts.SkillName;
+import com.ngocrong.backend.map.MapManager;
 import com.ngocrong.backend.map.tzone.KarinForest;
 import com.ngocrong.backend.map.tzone.TMap;
 import com.ngocrong.backend.map.tzone.Zone;
@@ -11,6 +13,7 @@ import com.ngocrong.backend.util.Utils;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Boss extends Char implements IBoss {
     private static Logger logger = Logger.getLogger(Boss.class);
@@ -115,6 +118,15 @@ public abstract class Boss extends Char implements IBoss {
         sendNotificationWhenDead(map.name);
     }
 
+    public void setLocation(int mapID, int zoneID) {
+        TMap map = MapManager.getInstance().getMap(mapID);
+        if (zoneID == -1) {
+            zoneID = map.randomZoneID();
+        }
+        Zone zone = map.getZoneByID(zoneID);
+        setLocation(zone);
+    }
+
     @Override
     public boolean meCanAttack() {
         return !isDead() && !isFreeze() && !isSleep() && !isHeld();
@@ -208,5 +220,54 @@ public abstract class Boss extends Char implements IBoss {
         zone.mapService.move(this);
     }
 
+    @Override
+    public void attack(Object obj) {
+        long now = System.currentTimeMillis();
+        if (now - lastTimeSkillShoot < 1000) {
+            return;
+        }
+        Char target = (Char) obj;
+        Skill skill = selectSkillAttack();
+        if (skill != null) {
+            int d = Utils.getDistance(0, 0, skill.dx, skill.dy);
+            if (skill.template.id == SkillName.CHIEU_KAMEJOKO || skill.template.id == SkillName.CHIEU_MASENKO || skill.template.id == SkillName.CHIEU_ANTOMIC) {
+                lastTimeSkillShoot = now;
+            }
+            this.select = skill;
+            moveTo((short) (target.getX() + Utils.nextInt(-d, d)), target.getY());
+            zone.attackPlayer(this, target);
 
+        }
+    }
+
+    private Skill selectSkillAttack() {
+        List<Skill> list = new ArrayList<>();
+        for (Skill skill : getSkills()) {
+            if (!skill.isCooldown()) {
+                if (skill.template.type == 1) {
+                    list.add(skill);
+                }
+            }
+        }
+        if (list.size() > 0) {
+            int index = Utils.nextInt(list.size());
+            return list.get(index);
+        } else {
+            return null;
+        }
+    }
+
+    private void moveTo(short x, short y) {
+        if (isDead()) {
+            return;
+        }
+        if (isBlind() || isFreeze() || isSleep() || isCharge()) {
+            return;
+        }
+        setX(x);
+        setY(y);
+        if (zone != null) {
+            zone.mapService.move(this);
+        }
+    }
 }

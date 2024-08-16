@@ -217,7 +217,7 @@ public class MagicTree {
     private int getItemCountInBag(Char _char, int itemType) {
         int count = 0;
         for (Item item : _char.itemBag) {
-            if (item != null && item.template.getType() == itemType) {
+            if (item != null && item.template.type == itemType) {
                 count += item.quantity; // Cộng dồn số lượng đậu
             }
         }

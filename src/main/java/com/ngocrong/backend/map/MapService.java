@@ -393,4 +393,107 @@ public class MapService {
             logger.error("failed!", ex);
         }
     }
+
+    public void setIDAuraEff(int playerID, short effID) {
+        zone.lockChar.readLock().lock();
+        try {
+            for (Char _c : zone.chars) {
+                _c.service.setIDAuraEff(playerID, effID);
+            }
+        } finally {
+            zone.lockChar.readLock().unlock();
+        }
+    }
+
+    public void fusion(Char _char, byte type) {
+        zone.lockChar.readLock().lock();
+        try {
+            for (Char _c : zone.chars) {
+                _c.service.fusion(_char, type);
+            }
+        } finally {
+            zone.lockChar.readLock().unlock();
+        }
+    }
+
+    public void chat(Char aChar, String text) {
+        zone.lockChar.readLock().lock();
+        try {
+            for (Char _c : zone.chars) {
+                _c.service.chat(aChar, text);
+            }
+        } finally {
+            zone.lockChar.readLock().unlock();
+        }
+    }
+
+    public void setSkillPaint_2(Char _char, ArrayList<Char> targets, byte skillId) {
+        try {
+            Message mss = new Message(Cmd.PLAYER_ATTACK_PLAYER);
+            DataOutputStream ds = mss.getWriter();
+            ds.writeInt(_char.getId());
+            ds.writeByte(skillId);
+            ds.writeByte(targets.size());
+            for (Char _t : targets) {
+                ds.writeInt(_t.getId());
+            }
+            ds.writeBoolean(false);
+            ds.flush();
+            sendMessage(mss, null);
+            mss.cleanup();
+        } catch (Exception ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void attackNpc(long damage, boolean isCrit, Mob mob, byte eff) {
+        try {
+            if (damage <= -1) {
+                Message msg = new Message(Cmd.NPC_MISS);
+                DataOutputStream ds = msg.getWriter();
+                ds.writeInt(mob.mobId);
+                ds.writeLong(mob.hp);
+                ds.flush();
+                sendMessage(msg, null);
+            } else {
+                Message mss = new Message(Cmd.MOB_HP);
+                DataOutputStream ds = mss.getWriter();
+                ds.writeInt(mob.mobId);
+                ds.writeLong(mob.hp);
+                ds.writeLong(damage);
+                ds.writeBoolean(isCrit);
+                ds.writeByte(eff);
+                ds.flush();
+                sendMessage(mss, null);
+            }
+        } catch (IOException ex) {
+            logger.error("failed!", ex);
+        }
+    }
+
+    public void playerLoadAo(Char _char) {
+        zone.lockChar.readLock().lock();
+        try {
+            for (Char _c : zone.chars) {
+                if (_c != _char) {
+                    _c.service.playerLoadAo(_char);
+                }
+            }
+        } finally {
+            zone.lockChar.readLock().unlock();
+        }
+    }
+
+    public void playerLoadQuan(Char _char) {
+        zone.lockChar.readLock().lock();
+        try {
+            for (Char _c : zone.chars) {
+                if (_c != _char) {
+                    _c.service.playerLoadQuan(_char);
+                }
+            }
+        } finally {
+            zone.lockChar.readLock().unlock();
+        }
+    }
 }
